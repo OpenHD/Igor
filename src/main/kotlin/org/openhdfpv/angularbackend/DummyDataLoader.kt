@@ -63,11 +63,10 @@ class DummyDataLoader {
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono<OpenHdData>()
-            .block() ?: throw RuntimeException("Failed to load data from $jsonUrl")
+            .block() ?: throw RuntimeException("Daten konnten nicht geladen werden")
 
         val listName = deriveListNameFromUrl()
         val endpoint = generateEndpoint(listName)
-
         val savedImages = mutableListOf<ImageEntity>()
 
         jsonData.osList.forEach { categoryJson ->
@@ -79,21 +78,18 @@ class DummyDataLoader {
                 )
             )
 
-            categoryJson.subitems.map { imageJson ->
-                ImageEntity(
-                    name = imageJson.name.trim(),
-                    description = imageJson.description,
-                    icon = imageJson.icon,
-                    url = imageJson.url,
-                    extractSize = imageJson.extractSize,
-                    extractSha256 = imageJson.extractSha256,
-                    imageDownloadSize = imageJson.imageDownloadSize,
-                    releaseDate = imageJson.releaseDate,
-                    initFormat = imageJson.initFormat ?: "systemd",
-                    category = osCategory
-                )
-            }.also {
-                buildImagesRepo.saveAll(it).forEach(savedImages::add)
+            categoryJson.subitems.forEach { imageJson ->
+                val sha256 = imageJson.extractSha256.lowercase().trim()
+                val existingImage = buildImagesRepo.findByExtractSha256(sha256)
+
+                if (existingImage != null) {
+                    handleExistingImage(existingImage, imageJson.url, buildImagesRepo)
+                    savedImages.add(existingImage)
+                } else {
+                    val newImage = createNewImageEntity(imageJson, osCategory)
+                    buildImagesRepo.save(newImage)
+                    savedImages.add(newImage)
+                }
             }
         }
 
@@ -103,11 +99,42 @@ class DummyDataLoader {
                 url = jsonData.imager.url,
                 name = listName,
                 endpoint = endpoint,
-                description = "Automatisch generiert von $jsonUrl",
+                description = "Automatisch generierte Liste",
                 imageEntities = savedImages.toSet()
             )
         )
     }
+
+    private fun handleExistingImage(
+        existingImage: ImageEntity,
+        newUrl: String,
+        repository: BuildImagesRepository
+    ) {
+        if (existingImage.url != newUrl && !existingImage.backupUrls.contains(newUrl)) {
+            val updatedImage = existingImage.copy(
+                backupUrls = (existingImage.backupUrls + newUrl).distinct()
+            )
+            repository.save(updatedImage)
+        }
+    }
+
+    private fun createNewImageEntity(
+        imageJson: ImageJson,
+        category: OsCategory
+    ) = ImageEntity(
+        name = imageJson.name.trim(),
+        description = imageJson.description,
+        icon = imageJson.icon,
+        url = imageJson.url,
+        extractSize = imageJson.extractSize,
+        extractSha256 = imageJson.extractSha256,
+        imageDownloadSize = imageJson.imageDownloadSize,
+        releaseDate = imageJson.releaseDate,
+        initFormat = imageJson.initFormat ?: "systemd",
+        category = category,
+        backupUrls = emptyList()
+    )
+
 
     private fun customExchangeStrategies(objectMapper: ObjectMapper) =
         ExchangeStrategies.builder()

@@ -24,7 +24,7 @@ data class ImageEntity(
     @Column(nullable = false)
     val url: String,
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "backup_urls", nullable = true)
     val backupUrls: List<String> = emptyList(),
 
