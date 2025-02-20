@@ -38,24 +38,27 @@ class DownloadListExporter(
                         "name" to category.name,
                         "description" to category.description,
                         "icon" to category.icon,
-                        "subitems" to imageEntities.map { imageEntity ->
-                            mapOf(
-                                "name" to imageEntity.name,
-                                "description" to imageEntity.description,
-                                "icon" to imageEntity.icon,
-                                "url" to imageEntity.url,
-                                "extract_size" to imageEntity.extractSize,
-                                "extract_sha256" to imageEntity.extractSha256,
-                                "image_download_size" to imageEntity.imageDownloadSize,
-                                "release_date" to imageEntity.releaseDate,
-                                "init_format" to imageEntity.initFormat
-                            )
-                        }
+                        "subitems" to imageEntities
+                            .sortedByDescending { it.releaseDate } // Sortierung nach Datum (neueste zuerst)
+                            .map { imageEntity ->
+                                mapOf(
+                                    "name" to imageEntity.name,
+                                    "description" to imageEntity.description,
+                                    "icon" to imageEntity.icon,
+                                    "url" to imageEntity.url,
+                                    "extract_size" to imageEntity.extractSize,
+                                    "extract_sha256" to imageEntity.extractSha256,
+                                    "image_download_size" to imageEntity.imageDownloadSize,
+                                    "release_date" to imageEntity.releaseDate,
+                                    "init_format" to imageEntity.initFormat
+                                )
+                            }
                     )
                 }
         )
         return ResponseEntity.ok(response)
     }
+
 
     @GetMapping("/request/json")
     fun getRequestBodyAsJson(request: HttpServletRequest): ResponseEntity<Map<String, Any?>> {

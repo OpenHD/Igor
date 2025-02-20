@@ -24,9 +24,13 @@ data class ImageEntity(
     @Column(nullable = false)
     val url: String,
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Column(name = "backup_urls", nullable = true)
+    val backupUrls: List<String> = emptyList(),
+
     val extractSize: Long,
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "extract_sha256", nullable = false, unique = true)
     val extractSha256: String,
 
     val imageDownloadSize: Long,
@@ -35,6 +39,8 @@ data class ImageEntity(
 
     @Column(nullable = false)
     val releaseDate: String,
+
+    val isEnabled: Boolean = true,
 
     @Column(nullable = false)
     val initFormat: String,
