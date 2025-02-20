@@ -1,8 +1,11 @@
 package org.openhdfpv.angularbackend.imager
 
 import jakarta.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import org.openhdfpv.angularbackend.buildartefact.ImageEntity
 import org.openhdfpv.angularbackend.oscategory.OsCategory
+import java.time.LocalDateTime
 
 
 @Entity
@@ -31,5 +34,15 @@ data class ImagesList(
         joinColumns = [JoinColumn(name = "list_id")],
         inverseJoinColumns = [JoinColumn(name = "image_id")]
     )
-    val imageEntities: Set<ImageEntity> = HashSet()
+    val imageEntities: Set<ImageEntity> = HashSet(),
+
+    // Erstellungszeitpunkt
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    val createdAt: LocalDateTime = LocalDateTime.MIN,
+
+    // Aktualisierungszeitpunkt
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    val updatedAt: LocalDateTime = LocalDateTime.MIN
 )

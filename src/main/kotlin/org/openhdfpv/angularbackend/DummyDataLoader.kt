@@ -24,57 +24,63 @@ class DummyDataLoader {
         return CommandLineRunner { _ ->
             // Kategorien erstellen
             val osCategory1 = OsCategory(
-                name = "Android",
-                description = "Android devices and OS",
-                icon = "android.png"
+                name = "OpenHD Evo Raspberry",
+                description = "Images for Raspberry-Pi SBC's",
+                icon = "https://upload.wikimedia.org/wikipedia/de/thumb/c/cb/Raspberry_Pi_Logo.svg/570px-Raspberry_Pi_Logo.svg.png"
             )
 
             val osCategory2 = OsCategory(
-                name = "Linux",
-                description = "Linux Distributions",
-                icon = "linux.png"
+                name = "OpenHD Evo Radxa",
+                description = "Images for Radxa SBC's",
+                icon = "https://forum.radxa.com/uploads/default/original/1X/afb83a5d13f03ccc5f26a0c5800a02e320b06468.png"
             )
 
-            val savedCategories = osCategoryRepo.saveAll(listOf(osCategory1, osCategory2))
+            val osCategory3 = OsCategory(
+                name = "OpenHD Evo X86",
+                description = "Images for normal Computers",
+                icon = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/ImageWriter/x86.png"
+            )
+
+            val savedCategories = osCategoryRepo.saveAll(listOf(osCategory1, osCategory2, osCategory3))
 
             // Images erstellen und Kategorien zuweisen
             val image1 = ImageEntity(
-                name = "Android 11 Image",
-                description = "Latest Android 11 release",
-                icon = "android11.png",
-                url = "https://example.com/android11.img",
-                extractSize = 1024 * 1024 * 2L, // Beispielgröße: 2MB
-                extractSha256 = "abcdef1234567890",
-                imageDownloadSize = 20480, // Beispielgröße: 20MB
-                releaseDate = "2023-01-01",
-                initFormat = "img",
+                name = "OpenHD-2.5.3-evo",
+                description = "Improved OS, frequencies,...",
+                icon = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/ImageWriter/rpi-ohd.png",
+                url = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/OpenHD-image-pi-bullseye-configurable-release-2024-01-08_1550.img.xz",
+                extractSize = 2866950656,
+                extractSha256 = "b6dafb8cf2c3e3c9e4f3e3ad427a2f25a02b55b45334863b6bd595c71b37bda5",
+                imageDownloadSize = 754596864,
+                releaseDate = "2024-01-08",
+                initFormat = "systemd",
                 category = savedCategories.first()
             )
 
             val image2 = ImageEntity(
-                name = "Ubuntu 22.04",
-                description = "Ubuntu LTS version",
-                icon = "ubuntu22.png",
-                url = "https://example.com/ubuntu22.img",
-                extractSize = 1024 * 1024 * 5L, // Beispielgröße: 5MB
-                extractSha256 = "123456abcdef7890",
-                imageDownloadSize = 51200, // Beispielgröße: 50MB
-                releaseDate = "2022-04-01",
-                initFormat = "img",
-                category = savedCategories.last() // Linux-Kategorie
+                name = "OpenHD-2.4.1-evo Rock5B",
+                description = "Added custom kernel and 8812bu support, only Ground",
+                icon = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/OpenHD-advanced.png",
+                url = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/OpenHD-image-rock5b--2.4-evo-2023-06-30_2230.img.xz",
+                extractSize = 14500000256,
+                extractSha256 = "399ba04a68a7f0872a9239f096fc0da8c2aacb56b5d0d028fe3e8822f971fa2d",
+                imageDownloadSize = 1698576940,
+                releaseDate = "2023-06-30",
+                initFormat = "systemd",
+                category = savedCategories[1] // Radxa category
             )
 
             val image3 = ImageEntity(
-                name = "Custom Linux Distro",
-                description = "Custom designed Linux distribution",
-                icon = "custom_linux.png",
-                url = "https://example.com/custom_linux.img",
-                extractSize = 1024 * 1024 * 3L,
-                extractSha256 = "0987654321fedcba",
-                imageDownloadSize = 30720, // 30MB
-                releaseDate = "2023-02-15",
-                initFormat = "iso",
-                category = savedCategories.last()
+                name = "OpenHD-2.4.1-evo",
+                description = "updated to latest OpenHD/QOpenHD",
+                icon = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/ImageWriter/x86-ohd.png",
+                url = "https://fra1.digitaloceanspaces.com/openhd-images/Downloader/release/OpenHD-image-x86-jammy--2.4-evo-2023-06-30_2230.img.xz",
+                extractSize = 16500000256,
+                extractSha256 = "8cecff8366272328694382dc5f644b5c962e9876a11428090256379170396253",
+                imageDownloadSize = 5616280016,
+                releaseDate = "2023-06-30",
+                initFormat = "systemd",
+                category = savedCategories.last() // X86 category
             )
 
             // Images speichern
@@ -82,25 +88,34 @@ class DummyDataLoader {
 
             // ImageLists erstellen und mit Images verknüpfen
             val imagesList1 = ImagesList(
-                latestVersion = "v1.0",
-                url = "https://example.com/list1",
-                name = "Official Images",
-                endpoint = "list1",
-                description = "Official image collection for Android and Linux",
-                imageEntities = setOf(savedImages[0], savedImages[1]) // Verknüpft Android mit Ubuntu
+                latestVersion = "2.0.4-OpenHD",
+                url = "https://openhdfpv.org/#downloads",
+                name = "OpenHD Raspberry List",
+                endpoint = "raspberry",
+                description = "Raspberry Pi Image Collection",
+                imageEntities = setOf(savedImages[0]) // Verknüpft Raspberry
             )
 
             val imagesList2 = ImagesList(
-                latestVersion = "v2.0",
-                url = "https://example.com/list2",
-                name = "Custom Images",
-                endpoint = "list2",
-                description = "Custom Linux images",
-                imageEntities = setOf(savedImages[0],savedImages[2]) // Verknüpft nur Custom Linux
+                latestVersion = "2.0.4-OpenHD",
+                url = "https://openhdfpv.org/#downloads",
+                name = "OpenHD Radxa List",
+                endpoint = "radxa",
+                description = "Radxa Image Collection",
+                imageEntities = setOf(savedImages[1]) // Verknüpft Radxa
+            )
+
+            val imagesList3 = ImagesList(
+                latestVersion = "2.0.4-OpenHD",
+                url = "https://openhdfpv.org/#downloads",
+                name = "OpenHD X86 List",
+                endpoint = "x86",
+                description = "X86 Image Collection",
+                imageEntities = setOf(savedImages[2]) // Verknüpft X86
             )
 
             // ImageLists speichern
-            imagesListRepo.saveAll(listOf(imagesList1, imagesList2))
+            imagesListRepo.saveAll(listOf(imagesList1, imagesList2, imagesList3))
         }
     }
 }
