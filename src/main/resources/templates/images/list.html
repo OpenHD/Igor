@@ -30,7 +30,7 @@
         <div class="card shadow">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">OS Image Management</h4>
-                <a th:href="@{/admin/images/create}" class="btn btn-light btn-sm">
+                <a href="#" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#editImageModal">
                     <i class="bi bi-plus-lg"></i> New OS Image
                 </a>
             </div>
@@ -53,13 +53,18 @@
                         <tr th:each="image : ${images}"
                             class="table-row-click"
                             th:attr="data-id=${image.id},
-                                     data-name=${image.name},
-                                     data-description=${image.description},
-                                     data-category=${image.category?.name},
-                                     data-enabled=${image.isEnabled},
-                                     data-available=${image.isAvailable},
-                                     data-icon=${image.icon},
-                                     data-redirects=${image.redirectsCount}">
+             data-name=${image.name},
+             data-description=${image.description},
+             data-category=${image.category?.name},
+             data-enabled=${image.isEnabled},
+             data-available=${image.isAvailable},
+             data-icon=${image.icon},
+             data-url=${image.url},
+             data-backup-urls=${#strings.listJoin(image.backupUrls, ',')},
+             data-extract-size=${image.extractSize},
+             data-extract-sha256=${image.extractSha256},
+             data-image-download-size=${image.imageDownloadSize},
+             data-redirects=${image.redirectsCount}">
 
                             <td>
                                 <img th:src="${#strings.startsWith(image.icon, 'http') ? image.icon : '/images/icons/' + image.icon}"
@@ -217,6 +222,10 @@
                     // Backup URLs initialisieren
                     const backupUrls = dataset.backupurls ? dataset.backupurls.split(',') : [];
                     initBackupUrls(backupUrls);
+
+                    // Modal-Titel anpassen für neue/editiere Images
+                    document.querySelector('.modal-title').textContent =
+                        dataset.id ? 'Edit OS Image' : 'New OS Image';
 
                     editModal.show();
                 });
@@ -384,6 +393,14 @@
                     showToast('danger', `Status update failed: ${error.message}`);
                 });
         }
+
+        document.querySelector('[data-bs-target="#editImageModal"]').addEventListener('click', () => {
+            document.getElementById('editImageForm').reset();
+            document.querySelector('.modal-title').textContent = 'New OS Image';
+            document.getElementById('imageId').value = '';
+            initBackupUrls([]);
+            updateIconPreview('');
+        });
     </script>
 </th:block>
 
