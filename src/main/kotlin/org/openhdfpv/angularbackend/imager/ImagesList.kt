@@ -28,7 +28,7 @@ data class ImagesList(
     @Column(nullable = false)
     val description: String = "", // Default value added
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "list_images",
         joinColumns = [JoinColumn(name = "list_id")],

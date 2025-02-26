@@ -3,14 +3,16 @@ package org.openhdfpv.angularbackend.buildartefact
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
+import org.hibernate.annotations.UuidGenerator
 import org.openhdfpv.angularbackend.oscategory.OsCategory
 import java.time.LocalDateTime
+import java.util.*
 
 
 @Entity
 data class ImageEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    @Id @org.hibernate.annotations.UuidGenerator(style = UuidGenerator.Style.AUTO)
+    val id: UUID? = null,
 
     @Column(nullable = false)
     val name: String,
@@ -30,7 +32,7 @@ data class ImageEntity(
 
     val extractSize: Long,
 
-    @Column(name = "extract_sha256", nullable = false, unique = true)
+    @Column(name = "extract_sha256", nullable = false, unique = false)
     val extractSha256: String,
 
     val imageDownloadSize: Long,
@@ -42,12 +44,16 @@ data class ImageEntity(
 
     val isEnabled: Boolean = true,
 
+    val isDeleted: Boolean = false,
+
+    val isAvailable: Boolean = false, // automatic periodically available checks
+
     @Column(nullable = false)
     val initFormat: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    val category: OsCategory,
+    @JoinColumn(name = "category_id", nullable = true)
+    val category: OsCategory? = null,
 
     // Erstellungszeitpunkt
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -58,4 +64,6 @@ data class ImageEntity(
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     val updatedAt: LocalDateTime = LocalDateTime.MIN
+
+
 )

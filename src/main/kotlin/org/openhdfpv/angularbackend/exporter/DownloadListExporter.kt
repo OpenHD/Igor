@@ -5,16 +5,19 @@ import org.openhdfpv.angularbackend.oscategory.OsCategoryRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
+import org.openhdfpv.angularbackend.imager.ImageListService
 import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/api")
 class DownloadListExporter(
-    private val imagesListRepository: ImagesListRepository
+    private val imagesListRepository: ImagesListRepository,
+    private val imageListService: ImageListService
+
 ) {
 
     @PreAuthorize("permitAll()")
-    @GetMapping("/image_list")
+    @GetMapping("/image_list", "image_lists")
     fun getAvailableImageListEndpoints(): ResponseEntity<List<String>> {
         val endpoints = imagesListRepository.findAll().map { it.endpoint }
         return ResponseEntity.ok(endpoints)
@@ -23,44 +26,19 @@ class DownloadListExporter(
 
     @PreAuthorize("permitAll()")
     @GetMapping("/image_list/{endpoint}")
-    fun getImageListByEndpoint(@PathVariable endpoint: String): ResponseEntity<Map<String, Any>> {
-        val imagesList = imagesListRepository.findAll().find { it.endpoint == endpoint }
+    fun getImageListByEndpoint(
+        @PathVariable endpoint: String,
+        request: HttpServletRequest
+    ): ResponseEntity<Map<String, Any>> {
+        val response = imageListService.createImageListResponse(endpoint, request)
             ?: return ResponseEntity.notFound().build()
 
-        val response = mapOf(
-            "imager" to mapOf(
-                "latest_version" to imagesList.latestVersion,
-                "url" to imagesList.url
-            ),
-            "os_list" to imagesList.imageEntities.groupBy { it.category }
-                .map { (category, imageEntities) ->
-                    mapOf(
-                        "name" to category.name,
-                        "description" to category.description,
-                        "icon" to category.icon,
-                        "subitems" to imageEntities
-                            .sortedByDescending { it.releaseDate } // Sortierung nach Datum (neueste zuerst)
-                            .map { imageEntity ->
-                                mapOf(
-                                    "name" to imageEntity.name,
-                                    "description" to imageEntity.description,
-                                    "icon" to imageEntity.icon,
-                                    "url" to imageEntity.url,
-                                    "extract_size" to imageEntity.extractSize,
-                                    "extract_sha256" to imageEntity.extractSha256,
-                                    "image_download_size" to imageEntity.imageDownloadSize,
-                                    "release_date" to imageEntity.releaseDate,
-                                    "init_format" to imageEntity.initFormat
-                                )
-                            }
-                    )
-                }
-        )
         return ResponseEntity.ok(response)
     }
 
 
-    @GetMapping("/request/json")
+
+    @GetMapping("/request")
     fun getRequestBodyAsJson(request: HttpServletRequest): ResponseEntity<Map<String, Any?>> {
         val headers = request.headerNames.toList().associateWith { request.getHeader(it) }
         val parameters = request.parameterMap.mapValues { it.value.joinToString(", ") }

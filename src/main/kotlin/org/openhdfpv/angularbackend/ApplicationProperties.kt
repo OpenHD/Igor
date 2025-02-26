@@ -1,3 +1,5 @@
+package org.openhdfpv.angularbackend
+
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
 
