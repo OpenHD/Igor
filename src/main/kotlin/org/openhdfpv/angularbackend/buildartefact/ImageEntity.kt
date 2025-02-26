@@ -15,38 +15,38 @@ data class ImageEntity(
     val id: UUID? = null,
 
     @Column(nullable = false)
-    val name: String,
+    var name: String,
 
     @Column(nullable = false)
-    val description: String,
+    var description: String,
 
     @Column(nullable = false)
-    val icon: String,
+    var icon: String,
 
     @Column(nullable = false)
-    val url: String,
+    var url: String,
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "backup_urls", nullable = true)
-    val backupUrls: List<String> = emptyList(),
+    var backupUrls: List<String> = emptyList(),
 
-    val extractSize: Long,
+    var extractSize: Long,
 
-    @Column(name = "extract_sha256", nullable = false, unique = false)
-    val extractSha256: String,
+    @Column(name = "extract_sha256", nullable = true, unique = false)
+    var extractSha256: String? = null,
 
-    val imageDownloadSize: Long,
+    var imageDownloadSize: Long,
 
     val redirectsCount: Long = 0L,
 
     @Column(nullable = false)
     val releaseDate: String,
 
-    val isEnabled: Boolean = true,
+    var isEnabled: Boolean = true,
 
     val isDeleted: Boolean = false,
 
-    val isAvailable: Boolean = false, // automatic periodically available checks
+    var isAvailable: Boolean = false, // automatic periodically available checks
 
     @Column(nullable = false)
     val initFormat: String,
@@ -64,6 +64,4 @@ data class ImageEntity(
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     val updatedAt: LocalDateTime = LocalDateTime.MIN
-
-
 )

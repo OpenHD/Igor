@@ -2,11 +2,14 @@ package org.openhdfpv.angularbackend.imager
 
 import jakarta.servlet.http.HttpServletRequest
 import org.openhdfpv.angularbackend.ApplicationProperties
+import org.openhdfpv.angularbackend.buildartefact.BuildImagesRepository
+import org.openhdfpv.angularbackend.buildartefact.ImageEntity
 import org.springframework.stereotype.Service
 
 @Service
 class ImageListService(
     private val imagesListRepository: ImagesListRepository,
+    private val buildImagesRepository: BuildImagesRepository,
     private val applicationProperties: ApplicationProperties // ApplicationProperties als Dependency
 ) {
 
@@ -61,4 +64,82 @@ class ImageListService(
             "$scheme://$host:$port$path"
         }
     }
+
+    // ImagesList erstellen
+    fun createImagesList(imagesList: ImagesList): ImagesList {
+        if (imagesListRepository.findByName(imagesList.name).isPresent) {
+            throw IllegalArgumentException("ImagesList mit dem Namen ${imagesList.name} existiert bereits.")
+        }
+        return imagesListRepository.save(imagesList)
+    }
+
+    // ImagesList aktualisieren
+    fun updateImagesList(imagesListId: Long, updatedData: ImagesList): ImagesList {
+        val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
+            IllegalArgumentException("ImagesList mit ID $imagesListId wurde nicht gefunden.")
+        }
+
+        val updatedImagesList = imagesList.copy(
+            name = updatedData.name,
+            description = updatedData.description,
+            url = updatedData.url,
+            latestVersion = updatedData.latestVersion,
+            endpoint = updatedData.endpoint
+        )
+        return imagesListRepository.save(updatedImagesList)
+    }
+
+    // ImagesList löschen
+    fun deleteImagesList(imagesListId: Long) {
+        val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
+            IllegalArgumentException("ImagesList mit ID $imagesListId wurde nicht gefunden.")
+        }
+        imagesListRepository.delete(imagesList)
+    }
+
+    fun mergeOrCreateImagesList(newData: ImagesList): ImagesList {
+        // Prüfen, ob eine ImagesList mit dem gleichen 'endpoint' bereits existiert
+        val existingList = imagesListRepository.findByEndpoint(newData.endpoint)
+
+        return if (existingList != null) {
+            // Merge Logik: Bestehende Daten aktualisieren
+            val mergedList = existingList.copy(
+                name = newData.name,
+                description = newData.description,
+                imageEntities = mergeImageEntities(existingList.imageEntities, newData.imageEntities)
+            )
+            imagesListRepository.save(mergedList)
+        } else {
+            // Neuen Eintrag erstellen
+            imagesListRepository.save(newData)
+        }
+
+    }
+
+    private fun mergeImageEntities(existingImages: Set<ImageEntity>, newImages: Set<ImageEntity>): Set<ImageEntity> {
+        val merged = existingImages.toMutableSet()
+
+        // Alle neuen Einträge hinzufügen oder bestehende aktualisieren
+        newImages.forEach { newImage ->
+            val existingImage = merged.firstOrNull { it.id == newImage.id }
+            if (existingImage != null) {
+                // Update vorhandener Einträge
+                merged.remove(existingImage)
+                merged.add(existingImage.copy(
+                    name = newImage.name,
+                    description = newImage.description,
+                    url = newImage.url,
+                    releaseDate = newImage.releaseDate
+                ))
+            } else {
+                // Neues Bild hinzufügen
+                merged.add(newImage)
+            }
+        }
+
+        return merged
+    }
+
+
+
 }

@@ -30,6 +30,7 @@ repositories {
 dependencies {
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
