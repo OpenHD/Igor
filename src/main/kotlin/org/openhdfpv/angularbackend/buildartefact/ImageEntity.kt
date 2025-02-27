@@ -14,6 +14,7 @@ data class ImageEntity(
     @Id @org.hibernate.annotations.UuidGenerator(style = UuidGenerator.Style.AUTO)
     val id: UUID? = null,
 
+    // Wichtige
     @Column(nullable = false)
     var name: String,
 
@@ -26,16 +27,15 @@ data class ImageEntity(
     @Column(nullable = false)
     var url: String,
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "backup_urls", nullable = true)
-    var backupUrls: List<String> = emptyList(),
-
     var extractSize: Long,
-
     @Column(name = "extract_sha256", nullable = true, unique = false)
     var extractSha256: String? = null,
 
     var imageDownloadSize: Long,
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "backup_urls", nullable = true)
+    var backupUrls: List<String> = emptyList(),
 
     val redirectsCount: Long = 0L,
 
