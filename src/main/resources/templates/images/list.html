@@ -7,21 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        .table-row-click {
-            cursor: pointer;
-        }
-        .status-toggle {
-            transition: all 0.3s ease;
-        }
-
-        .status-toggle:checked {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-
-        .status-toggle:focus {
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
+        .table-row-click { cursor: pointer; }
+        .status-toggle { transition: all 0.3s ease; }
+        .status-toggle:checked { background-color: #0d6efd; border-color: #0d6efd; }
+        .status-toggle:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
     </style>
 </head>
 <body class="bg-light">
@@ -67,8 +56,9 @@
              data-redirects=${image.redirectsCount}">
 
                             <td>
+                                <!-- Beispiel für Lazy Loading: -->
                                 <img th:src="${#strings.startsWith(image.icon, 'http') ? image.icon : '/images/icons/' + image.icon}"
-                                     alt="icon" width="40" height="40"/>
+                                     alt="icon" width="40" height="40" loading="lazy"/>
                             </td>
                             <td th:text="${image.name}"></td>
                             <td th:text="${image.description}"></td>
@@ -77,7 +67,7 @@
                                 <div class="form-check form-switch">
                                     <input class="form-check-input status-toggle" type="checkbox"
                                            role="switch" th:checked="${image.isEnabled}"
-                                           data-id="${image.id}"
+                                           th:attr="data-id=${image.id}"
                                            onclick="event.stopPropagation(); updateStatus(this);">
                                 </div>
                             </td>
@@ -105,6 +95,9 @@
         </div>
     </div>
 
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 1055;"></div>
+
+    <!-- Modal -->
     <div class="modal fade" id="editImageModal" tabindex="-1" aria-labelledby="editImageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form id="editImageForm" th:action="@{/admin/images/save}" method="post">
@@ -188,56 +181,98 @@
     </div>
 </div>
 
-<<th:block layout:fragment="js_assets">
+<th:block layout:fragment="js_assets">
     <script>
-        // Globale Variablen
-        let editModal;
+        document.addEventListener('DOMContentLoaded', () => {
+            const editModalEl = document.getElementById('editImageModal');
+            const editModal = new bootstrap.Modal(editModalEl);
+            const imagesTable = document.getElementById('imagesTable');
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
-        document.addEventListener('DOMContentLoaded', function () {
-            // Modal initialisieren
-            editModal = new bootstrap.Modal('#editImageModal');
+            // Event Delegation für Zeilenklicks
+            imagesTable.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target.closest('.status-toggle') || target.closest('form')) return;
 
-            // Tabellenzeilen Event Handler
-            document.querySelectorAll('.table-row-click').forEach(row => {
-                row.addEventListener('click', function (e) {
-                    if (e.target.closest('.status-toggle') || e.target.closest('form')) return;
+                const row = target.closest('tr');
+                if (!row) return;
+                const ds = row.dataset;
 
-                    // Daten aus der Zeile holen
-                    const dataset = this.dataset;
+                // Formularfelder setzen
+                document.getElementById('imageId').value = ds.id || '';
+                document.getElementById('imageName').value = ds.name || '';
+                document.getElementById('imageDescription').value = ds.description || '';
+                document.getElementById('imageIcon').value = ds.icon || '';
+                document.getElementById('imageUrl').value = ds.url || '';
+                document.getElementById('extractSize').value = ds.extractSize || '';
+                document.getElementById('extractSha256').value = ds.extractSha256 || '';
+                document.getElementById('imageDownloadSize').value = ds.imageDownloadSize || '';
+                document.getElementById('imageEnabled').checked = (ds.enabled === 'true');
 
-                    // Grunddaten setzen
-                    document.getElementById('imageId').value = dataset.id;
-                    document.getElementById('imageName').value = dataset.name;
-                    document.getElementById('imageDescription').value = dataset.description;
-                    document.getElementById('imageIcon').value = dataset.icon;
-                    document.getElementById('imageUrl').value = dataset.url;
-                    document.getElementById('extractSize').value = dataset.extractsize;
-                    document.getElementById('extractSha256').value = dataset.extractsha256;
-                    document.getElementById('imageDownloadSize').value = dataset.imagedownloadsize;
-                    document.getElementById('imageEnabled').checked = dataset.enabled === 'true';
-
-                    // Icon Preview
-                    updateIconPreview(dataset.icon);
-
-                    // Backup URLs initialisieren
-                    const backupUrls = dataset.backupurls ? dataset.backupurls.split(',') : [];
-                    initBackupUrls(backupUrls);
-
-                    // Modal-Titel anpassen für neue/editiere Images
-                    document.querySelector('.modal-title').textContent =
-                        dataset.id ? 'Edit OS Image' : 'New OS Image';
-
-                    editModal.show();
-                });
+                updateIconPreview(ds.icon);
+                initBackupUrls(ds.backupUrls ? ds.backupUrls.split(',') : []);
+                document.querySelector('.modal-title').textContent = ds.id ? 'Edit OS Image' : 'New OS Image';
+                editModal.show();
             });
 
-            // Icon Preview Handler
-            document.getElementById('imageIcon').addEventListener('input', function(e) {
+            document.getElementById('imageIcon').addEventListener('input', e => {
                 updateIconPreview(e.target.value);
+            });
+
+            document.getElementById('editImageForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const csrfToken = document.querySelector('input[name="_csrf"]').value;
+                const formData = {
+                    id: form.querySelector('#imageId').value || null,
+                    name: form.querySelector('#imageName').value,
+                    description: form.querySelector('#imageDescription').value,
+                    icon: form.querySelector('#imageIcon').value,
+                    url: form.querySelector('#imageUrl').value,
+                    backupUrls: Array.from(form.querySelectorAll('input[name="backupUrls"]')).map(input => input.value),
+                    extractSize: parseInt(form.querySelector('#extractSize').value),
+                    extractSha256: form.querySelector('#extractSha256').value,
+                    imageDownloadSize: parseInt(form.querySelector('#imageDownloadSize').value),
+                    isEnabled: form.querySelector('#imageEnabled').checked,
+                    _csrf: csrfToken
+                };
+
+                try {
+                    const response = await fetch('/admin/images/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || 'Save failed');
+                    }
+                    const savedImage = await response.json();
+                    // Aktualisiere oder füge neuen Eintrag hinzu
+                    updateTableRow(savedImage);
+                    bootstrap.Modal.getInstance(document.getElementById('editImageModal')).hide();
+                    showToast('success', 'Image updated successfully');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('danger', `Error: ${error.message}`);
+                }
+            });
+
+
+            // Reset des Formulars beim Öffnen des Modals
+            document.querySelector('[data-bs-target="#editImageModal"]').addEventListener('click', () => {
+                document.getElementById('editImageForm').reset();
+                document.querySelector('.modal-title').textContent = 'New OS Image';
+                document.getElementById('imageId').value = '';
+                initBackupUrls([]);
+                updateIconPreview('');
             });
         });
 
-        // Icon Preview Funktion
+        // Aktualisiert die Icon-Preview
         function updateIconPreview(url) {
             const preview = document.getElementById('iconPreview');
             if (url) {
@@ -248,139 +283,149 @@
             }
         }
 
-        // Backup URLs Handling
+        // Initialisiert Backup URL Felder
         function initBackupUrls(urls) {
             const container = document.getElementById('backupUrlsContainer');
             container.innerHTML = '';
-            urls.forEach((url, index) => addBackupUrlField(url, index));
+            urls.forEach(url => addBackupUrlField(url));
         }
 
-        function addBackupUrlField(value = '', index = Date.now()) {
+        // Fügt ein einzelnes Backup URL-Feld hinzu
+        function addBackupUrlField(value = '') {
+            const container = document.getElementById('backupUrlsContainer');
             const div = document.createElement('div');
             div.className = 'input-group mb-2';
             div.innerHTML = `
-            <input type="url" class="form-control" name="backupUrls" value="${value}"
-                   placeholder="Backup URL">
-            <button type="button" class="btn btn-outline-danger"
-                    onclick="this.parentElement.remove()">
-                <i class="bi bi-trash"></i>
-            </button>
-        `;
-            document.getElementById('backupUrlsContainer').appendChild(div);
+                <input type="url" class="form-control" name="backupUrls" value="${value}" placeholder="Backup URL">
+                <button type="button" class="btn btn-outline-danger" onclick="this.parentElement.remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(div);
         }
 
-        // Formular Submit Handler
-        document.getElementById('editImageForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const formData = {
-                id: document.getElementById('imageId').value,
-                name: document.getElementById('imageName').value,
-                description: document.getElementById('imageDescription').value,
-                icon: document.getElementById('imageIcon').value,
-                url: document.getElementById('imageUrl').value,
-                backupUrls: Array.from(document.querySelectorAll('input[name="backupUrls"]')).map(input => input.value),
-                extractSize: parseInt(document.getElementById('extractSize').value),
-                extractSha256: document.getElementById('extractSha256').value,
-                imageDownloadSize: parseInt(document.getElementById('imageDownloadSize').value),
-                isEnabled: document.getElementById('imageEnabled').checked,
-                _csrf: document.querySelector('input[name="_csrf"]').value
-            };
-
-            try {
-                const response = await fetch('/admin/images/save', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': formData._csrf
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (!response.ok) {
-                    const error = await response.text();
-                    throw new Error(error || 'Save failed');
-                }
-
-                const savedImage = await response.json();
-                editModal.hide();
-                updateTableRow(savedImage);
-                showToast('success', 'Image updated successfully');
-
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('danger', `Error: ${error.message}`);
-            }
-        });
-
-        // Tabellenzeile aktualisieren
+        // Aktualisiert die entsprechende Tabellenzeile
         function updateTableRow(image) {
-            const row = document.querySelector(`tr[data-id="${image.id}"]`);
-            if (!row) return;
+            let row = document.querySelector(`tr[data-id="${image.id}"]`);
+            if (row) {
+                // Aktualisiere existierende Zeile
+                row.dataset.name = image.name;
+                row.dataset.description = image.description;
+                row.dataset.icon = image.icon;
+                row.dataset.url = image.url;
+                row.dataset.backupUrls = image.backupUrls.join(',');
+                row.dataset.extractSize = image.extractSize;
+                row.dataset.extractSha256 = image.extractSha256;
+                row.dataset.imageDownloadSize = image.imageDownloadSize;
+                row.dataset.enabled = image.isEnabled;
+                row.querySelector('td:nth-child(2)').textContent = image.name;
+                row.querySelector('td:nth-child(3)').textContent = image.description;
+                row.querySelector('td:nth-child(1) img').src =
+                    image.icon.startsWith('http') ? image.icon : `/images/icons/${image.icon}`;
+                row.querySelector('.status-toggle').checked = image.isEnabled;
+            } else {
+                // Erstelle eine neue Tabellenzeile
+                const tbody = document.querySelector('#imagesTable tbody');
+                row = document.createElement('tr');
+                row.classList.add('table-row-click');
+                row.setAttribute('data-id', image.id);
+                row.setAttribute('data-name', image.name);
+                row.setAttribute('data-description', image.description);
+                row.setAttribute('data-icon', image.icon);
+                row.setAttribute('data-url', image.url);
+                row.setAttribute('data-backup-urls', image.backupUrls.join(','));
+                row.setAttribute('data-extract-size', image.extractSize);
+                row.setAttribute('data-extract-sha256', image.extractSha256);
+                row.setAttribute('data-image-download-size', image.imageDownloadSize);
+                row.setAttribute('data-enabled', image.isEnabled);
 
-            // Update dataset attributes
-            row.dataset.name = image.name;
-            row.dataset.description = image.description;
-            row.dataset.icon = image.icon;
-            row.dataset.url = image.url;
-            row.dataset.backupurls = image.backupUrls.join(',');
-            row.dataset.extractsize = image.extractSize;
-            row.dataset.extractsha256 = image.extractSha256;
-            row.dataset.imagedownloadsize = image.imageDownloadSize;
-            row.dataset.enabled = image.isEnabled;
-
-            // Update visible cells
-            row.querySelector('td:nth-child(2)').textContent = image.name;
-            row.querySelector('td:nth-child(3)').textContent = image.description;
-
-            // Update icon
-            const iconImg = row.querySelector('td:nth-child(1) img');
-            iconImg.src = image.icon.startsWith('http')
-                ? image.icon
-                : `/images/icons/${image.icon}`;
-
-            // Update status toggle
-            const switchElement = row.querySelector('.status-toggle');
-            switchElement.checked = image.isEnabled;
-        }
-
-        // Toast Notification
-        function showToast(type, message) {
-            const toastContainer = document.createElement('div');
-            toastContainer.innerHTML = `
-            <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">${message}</div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                // Erstelle die Zellen – hier ein Beispiel
+                row.innerHTML = `
+            <td>
+                <img src="${ image.icon.startsWith('http') ? image.icon : `/images/icons/${image.icon}` }" alt="icon" width="40" height="40" loading="lazy">
+            </td>
+            <td>${image.name}</td>
+            <td>${image.description}</td>
+            <td>${image.category?.name || 'No Category'}</td>
+            <td class="text-center">
+                <div class="form-check form-switch">
+                    <input class="form-check-input status-toggle" type="checkbox" role="switch" ${ image.isEnabled ? 'checked' : '' } data-id="${image.id}" onclick="event.stopPropagation(); updateStatus(this);">
                 </div>
-            </div>
+            </td>
+            <td class="text-center">
+                <span class="badge ${ image.isAvailable ? 'bg-success' : 'bg-secondary' }">${ image.isAvailable ? 'Yes' : 'No' }</span>
+            </td>
+            <td class="text-center">${image.redirectsCount}</td>
+            <td class="text-center">
+                <form action="/admin/images/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete?');">
+                    <input type="hidden" name="id" value="${image.id}">
+                    <input type="hidden" name="_csrf" value="${document.querySelector('input[name="_csrf"]').value}">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </td>
         `;
-
-            document.body.appendChild(toastContainer);
-            const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
-            toast.show();
-
-            // Remove after animation
-            setTimeout(() => toastContainer.remove(), 5000);
+                // Registriere den Event Listener für das Zeilen-Klick-Verhalten
+                row.addEventListener('click', function(e) {
+                    if (e.target.closest('.status-toggle') || e.target.closest('form')) return;
+                    const ds = row.dataset;
+                    document.getElementById('imageId').value = ds.id || '';
+                    document.getElementById('imageName').value = ds.name || '';
+                    document.getElementById('imageDescription').value = ds.description || '';
+                    document.getElementById('imageIcon').value = ds.icon || '';
+                    document.getElementById('imageUrl').value = ds.url || '';
+                    document.getElementById('extractSize').value = ds.extractSize || '';
+                    document.getElementById('extractSha256').value = ds.extractSha256 || '';
+                    document.getElementById('imageDownloadSize').value = ds.imageDownloadSize || '';
+                    document.getElementById('imageEnabled').checked = ds.enabled === 'true';
+                    updateIconPreview(ds.icon);
+                    initBackupUrls(ds.backupUrls ? ds.backupUrls.split(',') : []);
+                    document.querySelector('.modal-title').textContent = ds.id ? 'Edit OS Image' : 'New OS Image';
+                    bootstrap.Modal.getInstance(document.getElementById('editImageModal')).show();
+                });
+                tbody.appendChild(row);
+            }
         }
+
+
+        // Zeigt eine Toast-Nachricht an
+        function showToast(type, message) {
+            const toastContainer = document.getElementById('toast-container');
+            const toastEl = document.createElement('div');
+            toastEl.innerHTML = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+            toastContainer.appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl.querySelector('.toast'));
+            toast.show();
+            setTimeout(() => toastEl.remove(), 5000);
+        }
+
 
         // Status Update Funktion
         function updateStatus(toggle) {
             const imageId = toggle.dataset.id;
             const isEnabled = toggle.checked;
+            const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
-            fetch(`/api/images/${imageId}/status`, {
+            fetch(`/admin/images/${imageId}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_csrf"]').value
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({ enabled: isEnabled })
             })
                 .then(response => {
                     if (!response.ok) {
                         toggle.checked = !isEnabled;
-                        throw new Error('Update failed');
+                        return response.text().then(text => { throw new Error(text || 'Update failed') });
                     }
                     return response.json();
                 })
@@ -393,16 +438,7 @@
                     showToast('danger', `Status update failed: ${error.message}`);
                 });
         }
-
-        document.querySelector('[data-bs-target="#editImageModal"]').addEventListener('click', () => {
-            document.getElementById('editImageForm').reset();
-            document.querySelector('.modal-title').textContent = 'New OS Image';
-            document.getElementById('imageId').value = '';
-            initBackupUrls([]);
-            updateIconPreview('');
-        });
     </script>
 </th:block>
-
 </body>
 </html>

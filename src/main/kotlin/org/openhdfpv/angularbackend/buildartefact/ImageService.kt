@@ -2,6 +2,7 @@ package org.openhdfpv.angularbackend.buildartefact
 
 import org.openhdfpv.angularbackend.imager.ImagesList
 import org.openhdfpv.angularbackend.imager.ImagesListRepository
+import org.openhdfpv.angularbackend.special.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -11,100 +12,61 @@ import java.util.*
 class ImageService(
     private val buildImagesRepository: BuildImagesRepository,
     private val imagesListRepository: ImagesListRepository
-)
-{
-    fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> {
-        return if (imageEntity != null) {
-            // Erhöhe redirectsCount
-            val updatedEntity = imageEntity.copy(redirectsCount = imageEntity.redirectsCount + 1)
-            buildImagesRepository.save(updatedEntity) // Speichern der aktualisierten Entität
+) {
 
+    fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
+        imageEntity?.let { entity ->
+            val updatedEntity = entity.copy(redirectsCount = entity.redirectsCount + 1)
+            buildImagesRepository.save(updatedEntity)
             ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", imageEntity.url)
+                .header("Location", entity.url)
                 .build()
-        } else {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body("ImageEntity not found.")
-        }
-    }
+        } ?: ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("ImageEntity not found.")
 
-    fun findBySha256(sha256: String): ImageEntity? {
-        return buildImagesRepository.findByExtractSha256(sha256)
-    }
+    fun findBySha256(sha256: String): ImageEntity? =
+        buildImagesRepository.findByExtractSha256(sha256)
 
-    fun findById(id: UUID): Optional<ImageEntity> {
-        return buildImagesRepository.findById(id)
-    }
+    fun findById(id: UUID): ImageEntity =
+        buildImagesRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("ImageEntity with ID $id not found") }
 
-    fun findAll(): List<ImageEntity> {
-        return buildImagesRepository.findAll()
-    }
+    fun findAll(): List<ImageEntity> = buildImagesRepository.findAll()
 
-    fun save(image: ImageEntity) {
+    fun save(image: ImageEntity): ImageEntity =
         buildImagesRepository.save(image)
-    }
 
     fun delete(id: UUID) {
-        // Prüfe, ob die ImageEntity vorhanden ist
-        val imageEntityOptional = buildImagesRepository.findById(id)
-        if (imageEntityOptional.isPresent) {
-            val imageEntity = imageEntityOptional.get()
-
-            // Setze das isDeleted-Flag auf true
-            val updatedImageEntity = imageEntity.copy(isDeleted = true)
-
-            // Speichere die aktualisierte Entität
-            buildImagesRepository.save(updatedImageEntity)
-        } else {
-            throw IllegalArgumentException("ImageEntity mit ID $id wurde nicht gefunden.")
-        }
+        val imageEntity = buildImagesRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("ImageEntity with ID $id not found") }
+        val updatedImageEntity = imageEntity.copy(isDeleted = true)
+        buildImagesRepository.save(updatedImageEntity)
     }
 
-    // Bild zu ImagesList hinzufügen
-    fun addImageToImagesList(imageId: UUID, imagesListId: Long): ImagesList? {
-        val imageEntity = buildImagesRepository.findById(imageId).orElseThrow {
-            IllegalArgumentException("ImageEntity mit ID $imageId wurde nicht gefunden.")
-        }
+    fun addImageToImagesList(imageId: UUID, imagesListId: Long) =
+        imagesListRepository.findById(imagesListId).map { imagesList ->
+            val imageEntity = findById(imageId)
+            val updatedImagesList = imagesList.copy(
+                imageEntities = imagesList.imageEntities + imageEntity
+            )
+            imagesListRepository.save(updatedImagesList)
+        }.orElseThrow { EntityNotFoundException("ImagesList with ID $imagesListId not found") }
 
-        val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
-            IllegalArgumentException("ImagesList mit ID $imagesListId wurde nicht gefunden.")
-        }
+    fun removeImageFromImagesList(imageId: UUID, imagesListId: Long) =
+        imagesListRepository.findById(imagesListId).map { imagesList ->
+            val updatedImagesList = imagesList.copy(
+                imageEntities = imagesList.imageEntities.filter { it.id != imageId }.toSet()
+            )
+            imagesListRepository.save(updatedImagesList)
+        }.orElseThrow { EntityNotFoundException("ImagesList with ID $imagesListId not found") }
 
-        val updatedImagesList = imagesList.copy(
-            imageEntities = imagesList.imageEntities + imageEntity
-        )
-
-        return imagesListRepository.save(updatedImagesList)
-    }
-
-    // Bild aus ImagesList entfernen
-    fun removeImageFromImagesList(imageId: UUID, imagesListId: Long): ImagesList? {
-        val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
-            IllegalArgumentException("ImagesList mit ID $imagesListId wurde nicht gefunden.")
-        }
-
-        val updatedImagesList = imagesList.copy(
-            imageEntities = imagesList.imageEntities.filter { it.id != imageId }.toSet()
-        )
-
-        return imagesListRepository.save(updatedImagesList)
-    }
-
-    // Kategorie für ein Bild aktualisieren (Many-to-One)
     fun updateImageCategory(imageId: UUID, categoryId: Long?): ImageEntity {
-        val imageEntity = buildImagesRepository.findById(imageId).orElseThrow {
-            IllegalArgumentException("ImageEntity mit ID $imageId wurde nicht gefunden.")
-        }
-
+        val imageEntity = findById(imageId)
         val category = categoryId?.let {
-            // Laden der Kategorie
-            null // Beispiel: Laden einer Kategorie aus einem Repository für OsCategory
+            // Beispiel: osCategoryRepository.findById(it).orElse(null)
+            null
         }
-
         val updatedImageEntity = imageEntity.copy(category = category)
-        return buildImagesRepository.save(updatedImageEntity)
+        return save(updatedImageEntity)
     }
-
-
-
-
 }

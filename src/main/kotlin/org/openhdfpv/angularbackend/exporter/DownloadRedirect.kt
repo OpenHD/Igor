@@ -28,7 +28,7 @@ class DownloadRedirect(
     @GetMapping("/id/{id}")
     fun redirectToImageUrlById(@PathVariable id: UUID): ResponseEntity<Any> {
         val imageEntity = imageService.findById(id)
-        return imageService.handleRedirect(imageEntity.orElse(null))
+        return imageService.handleRedirect(imageEntity)
     }
 
 

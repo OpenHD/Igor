@@ -25,7 +25,7 @@ class ImageController(
 
     @GetMapping("/edit")
     fun editImage(@RequestParam("id", required = false) id: UUID?, model: Model): String {
-        val image = id?.let { imageService.findById(it).orElse(null) } ?: ImageEntity(
+        val image = id?.let { imageService.findById(it) } ?: ImageEntity(
             name = "",
             description = "",
             icon = "",
