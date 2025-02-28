@@ -1,63 +1,51 @@
 package org.openhdfpv.angularbackend
 
-import org.openhdfpv.angularbackend.buildartefact.BuildImagesRepository
 import org.openhdfpv.angularbackend.buildartefact.ImageEntity
 import org.openhdfpv.angularbackend.imager.ImagesList
-import org.openhdfpv.angularbackend.imager.ImagesListRepository
 import org.openhdfpv.angularbackend.oscategory.OsCategory
-import org.openhdfpv.angularbackend.oscategory.OsCategoryRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.openhdfpv.angularbackend.buildartefact.ImageService
+import org.openhdfpv.angularbackend.buildartefact.ImageUrl
+import org.openhdfpv.angularbackend.imager.ImageListService
+import org.openhdfpv.angularbackend.oscategory.OsCategoryService
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.http.MediaType
 import org.springframework.http.codec.json.Jackson2JsonDecoder
-import org.springframework.http.codec.json.Jackson2JsonEncoder
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.bodyToMono
 
 
 @Configuration
 @Profile("dev")
-class DummyDataLoader {
+class DummyDataLoader(
+    private val imageListService: ImageListService,
+    private val osCategoryService: OsCategoryService,
+    private val imageService: ImageService
+) {
 
     private val jsonUrl = "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-development-releases.json"
 
     @Bean
-    fun dummyDataInitializer(
-        imagesListRepo: ImagesListRepository,
-        osCategoryRepo: OsCategoryRepository,
-        buildImagesRepo: BuildImagesRepository,
-        objectMapper: ObjectMapper
-    ): CommandLineRunner {
+    fun dummyDataInitializer(objectMapper: ObjectMapper): CommandLineRunner {
         return CommandLineRunner { _ ->
-            imagesListRepo.deleteAll()
-            buildImagesRepo.deleteAll()
-            osCategoryRepo.deleteAll()
+            imageListService.deleteAll()
+            imageService.deleteAll()
+            osCategoryService.deleteAll()
 
             val webClient = WebClient.builder()
                 .exchangeStrategies(customExchangeStrategies(objectMapper))
                 .build()
 
-            processJsonSource(
-                webClient = webClient,
-                imagesListRepo = imagesListRepo,
-                osCategoryRepo = osCategoryRepo,
-                buildImagesRepo = buildImagesRepo
-            )
+            processJsonSource(webClient)
         }
     }
 
-    private fun processJsonSource(
-        webClient: WebClient,
-        imagesListRepo: ImagesListRepository,
-        osCategoryRepo: OsCategoryRepository,
-        buildImagesRepo: BuildImagesRepository
-    ) {
+    private fun processJsonSource(webClient: WebClient) {
         val jsonData = webClient.get()
             .uri(jsonUrl)
             .accept(MediaType.APPLICATION_JSON)
@@ -70,30 +58,31 @@ class DummyDataLoader {
         val savedImages = mutableListOf<ImageEntity>()
 
         jsonData.osList.forEach { categoryJson ->
-            val osCategory = osCategoryRepo.findByName(categoryJson.name) ?: osCategoryRepo.save(
-                OsCategory(
-                    name = categoryJson.name,
-                    description = categoryJson.description,
-                    icon = categoryJson.icon
+            val osCategory = osCategoryService.findCategoryByName(categoryJson.name)
+                ?: osCategoryService.createOsCategory(
+                    OsCategory(
+                        name = categoryJson.name,
+                        description = categoryJson.description,
+                        icon = categoryJson.icon
+                    )
                 )
-            )
 
             categoryJson.subitems.forEach { imageJson ->
                 val sha256 = imageJson.extractSha256.lowercase().trim()
-                val existingImage = buildImagesRepo.findByExtractSha256(sha256)
+                val existingImage = imageService.findBySha256(sha256)
 
                 if (existingImage != null) {
-                    handleExistingImage(existingImage, imageJson.url, buildImagesRepo)
+                    handleExistingImage(existingImage, imageJson.url)
                     savedImages.add(existingImage)
                 } else {
                     val newImage = createNewImageEntity(imageJson, osCategory)
-                    buildImagesRepo.save(newImage)
+                    imageService.save(newImage)
                     savedImages.add(newImage)
                 }
             }
         }
 
-        imagesListRepo.save(
+        imageListService.mergeOrCreateImagesList(
             ImagesList(
                 latestVersion = jsonData.imager.latestVersion,
                 url = jsonData.imager.url,
@@ -105,16 +94,20 @@ class DummyDataLoader {
         )
     }
 
-    private fun handleExistingImage(
-        existingImage: ImageEntity,
-        newUrl: String,
-        repository: BuildImagesRepository
-    ) {
-        if (existingImage.url != newUrl && !existingImage.backupUrls.contains(newUrl)) {
-            val updatedImage = existingImage.copy(
-                backupUrls = (existingImage.backupUrls + newUrl).distinct()
+    private fun handleExistingImage(existingImage: ImageEntity, newUrl: String) {
+        // Check if URL already exists
+        val urlExists = existingImage.urls.any { it.url == newUrl }
+
+        if (!urlExists) {
+            val newImageUrl = ImageUrl(
+                url = newUrl,
+                isAvailable = false,
+                isDefault = false
             )
-            repository.save(updatedImage)
+            val updatedImage = existingImage.copy(
+                urls = existingImage.urls + newImageUrl
+            )
+            imageService.save(updatedImage)
         }
     }
 
@@ -125,16 +118,21 @@ class DummyDataLoader {
         name = imageJson.name.trim(),
         description = imageJson.description,
         icon = imageJson.icon,
-        url = imageJson.url,
+        urls = listOf(
+            ImageUrl(
+                url = imageJson.url,
+                isAvailable = false,
+                isDefault = true
+            )
+        ),
         extractSize = imageJson.extractSize,
         extractSha256 = imageJson.extractSha256,
         imageDownloadSize = imageJson.imageDownloadSize,
         releaseDate = imageJson.releaseDate,
         initFormat = imageJson.initFormat ?: "systemd",
         category = category,
-        backupUrls = emptyList()
+        url = imageJson.url,
     )
-
 
     private fun customExchangeStrategies(objectMapper: ObjectMapper) =
         ExchangeStrategies.builder()

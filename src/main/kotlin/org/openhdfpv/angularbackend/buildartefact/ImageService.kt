@@ -1,5 +1,6 @@
 package org.openhdfpv.angularbackend.buildartefact
 
+import org.openhdfpv.angularbackend.imager.ImageListService
 import org.openhdfpv.angularbackend.imager.ImagesList
 import org.openhdfpv.angularbackend.imager.ImagesListRepository
 import org.openhdfpv.angularbackend.special.EntityNotFoundException
@@ -11,7 +12,7 @@ import java.util.*
 @Service
 class ImageService(
     private val buildImagesRepository: BuildImagesRepository,
-    private val imagesListRepository: ImagesListRepository
+    private val imageListService: ImageListService // Statt ImagesListRepository
 ) {
 
     fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
@@ -43,22 +44,15 @@ class ImageService(
         buildImagesRepository.save(updatedImageEntity)
     }
 
-    fun addImageToImagesList(imageId: UUID, imagesListId: Long) =
-        imagesListRepository.findById(imagesListId).map { imagesList ->
-            val imageEntity = findById(imageId)
-            val updatedImagesList = imagesList.copy(
-                imageEntities = imagesList.imageEntities + imageEntity
-            )
-            imagesListRepository.save(updatedImagesList)
-        }.orElseThrow { EntityNotFoundException("ImagesList with ID $imagesListId not found") }
+    fun addImageToImagesList(imageId: UUID, imagesListId: Long) {
+        val imageEntity = findById(imageId)
+        imageListService.addImageToImagesList(imagesListId, imageEntity)
+    }
 
-    fun removeImageFromImagesList(imageId: UUID, imagesListId: Long) =
-        imagesListRepository.findById(imagesListId).map { imagesList ->
-            val updatedImagesList = imagesList.copy(
-                imageEntities = imagesList.imageEntities.filter { it.id != imageId }.toSet()
-            )
-            imagesListRepository.save(updatedImagesList)
-        }.orElseThrow { EntityNotFoundException("ImagesList with ID $imagesListId not found") }
+    fun removeImageFromImagesList(imageId: UUID, imagesListId: Long) {
+        val imageEntity = findById(imageId)
+        imageListService.removeImageFromImagesList(imagesListId, imageEntity)
+    }
 
     fun updateImageCategory(imageId: UUID, categoryId: Long?): ImageEntity {
         val imageEntity = findById(imageId)
@@ -69,4 +63,10 @@ class ImageService(
         val updatedImageEntity = imageEntity.copy(category = category)
         return save(updatedImageEntity)
     }
+
+    fun findAllNonDeleted(): List<ImageEntity> = buildImagesRepository.findByIsDeletedFalse()
+
+    fun deleteAll() = buildImagesRepository.deleteAll()
+
+
 }

@@ -1,7 +1,5 @@
 package org.openhdfpv.angularbackend.exporter
 
-import org.openhdfpv.angularbackend.imager.ImagesListRepository
-import org.openhdfpv.angularbackend.oscategory.OsCategoryRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
@@ -11,18 +9,15 @@ import org.springframework.security.access.prepost.PreAuthorize
 @RestController
 @RequestMapping("/api")
 class DownloadListExporter(
-    private val imagesListRepository: ImagesListRepository,
-    private val imageListService: ImageListService
-
+    private val imageListService: ImageListService // Repository entfernt
 ) {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/image_list", "image_lists")
     fun getAvailableImageListEndpoints(): ResponseEntity<List<String>> {
-        val endpoints = imagesListRepository.findAll().map { it.endpoint }
+        val endpoints = imageListService.getAllEndpoints() // Service-Methode
         return ResponseEntity.ok(endpoints)
     }
-
 
     @PreAuthorize("permitAll()")
     @GetMapping("/image_list/{endpoint}")

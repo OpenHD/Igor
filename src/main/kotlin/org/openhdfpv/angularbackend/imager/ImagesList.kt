@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.openhdfpv.angularbackend.buildartefact.ImageEntity
-import org.openhdfpv.angularbackend.oscategory.OsCategory
 import java.time.LocalDateTime
 
 

@@ -1,6 +1,6 @@
 package org.openhdfpv.angularbackend.buildartefact
 
-import org.openhdfpv.angularbackend.oscategory.OsCategoryRepository
+import org.openhdfpv.angularbackend.oscategory.OsCategoryService
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
@@ -10,17 +10,17 @@ import java.util.UUID
 @RequestMapping("/images")
 class ImageController(
     private val imageService: ImageService,
-    private val osCategoryRepository: OsCategoryRepository
+    private val osCategoryService: OsCategoryService
 ) {
 
     @GetMapping
     fun listImages(model: Model): String {
-        val images = imageService.findAll() // Alle Images holen
-        val categories = osCategoryRepository.findAll() // Kategorien holen
+        val images = imageService.findAll()
+        val categories = osCategoryService.findAllCategories() // Service-Methode
 
         model.addAttribute("images", images)
         model.addAttribute("categories", categories)
-        return "image/list" // Thymeleaf-Template für die Liste
+        return "image/list"
     }
 
     @GetMapping("/edit")
@@ -35,13 +35,13 @@ class ImageController(
             imageDownloadSize = 0,
             releaseDate = "",
             initFormat = "",
-            category = null // Wählen Sie Standardkategorie aus
+            category = null
         )
-        val categories = osCategoryRepository.findAll()
+        val categories = osCategoryService.findAllCategories() // Service-Methode
 
         model.addAttribute("image", image)
         model.addAttribute("categories", categories)
-        return "image/edit" // Thymeleaf-Template für Bearbeiten
+        return "image/edit"
     }
 
     @PostMapping

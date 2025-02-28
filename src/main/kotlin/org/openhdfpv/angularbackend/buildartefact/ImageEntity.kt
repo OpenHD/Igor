@@ -27,6 +27,10 @@ data class ImageEntity(
     @Column(nullable = false)
     var url: String,
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "image_urls", joinColumns = [JoinColumn(name = "image_id")])
+    var urls: List<ImageUrl> = emptyList(),
+
     var extractSize: Long,
     @Column(name = "extract_sha256", nullable = true, unique = false)
     var extractSha256: String? = null,
@@ -64,4 +68,28 @@ data class ImageEntity(
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     val updatedAt: LocalDateTime = LocalDateTime.MIN
-)
+) {
+    fun getCurrentAvailableUrl(): String? {
+        // Zuerst wird nach der als default markierten und verfügbaren URL gesucht
+        val defaultAvailable = urls.firstOrNull { it.isDefault && it.isAvailable }
+        if (defaultAvailable != null) {
+            return defaultAvailable.url
+        }
+        // Falls keine default URL verfügbar ist, wird eine beliebige verfügbare URL gesucht
+        return urls.firstOrNull { it.isAvailable }?.url
+    }
+
+    fun getAvailable(): Boolean {
+        return getCurrentAvailableUrl() != null
+    }
+
+    fun getAvailableUrlsCount(): Pair<Int, Int> {
+        val availableCount = urls.count { it.isAvailable }
+        val totalCount = urls.size
+        return Pair(availableCount, totalCount)
+    }
+    
+    
+    
+    
+}

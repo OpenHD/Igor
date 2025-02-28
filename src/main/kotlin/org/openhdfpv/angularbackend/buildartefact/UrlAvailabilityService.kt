@@ -8,27 +8,45 @@ import org.springframework.stereotype.Service
 
 @Service
 class UrlAvailabilityService(
-    private val imageRepository: BuildImagesRepository
+    private val imageService: ImageService // Changed from repository to service
 ) {
 
     private val logger = LoggerFactory.getLogger(UrlAvailabilityService::class.java)
 
-    @Scheduled(fixedRate = 10000) // Alle 30 Sekunden
+    @Scheduled(fixedRate = 10000)
     fun checkUrlAvailability() {
-
-        // Alle nicht gelöschten Entities abrufen
-        val entities = imageRepository.findByIsDeletedFalse()
+        // Use service method to get non-deleted entities
+        val entities = imageService.findAllNonDeleted()
 
         for (entity in entities) {
-            val isAvailable = isUrlReachable(entity.url)
-            if (entity.isAvailable != isAvailable) { // Nur updaten, wenn nötig
-                logger.info("Änderung von isAvailable für Entity ${entity.name}: $isAvailable")
-                entity.copy(isAvailable = isAvailable).let {
-                    imageRepository.save(it) // Speichern des aktualisierten Status
+            val updatedUrls = entity.urls.map { imageUrl ->
+                val available = isUrlReachable(imageUrl.url)
+                if (imageUrl.isAvailable != available) {
+                    logger.info("Änderung von isAvailable für URL ${imageUrl.url} in Entity ${entity.name}: $available")
+                    imageUrl.copy(isAvailable = available)
+                } else {
+                    imageUrl
                 }
             }
-        }
 
+            val legacyAvailable = isUrlReachable(entity.url)
+            var requiresUpdate = false
+
+            if (entity.isAvailable != legacyAvailable) {
+                logger.info("Änderung von isAvailable für Legacy-URL ${entity.url} in Entity ${entity.name}: $legacyAvailable")
+                entity.isAvailable = legacyAvailable
+                requiresUpdate = true
+            }
+
+            if (updatedUrls != entity.urls) {
+                entity.urls = updatedUrls
+                requiresUpdate = true
+            }
+
+            if (requiresUpdate) {
+                imageService.save(entity) // Use service to save changes
+            }
+        }
     }
 
     /**
