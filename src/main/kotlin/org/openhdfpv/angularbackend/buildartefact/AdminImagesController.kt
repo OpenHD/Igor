@@ -24,6 +24,13 @@ class AdminImagesController(
         return "images/list"
     }
 
+    @GetMapping("/{id}")
+    @ResponseBody
+    fun getImage(@PathVariable id: UUID): ResponseEntity<ImageEntity> {
+        val image = imageService.findById(id)
+        return ResponseEntity.ok(image)
+    }
+
     @GetMapping("/edit/{id}")
     fun editImage(@PathVariable id: UUID, model: Model): String {
         val image = imageService.findById(id)
@@ -53,51 +60,17 @@ class AdminImagesController(
     @PostMapping("/save")
     @ResponseBody
     fun saveImage(@RequestBody @Valid dto: ImageUpdateDTO): ResponseEntity<Map<String, Any?>> {
-        val savedImage = if (dto.id == null) {
-            // Neuer Eintrag: Erstelle ein neues ImageEntity
-            val newImage = ImageEntity(
-                name = dto.name,
-                description = dto.description,
-                icon = dto.icon,
-                url = dto.url,
-                backupUrls = dto.backupUrls,
-                extractSize = dto.extractSize,
-                extractSha256 = dto.extractSha256,
-                imageDownloadSize = dto.imageDownloadSize,
-                releaseDate = "", // Hier ggf. einen sinnvollen Standardwert setzen
-                initFormat = ""   // Ebenso hier
-            )
-            imageService.save(newImage)
-        } else {
-            // Bestehendes Image updaten
-            val existingImage = imageService.findById(dto.id)
-            existingImage.apply {
-                name = dto.name
-                description = dto.description
-                icon = dto.icon
-                url = dto.url
-                backupUrls = dto.backupUrls
-                extractSize = dto.extractSize
-                extractSha256 = dto.extractSha256
-                imageDownloadSize = dto.imageDownloadSize
-                isEnabled = dto.isEnabled
-            }
-            imageService.save(existingImage)
-        }
+        val savedImage = imageService.saveFromDto(dto)
 
-        val responseBody = mapOf(
+        return ResponseEntity.ok(mapOf(
             "id" to savedImage.id,
             "name" to savedImage.name,
             "description" to savedImage.description,
             "icon" to savedImage.icon,
-            "url" to savedImage.url,
+            "urls" to savedImage.urls.map { mapOf("url" to it.url, "isDefault" to it.isDefault) },
             "backupUrls" to savedImage.backupUrls,
-            "extractSize" to savedImage.extractSize,
-            "extractSha256" to savedImage.extractSha256,
-            "imageDownloadSize" to savedImage.imageDownloadSize,
             "isEnabled" to savedImage.isEnabled
-        )
-        return ResponseEntity.ok(responseBody)
+        ))
     }
 
 

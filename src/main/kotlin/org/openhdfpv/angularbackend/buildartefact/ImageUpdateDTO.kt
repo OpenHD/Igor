@@ -6,7 +6,6 @@ import java.util.*
 
 data class ImageUrlDTO(
     val url: String,
-    val isAvailable: Boolean = false,
     val isDefault: Boolean = false
 )
 

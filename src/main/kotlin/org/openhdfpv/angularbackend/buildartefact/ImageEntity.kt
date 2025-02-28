@@ -1,5 +1,6 @@
 package org.openhdfpv.angularbackend.buildartefact
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -87,6 +88,10 @@ data class ImageEntity(
         val availableCount = urls.count { it.isAvailable }
         val totalCount = urls.size
         return Pair(availableCount, totalCount)
+    }
+
+    fun getUrlsAsJson(): String {
+        return jacksonObjectMapper().writeValueAsString(urls)
     }
     
     

@@ -29,6 +29,12 @@ repositories {
 
 dependencies {
 
+    // HTMX
+    implementation("org.webjars.npm:htmx.org:1.9.10")
+
+    // Alpine.js
+    implementation("org.webjars.npm:alpinejs:3.13.5")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")

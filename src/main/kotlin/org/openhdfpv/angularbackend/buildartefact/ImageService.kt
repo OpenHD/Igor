@@ -68,5 +68,49 @@ class ImageService(
 
     fun deleteAll() = buildImagesRepository.deleteAll()
 
+    // ImageService.kt
+    fun saveFromDto(dto: ImageUpdateDTO): ImageEntity {
+        return if (dto.id != null) {
+            val existingImage = findById(dto.id)
+            existingImage.apply {
+                name = dto.name
+                description = dto.description
+                icon = dto.icon
+                url = dto.url
+                backupUrls = dto.backupUrls
+                extractSize = dto.extractSize
+                extractSha256 = dto.extractSha256
+                imageDownloadSize = dto.imageDownloadSize
+                isEnabled = dto.isEnabled
+                urls = dto.urls.map { urlDto ->
+                    ImageUrl(
+                        url = urlDto.url,
+                        isDefault = urlDto.isDefault
+                    )
+                }
+            }
+            save(existingImage)
+        } else {
+            val newImage = ImageEntity(
+                name = dto.name,
+                description = dto.description,
+                icon = dto.icon,
+                url = dto.url,
+                backupUrls = dto.backupUrls,
+                extractSize = dto.extractSize,
+                extractSha256 = dto.extractSha256,
+                imageDownloadSize = dto.imageDownloadSize,
+                urls = dto.urls.map { urlDto ->
+                    ImageUrl(
+                        url = urlDto.url,
+                        isDefault = urlDto.isDefault
+                    )
+                },
+                releaseDate = "", // Setzen Sie hier Standardwerte
+                initFormat = ""
+            )
+            save(newImage)
+        }
+    }
 
 }
