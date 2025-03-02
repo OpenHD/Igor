@@ -15,13 +15,15 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .csrf { csrf -> csrf.disable() } // TODO: Deaktiviert CSRF vorübergehend
+            .cors { cors -> cors.disable() } // TODO: Deaktiviert CORS vorübergehend
             .authorizeHttpRequests { auth ->
                 auth
-                    // Grundlegende Freigabe (optional, falls erforderlich)
-                    .anyRequest().permitAll()
+                    .anyRequest().permitAll() // Erlaubt alle Requests
             }
             .httpBasic { }
 
         return http.build()
     }
+
 }

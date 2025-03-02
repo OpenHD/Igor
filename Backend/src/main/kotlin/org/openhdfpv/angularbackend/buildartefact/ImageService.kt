@@ -69,7 +69,7 @@ class ImageService(
     fun deleteAll() = buildImagesRepository.deleteAll()
 
     // ImageService.kt
-    fun saveFromDto(dto: ImageUpdateDTO): ImageEntity {
+    fun saveFromDto(dto: ImageDTO): ImageEntity {
         var foundCategory = dto.categoryId?.let {
             osCategoryService.findCategoryById(it)
         }

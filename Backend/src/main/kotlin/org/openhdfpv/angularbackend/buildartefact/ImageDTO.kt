@@ -6,10 +6,12 @@ import java.util.*
 
 data class ImageUrlDTO(
     val url: String,
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val isAvailable: Boolean = false
 )
 
-data class ImageUpdateDTO(
+data class ImageDTO(
     // ID ist jetzt optional, weil sie beim Erstellen leer bleiben kann
     val id: UUID? = null,
 
@@ -39,6 +41,12 @@ data class ImageUpdateDTO(
     val imageDownloadSize: Long,
 
     val isEnabled: Boolean,
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val isAvailable: Boolean,
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val redirectsCount: Long,
 
     val categoryId: Long?,
 

@@ -1,20 +1,17 @@
-// category.service.ts
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Category } from '../models/category';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {OsCategory} from '../models/osCategory';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryService {
-  private mockCategories: Category[] = [
-    { name: 'Category 1' },
-    { name: 'Category 2' },
-    { name: 'Category 3' },
-    { name: 'Uncategorized' }
-  ];
+  private apiUrl = 'http://127.0.0.1:8080/admin/images/categories';
 
-  getCategories(): Observable<Category[]> {
-    return of(this.mockCategories);
+  constructor(private http: HttpClient) { }
+
+  getCategories(): Observable<OsCategory[]> {
+    return this.http.get<OsCategory[]>(this.apiUrl);
   }
 }

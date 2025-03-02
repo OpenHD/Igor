@@ -59,7 +59,7 @@ class AdminImagesController(
 
     @PostMapping("/save")
     @ResponseBody
-    fun saveImage(@RequestBody @Valid dto: ImageUpdateDTO): ResponseEntity<Map<String, Any?>> {
+    fun saveImage(@RequestBody @Valid dto: ImageDTO): ResponseEntity<Map<String, Any?>> {
         val savedImage = imageService.saveFromDto(dto)
 
         return ResponseEntity.ok(mapOf(

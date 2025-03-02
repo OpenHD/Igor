@@ -4,9 +4,10 @@ import {ImageService} from '../services/image.service';
 import {Image} from '../models/image';
 import {EditImageModalComponent} from '../edit-image-modal/edit-image-modal.component';
 import {NgClass, NgForOf} from '@angular/common';
-import {Category} from '../models/category';
+import {OsCategory} from '../models/osCategory';
 import {CategoryService} from '../services/category.service';
 import {FormsModule} from '@angular/forms';
+import {HttpClientModule} from '@angular/common/http';
 
 @Component({
   selector: 'app-image-management',
@@ -17,7 +18,7 @@ import {FormsModule} from '@angular/forms';
 })
 export class ImageManagementComponent {
   images: Image[] = [];
-  categories: Category[] = [];
+  categories: OsCategory[] = [];
 
   constructor(
     private imageService: ImageService,
@@ -32,10 +33,12 @@ export class ImageManagementComponent {
     this.categoryService.getCategories().subscribe(data => this.categories = data);
   }
 
-  updateCategory(image: Image, categoryName: string): void {
-    image.category = { name: categoryName };
-    this.imageService.updateImage(image).subscribe(); // Neuen updateImage Service erstellen
+  updateCategory(image: Image, categoryId: number): void {
+    this.imageService.updateImage(image).subscribe(updatedImage => {
+      image.category = updatedImage.category;
+    });
   }
+
 
   loadImages(): void {
     this.imageService.getImages().subscribe(data => this.images = data);

@@ -1,17 +1,19 @@
 package org.openhdfpv.angularbackend.buildartefact
 
 import jakarta.validation.Valid
+import org.openhdfpv.angularbackend.oscategory.OsCategory
+import org.openhdfpv.angularbackend.oscategory.OsCategoryService
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.*
 import java.util.UUID
 import org.springframework.web.bind.annotation.*
 
-
-@RestController // Statt @Controller
+@CrossOrigin(origins = ["http://localhost:4200", "http://127.0.0.1:4200"], allowedHeaders = ["*"], methods = [RequestMethod.GET, RequestMethod.POST, RequestMethod.PATCH, RequestMethod.DELETE])@RestController // Statt @Controller
 @RequestMapping("/admin/images")
 @Validated
 class AngularImagesController(
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val osCategoryService: OsCategoryService
 ) { // Alle Images als JSON zurückgeben
     @GetMapping
     fun listImages(): ResponseEntity<List<ImageEntity>> {
@@ -28,7 +30,7 @@ class AngularImagesController(
 
     // Image erstellen/aktualisieren
     @PostMapping("/save")
-    fun saveImage(@RequestBody @Valid dto: ImageUpdateDTO): ResponseEntity<Map<String, Any?>> {
+    fun saveImage(@RequestBody @Valid dto: ImageDTO): ResponseEntity<Map<String, Any?>> {
         val savedImage = imageService.saveFromDto(dto)
         return ResponseEntity.ok(mapOf(
             "id" to savedImage.id,
@@ -58,5 +60,11 @@ class AngularImagesController(
     fun deleteImage(@PathVariable id: UUID): ResponseEntity<Void> {
         imageService.delete(id)
         return ResponseEntity.noContent().build()
+    }
+
+    @RequestMapping("/categories")
+    fun getCategories(): ResponseEntity<List<OsCategory>> {
+        val categories = osCategoryService.findAllCategories()
+        return ResponseEntity.ok(categories)
     }
 }
