@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @Controller
-@RequestMapping("/admin/images")
+@RequestMapping("/adminold/images")
 @Validated
 class AdminImagesController(
     private val imageService: ImageService // Service statt Repository

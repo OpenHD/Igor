@@ -1,8 +1,7 @@
 package org.openhdfpv.angularbackend.buildartefact
 
 import org.openhdfpv.angularbackend.imager.ImageListService
-import org.openhdfpv.angularbackend.imager.ImagesList
-import org.openhdfpv.angularbackend.imager.ImagesListRepository
+import org.openhdfpv.angularbackend.oscategory.OsCategoryService
 import org.openhdfpv.angularbackend.special.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -12,7 +11,8 @@ import java.util.*
 @Service
 class ImageService(
     private val buildImagesRepository: BuildImagesRepository,
-    private val imageListService: ImageListService // Statt ImagesListRepository
+    private val imageListService: ImageListService, // Statt ImagesListRepository
+    private val osCategoryService: OsCategoryService
 ) {
 
     fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
@@ -70,6 +70,10 @@ class ImageService(
 
     // ImageService.kt
     fun saveFromDto(dto: ImageUpdateDTO): ImageEntity {
+        var foundCategory = dto.categoryId?.let {
+            osCategoryService.findCategoryById(it)
+        }
+
         return if (dto.id != null) {
             val existingImage = findById(dto.id)
             existingImage.apply {
@@ -88,6 +92,7 @@ class ImageService(
                         isDefault = urlDto.isDefault
                     )
                 }
+                category = foundCategory
             }
             save(existingImage)
         } else {
@@ -106,6 +111,7 @@ class ImageService(
                         isDefault = urlDto.isDefault
                     )
                 },
+                category = foundCategory,
                 releaseDate = "", // Setzen Sie hier Standardwerte
                 initFormat = ""
             )

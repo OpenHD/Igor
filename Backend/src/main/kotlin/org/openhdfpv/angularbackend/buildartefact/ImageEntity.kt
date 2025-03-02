@@ -58,7 +58,7 @@ data class ImageEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = true)
-    val category: OsCategory? = null,
+    var category: OsCategory? = null,
 
     // Erstellungszeitpunkt
     @Column(name = "created_at", nullable = false, updatable = false)

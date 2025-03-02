@@ -40,6 +40,8 @@ data class ImageUpdateDTO(
 
     val isEnabled: Boolean,
 
+    val categoryId: Long?,
+
     @get:JsonProperty("_csrf")
     val csrfToken: String
 )
