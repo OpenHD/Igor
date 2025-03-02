@@ -1,0 +1,94 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ image?.id ? 'Edit OS Image' : 'New OS Image' }}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="imageForm" (ngSubmit)="onSubmit()">
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-md-6">
+
+        <div class="mb-3">
+          <label for="imageName" class="form-label">Name *</label>
+          <input type="text" id="imageName" class="form-control" formControlName="name" required>
+          <div *ngIf="imageForm.get('name')?.touched && imageForm.get('name')?.invalid" class="text-danger">
+            <small *ngIf="imageForm.get('name')?.errors?.['required']"><small
+              *ngIf="imageForm.get('name')?.errors?.['required']">Name is required.</small></small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="imageDescription" class="form-label">Description *</label>
+          <textarea id="imageDescription" class="form-control" formControlName="description" required></textarea>
+          <div *ngIf="imageForm.get('description')?.touched && imageForm.get('description')?.invalid" class="text-danger">
+            <small *ngIf="imageForm.get('description')?.errors?.['required']">Description is required.</small>
+          </div>
+        </div>
+
+
+        <div class="mb-3">
+          <label for="imageIcon" class="form-label">Icon URL *</label>
+          <input type="url" id="imageIcon" class="form-control" formControlName="icon" required (input)="updateIconPreview()">
+          <div class="mt-2">
+            <img [src]="iconPreview" alt="Icon Preview" style="max-width: 100px;" *ngIf="iconPreview">
+          </div>
+
+        </div>
+        <div class="mb-3">
+          <label for="imageUrl" class="form-label">Download URL *</label>
+          <input type="url" id="imageUrl" class="form-control" formControlName="url" required>
+          <div *ngIf="imageForm.get('url')?.touched && imageForm.get('url')?.invalid" class="text-danger">
+            <small *ngIf="imageForm.get('url')?.errors?.['required']">Download URL is required.</small>
+            <small *ngIf="imageForm.get('url')?.errors?.['pattern']">Invalid URL format.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="imageCategory" class="form-label">Category *</label>
+          <select id="imageCategory" class="form-select" formControlName="category">
+            <option *ngFor="let cat of categories" [value]="cat.name">
+              {{ cat.name }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Backup URLs</label>
+          <div formArrayName="backupUrls">
+            <div *ngFor="let backupCtrl of backupUrls.controls; let i = index" class="input-group mb-2">
+              <input type="url" class="form-control" [formControlName]="i" placeholder="Backup URL">
+              <button type="button" class="btn btn-outline-danger" (click)="removeBackupUrl(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-secondary mt-2" (click)="addBackupUrl()">
+            <i class="bi bi-plus"></i> Add URL
+          </button>
+        </div>
+        <div class="mb-3">
+          <label for="extractSize" class="form-label">Extract Size (bytes) *</label>
+          <input type="number" id="extractSize" class="form-control" formControlName="extractSize" required min="0">
+        </div>
+        <div class="mb-3">
+          <label for="extractSha256" class="form-label">SHA256 Hash *</label>
+          <input type="text" id="extractSha256" class="form-control" formControlName="extractSha256" required>
+        </div>
+        <div class="mb-3">
+          <label for="imageDownloadSize" class="form-label">Download Size (bytes) *</label>
+          <input type="number" id="imageDownloadSize" class="form-control" formControlName="imageDownloadSize" required min="0">
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" id="imageEnabled" class="form-check-input" formControlName="isEnabled">
+          <label for="imageEnabled" class="form-check-label">Enabled</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
