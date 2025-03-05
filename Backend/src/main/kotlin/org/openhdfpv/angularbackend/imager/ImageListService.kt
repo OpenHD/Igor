@@ -1,18 +1,32 @@
 package org.openhdfpv.angularbackend.imager
 
 import jakarta.servlet.http.HttpServletRequest
-import org.openhdfpv.angularbackend.ApplicationProperties
-import org.openhdfpv.angularbackend.buildartefact.BuildImagesRepository
+import org.openhdfpv.angularbackend.special.ApplicationProperties
 import org.openhdfpv.angularbackend.buildartefact.ImageEntity
+import org.openhdfpv.angularbackend.special.EntityNotFoundException
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class ImageListService(
     private val imagesListRepository: ImagesListRepository,
     private val applicationProperties: ApplicationProperties // ApplicationProperties als Dependency
 ) {
+
+    fun getAllImagesLists(): List<ImagesList> {
+        return imagesListRepository.findAll().map {
+            // Sicherstellen, dass imageEntities nicht null ist
+            it.copy(imageEntities = it.imageEntities ?: emptySet())
+        }
+    }
+
+    fun getImagesListById(id: Long): ImagesList? =
+        imagesListRepository.findById(id).orElse(null)
+
+    fun getImagesListByEndpoint(endpoint: String): ImagesList? =
+        imagesListRepository.findByEndpoint(endpoint)
 
     fun createImageListResponse(endpoint: String, request: HttpServletRequest): Map<String, Any>? {
         val imagesList = imagesListRepository.findAll().find { it.endpoint == endpoint }
@@ -73,26 +87,26 @@ class ImageListService(
 
     // ImagesList erstellen
     fun createImagesList(imagesList: ImagesList): ImagesList {
-        if (imagesListRepository.findByName(imagesList.name).isPresent) {
-            throw IllegalArgumentException("ImagesList mit dem Namen ${imagesList.name} existiert bereits.")
+        if (imagesListRepository.existsByName(imagesList.name)) {
+            throw IllegalArgumentException("ImagesList existiert bereits.")
         }
         return imagesListRepository.save(imagesList)
     }
 
     // ImagesList aktualisieren
-    fun updateImagesList(imagesListId: Long, updatedData: ImagesList): ImagesList {
-        val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
-            IllegalArgumentException("ImagesList mit ID $imagesListId wurde nicht gefunden.")
-        }
-
-        val updatedImagesList = imagesList.copy(
-            name = updatedData.name,
-            description = updatedData.description,
-            url = updatedData.url,
-            latestVersion = updatedData.latestVersion,
-            endpoint = updatedData.endpoint
+    fun updateImagesList(id: Long, updatedList: ImagesList): ImagesList {
+        val existingList = imagesListRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("ImagesList nicht gefunden.") }
+        return imagesListRepository.save(
+            existingList.copy(
+                latestVersion = updatedList.latestVersion,
+                url = updatedList.url,
+                name = updatedList.name,
+                endpoint = updatedList.endpoint,
+                description = updatedList.description,
+                imageEntities = updatedList.imageEntities
+            )
         )
-        return imagesListRepository.save(updatedImagesList)
     }
 
     // ImagesList löschen
@@ -180,5 +194,24 @@ class ImageListService(
     fun getAllEndpointsCached(): List<String> {
         return getAllEndpoints()
     }
+
+    fun updateImagesListPartial(id: Long, input: ImagesListPartialInput): ImagesList {
+        val existingList = imagesListRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("ImagesList mit ID $id nicht gefunden.") }
+        return imagesListRepository.save(
+            existingList.copy(
+                latestVersion = input.latestVersion ?: existingList.latestVersion,
+                url = input.url ?: existingList.url,
+                name = input.name ?: existingList.name,
+                endpoint = input.endpoint ?: existingList.endpoint,
+                description = input.description ?: existingList.description
+            )
+        )
+    }
+
+    fun findImagesListsByImageId(imageId: UUID): List<Long> {
+        return imagesListRepository.findByImageEntitiesId(imageId).map { it.id!! }
+    }
+
 
 }

@@ -1,8 +1,9 @@
 package org.openhdfpv.angularbackend.buildartefact
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import jakarta.validation.constraints.*
-import java.util.*
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.PositiveOrZero
+import java.util.UUID
 
 data class ImageUrlDTO(
     val url: String,
@@ -12,7 +13,6 @@ data class ImageUrlDTO(
 )
 
 data class ImageDTO(
-    // ID ist jetzt optional, weil sie beim Erstellen leer bleiben kann
     val id: UUID? = null,
 
     @field:NotBlank(message = "Name darf nicht leer sein")
@@ -40,16 +40,43 @@ data class ImageDTO(
     @field:PositiveOrZero(message = "Download Size muss >= 0 sein")
     val imageDownloadSize: Long,
 
-    val isEnabled: Boolean,
+    val isEnabled: Boolean = true,
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val isAvailable: Boolean,
+    val isAvailable: Boolean = false,
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val redirectsCount: Long,
+    val redirectsCount: Long = 0,
 
-    val categoryId: Long?,
+    val categoryId: Long?
+)
 
-    @get:JsonProperty("_csrf")
-    val csrfToken: String
+// Input-Klassen für GraphQL (nur die Felder, die auch geändert/gesetzt werden sollen)
+data class ImageInput(
+    val name: String,
+    val description: String,
+    val icon: String,
+    val url: String,
+    val urls: List<ImageUrlInput>,
+    val extractSize: Long,
+    val extractSha256: String?,
+    val imageDownloadSize: Long,
+    val categoryId: Long?
+) {
+    fun toDTO(): ImageDTO = ImageDTO(
+        name = name,
+        description = description,
+        icon = icon,
+        url = url,
+        urls = urls.map { ImageUrlDTO(it.url, it.isDefault) },
+        extractSize = extractSize,
+        extractSha256 = extractSha256 ?: "",
+        imageDownloadSize = imageDownloadSize,
+        categoryId = categoryId
+    )
+}
+
+data class ImageUrlInput(
+    val url: String,
+    val isDefault: Boolean
 )

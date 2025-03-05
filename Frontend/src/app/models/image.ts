@@ -16,6 +16,7 @@ export interface Image {
   isAvailable: boolean;
   redirectsCount: number;
   category?: OsCategory;
+  categoryId?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }

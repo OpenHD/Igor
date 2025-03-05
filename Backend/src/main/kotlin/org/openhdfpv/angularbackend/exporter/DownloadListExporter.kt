@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import jakarta.servlet.http.HttpServletRequest
 import org.openhdfpv.angularbackend.imager.ImageListService
-import org.springframework.security.access.prepost.PreAuthorize
 
 @RestController
 @RequestMapping("/api")
@@ -12,14 +11,12 @@ class DownloadListExporter(
     private val imageListService: ImageListService // Repository entfernt
 ) {
 
-    @PreAuthorize("permitAll()")
     @GetMapping("/image_list", "image_lists")
     fun getAvailableImageListEndpoints(): ResponseEntity<List<String>> {
         val endpoints = imageListService.getAllEndpoints() // Service-Methode
         return ResponseEntity.ok(endpoints)
     }
 
-    @PreAuthorize("permitAll()")
     @GetMapping("/image_list/{endpoint}")
     fun getImageListByEndpoint(
         @PathVariable endpoint: String,

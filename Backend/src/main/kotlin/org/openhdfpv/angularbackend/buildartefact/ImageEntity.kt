@@ -42,10 +42,10 @@ data class ImageEntity(
     @Column(name = "backup_urls", nullable = true)
     var backupUrls: List<String> = emptyList(),
 
-    val redirectsCount: Long = 0L,
+    var redirectsCount: Long = 0L,
 
     @Column(nullable = false)
-    val releaseDate: String,
+    var releaseDate: String,
 
     var isEnabled: Boolean = true,
 
@@ -98,3 +98,15 @@ data class ImageEntity(
     
     
 }
+
+@Embeddable
+data class ImageUrl(
+    @Column(nullable = false)
+    var url: String,
+
+    // Gibt an, ob diese URL aktuell erreichbar ist
+    var isAvailable: Boolean = false,
+
+    // Kennzeichnet, ob es sich um die Standard-URL handelt
+    var isDefault: Boolean = false
+)

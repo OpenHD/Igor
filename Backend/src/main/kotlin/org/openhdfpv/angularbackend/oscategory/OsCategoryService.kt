@@ -70,4 +70,19 @@ class OsCategoryService(
     fun deleteAll() {
         osCategoryRepository.deleteAll()
     }
+
+    fun updateOsCategoryPartial(input: OsCategoryInputUpdate): OsCategory {
+        val existingCategory = osCategoryRepository.findById(input.id)
+            .orElseThrow { EntityNotFoundException("OS-Kategorie mit ID ${input.id} nicht gefunden") }
+
+        return osCategoryRepository.save(
+            existingCategory.copy(
+                name = input.name ?: existingCategory.name,
+                description = input.description ?: existingCategory.description,
+                icon = input.icon ?: existingCategory.icon
+            )
+        )
+    }
+
+
 }

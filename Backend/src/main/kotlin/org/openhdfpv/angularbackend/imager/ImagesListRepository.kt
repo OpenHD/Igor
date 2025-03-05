@@ -10,6 +10,9 @@ interface ImagesListRepository : JpaRepository<ImagesList, Long> {
 
     fun findByName(name: String): Optional<ImagesList>
     fun findByEndpoint(endpoint: String): ImagesList?
+    fun existsByName(name: String): Boolean
+    fun findByImageEntitiesId(imageId: UUID): List<ImagesList>
+
 
 }
 

@@ -1,4 +1,4 @@
-package org.openhdfpv.angularbackend
+package org.openhdfpv.angularbackend.special
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling

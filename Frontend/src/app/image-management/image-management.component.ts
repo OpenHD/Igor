@@ -33,13 +33,19 @@ export class ImageManagementComponent {
     this.categoryService.getCategories().subscribe(data => this.categories = data);
   }
 
-  updateCategory(image: Image, categoryId: number): void {
+  updateCategory(image: Image, newCategoryId: number): void {
+    image.categoryId = newCategoryId;
     this.imageService.updateImage(image).subscribe(updatedImage => {
-      image.category = updatedImage.category;
+      // Mappe die Kategorie-ID auf das Kategorie-Objekt
+      updatedImage.category = this.categories.find(c => c.id === newCategoryId);
+
+      // Aktualisiere das Bild in der Liste
+      const index = this.images.findIndex(i => i.id === updatedImage.id);
+      if (index !== -1) {
+        this.images[index] = updatedImage;
+      }
     });
   }
-
-
   loadImages(): void {
     this.imageService.getImages().subscribe(data => this.images = data);
   }

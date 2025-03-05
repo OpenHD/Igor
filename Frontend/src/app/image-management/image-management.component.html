@@ -30,7 +30,7 @@
               <td>{{ image.name }}</td>
               <td>{{ image.description }}</td>
               <td (click)="$event.stopPropagation()">
-                <select [ngModel]="image.category?.id"
+                <select [ngModel]="image.categoryId"
                         (ngModelChange)="updateCategory(image, $event)">
                   <option *ngFor="let cat of categories" [value]="cat.id">
                     {{ cat.name }}

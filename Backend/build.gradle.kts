@@ -35,6 +35,7 @@ dependencies {
     // Alpine.js
     implementation("org.webjars.npm:alpinejs:3.13.5")
 
+    implementation("com.graphql-java:graphql-java-extended-scalars")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
@@ -43,12 +44,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.projectlombok:lombok")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    //implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    //implementation("com.netflix.graphql.dgs.codegen:graphql-dgs-codegen-gradle:7.0.3")
     runtimeOnly("com.h2database:h2") // oder eine andere Datenbank Ihrer Wahl
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-graphql")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-    implementation("org.springframework.boot:spring-boot-starter-security")
+    //implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    //implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -61,7 +63,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.graphql:spring-graphql-test")
-    testImplementation("org.springframework.security:spring-security-test")
+    //testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

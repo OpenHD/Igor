@@ -39,7 +39,9 @@ class AngularImagesController(
             "icon" to savedImage.icon,
             "urls" to savedImage.urls.map { mapOf("url" to it.url, "isDefault" to it.isDefault) },
             "backupUrls" to savedImage.backupUrls,
-            "isEnabled" to savedImage.isEnabled
+            "isEnabled" to savedImage.isEnabled,
+            "category" to savedImage.category?.let { mapOf("id" to it.id, "name" to it.name) },
+            "categoryId" to savedImage.category?.id
         ))
     }
 

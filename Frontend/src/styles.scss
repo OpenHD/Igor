@@ -3,3 +3,11 @@
 /* Importing Bootstrap SCSS file. */
 @use 'bootstrap' as *;
 @use 'bootstrap-icons' as *;
+
+$important-color: #00a2ec;
+
+body {
+  background: rgb(255, 255, 255);
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 36%, $important-color 75%, rgba(1, 107, 153, 1) 100%);
+  background-attachment: fixed;
+}

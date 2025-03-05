@@ -1,4 +1,4 @@
-package org.openhdfpv.angularbackend
+package org.openhdfpv.angularbackend.special
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

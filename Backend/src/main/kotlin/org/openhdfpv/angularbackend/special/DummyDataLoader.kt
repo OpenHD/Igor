@@ -1,4 +1,4 @@
-package org.openhdfpv.angularbackend
+package org.openhdfpv.angularbackend.special
 
 import org.openhdfpv.angularbackend.buildartefact.ImageEntity
 import org.openhdfpv.angularbackend.imager.ImagesList

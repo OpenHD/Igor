@@ -70,7 +70,7 @@ class ImageService(
 
     // ImageService.kt
     fun saveFromDto(dto: ImageDTO): ImageEntity {
-        var foundCategory = dto.categoryId?.let {
+        val foundCategory = dto.categoryId?.let {
             osCategoryService.findCategoryById(it)
         }
 
@@ -117,6 +117,29 @@ class ImageService(
             )
             save(newImage)
         }
+    }
+
+    fun updateImagePartial(id: UUID, input: ImagePartialInput): ImageEntity {
+        val existingImage = findById(id)
+        input.name?.let { existingImage.name = it }
+        input.description?.let { existingImage.description = it }
+        input.icon?.let { existingImage.icon = it }
+        input.url?.let { existingImage.url = it }
+        input.urls?.let { urls ->
+            existingImage.urls = urls.map { ImageUrl(it.url, isDefault = it.isDefault) }
+        }
+        input.backupUrls?.let { existingImage.backupUrls = it }
+        input.extractSize?.let { existingImage.extractSize = it }
+        input.extractSha256?.let { existingImage.extractSha256 = it }
+        input.imageDownloadSize?.let { existingImage.imageDownloadSize = it }
+        input.isEnabled?.let { existingImage.isEnabled = it }
+        input.isAvailable?.let { existingImage.isAvailable = it }
+        input.releaseDate?.let { existingImage.releaseDate = it }
+        input.redirectsCount?.let { existingImage.redirectsCount = it }
+        input.categoryId?.let {
+            existingImage.category = osCategoryService.findCategoryById(it)
+        }
+        return save(existingImage)
     }
 
 }

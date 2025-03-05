@@ -41,13 +41,14 @@ export class ImageService {
       name: image.name,
       description: image.description,
       icon: image.icon,
+      url: image.url, // Add this line to include the 'url' field
       urls: image.urls,
       backupUrls: image.backupUrls,
       extractSize: image.extractSize,
       extractSha256: image.extractSha256,
       imageDownloadSize: image.imageDownloadSize,
       isEnabled: image.isEnabled,
-      categoryId: image.category?.id
+      categoryId: image.categoryId || image.category?.id  // Priorisiere explizite categoryId
     };
   }
 }
