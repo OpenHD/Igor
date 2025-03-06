@@ -22,7 +22,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let image of images; trackBy: trackById" (click)="selectImage(image)" style="cursor: pointer;">
+            <tr *ngFor="let image of images; trackBy: trackById" (click)="openEditModal(image)">
               <td>
                 <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
                      alt="icon" width="40" height="40" style="object-fit: contain;" loading="lazy">
@@ -30,12 +30,13 @@
               <td>{{ image.name }}</td>
               <td>{{ image.description }}</td>
               <td (click)="$event.stopPropagation()">
-                <select [ngModel]="image.categoryId"
+                <select [ngModel]="image.category?.id"
                         (ngModelChange)="updateCategory(image, $event)">
                   <option *ngFor="let cat of categories" [value]="cat.id">
                     {{ cat.name }}
                   </option>
                 </select>
+
               </td>
               <td class="text-center">
                 <div class="form-check form-switch">
@@ -45,11 +46,14 @@
                 </div>
               </td>
               <td class="text-center">
-                  <span class="badge" [ngClass]="{'bg-success': image.isAvailable, 'bg-secondary': !image.isAvailable}">
-                    {{ image.isAvailable ? 'Yes' : 'No' }}
-                  </span>
+  <span class="badge"
+        [class.bg-warning]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length"
+        [class.bg-success]="getAvailableCount(image) === image.urls.length"
+        [class.bg-danger]="getAvailableCount(image) === 0">
+    {{ getAvailableCount(image) }}/{{ image.urls.length }}
+  </span>
               </td>
-              <td class="text-center">{{ image.redirectsCount }}</td>
+              <td class="text-center">{{ image.redirectsCount || 0 }}</td>
               <td class="text-center">
                 <button class="btn btn-sm btn-danger" (click)="deleteImage(image, $event)">
                   <i class="bi bi-trash"></i>

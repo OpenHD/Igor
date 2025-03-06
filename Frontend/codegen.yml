@@ -1,0 +1,14 @@
+# codegen.yml
+schema: ./src/app/graphql/schema.graphql
+documents: ./src/app/graphql/operations/**/*.graphql
+generates:
+  ./src/app/graphql/generated.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-apollo-angular
+    config:
+      scalars:
+        Long: number
+      strict: true
+      enumsAsTypes: true

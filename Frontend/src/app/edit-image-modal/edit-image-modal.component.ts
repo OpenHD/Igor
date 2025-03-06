@@ -1,123 +1,120 @@
-  import {Component, Input, OnInit} from '@angular/core';
-  import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-  import {CommonModule} from '@angular/common';
-  import {FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-  import {Image} from '../models/image';
-  import {ImageService} from '../services/image.service';
-  import {CategoryService} from '../services/category.service';
-  import {OsCategory} from '../models/osCategory';
+// src/app/edit-image-modal/edit-image-modal.component.ts
+import { Component, inject, Output, EventEmitter } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Image, ImageFragmentFragment, OsCategoryFragmentFragment } from '../graphql/generated';
+import { GraphqlService } from '../services/graphql.service';
 
-  @Component({
-    selector: 'app-edit-image-modal',
-    imports: [CommonModule, ReactiveFormsModule],
-    standalone: true,
-    templateUrl: './edit-image-modal.component.html',
-    styleUrl: './edit-image-modal.component.scss'
-  })
-  export class EditImageModalComponent implements OnInit {
-    @Input() image?: Image;
-    imageForm!: FormGroup;
-    iconPreview: string = '';
+@Component({
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './edit-image-modal.component.html'
+})
+export class EditImageModalComponent {
+  @Output() imageCreated = new EventEmitter<ImageFragmentFragment>();
 
-    categories: OsCategory[] = [];
+  modal = inject(NgbActiveModal);
+  image?: ImageFragmentFragment;
+  categories: OsCategoryFragmentFragment[] = [];
+  iconPreview?: string;
+  graphql = inject(GraphqlService);
 
-    constructor(
-      public modal: NgbActiveModal,
-      private fb: FormBuilder,
-      private imageService: ImageService,
-      private categoryService: CategoryService
-    ) {}
+  updateIconPreview() {
+    this.iconPreview = this.imageForm.get('icon')?.value;
+  }
 
-    ngOnInit(): void {
-      this.categoryService.getCategories().subscribe(cats => this.categories = cats);
 
-      this.imageForm = this.fb.group({
-        id: [this.image?.id || ''],
-        name: [this.image?.name || '', Validators.required],
-        description: [this.image?.description || '', Validators.required],
-        icon: [this.image?.icon || '', [Validators.required]],
-        url: [this.image?.url || '', [Validators.required]],
-        urls: this.fb.array([], Validators.required),
-        backupUrls: this.fb.array(this.image?.backupUrls?.length ? this.image.backupUrls : []),
-        extractSize: [this.image?.extractSize || 0, [Validators.required, Validators.min(0)]],
-        extractSha256: [this.image?.extractSha256 || '', Validators.required],
-        imageDownloadSize: [this.image?.imageDownloadSize || 0, [Validators.required, Validators.min(0)]],
-        isEnabled: [this.image?.isEnabled || false],
-        category: [this.image?.category?.name || '', Validators.required]
+  imageForm = new FormGroup({
+    name: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+    description: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+    icon: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
+    urls: new FormArray<FormGroup<{
+      url: FormControl<string>;
+      isDefault: FormControl<boolean>;
+    }>>([]),
+    extractSize: new FormControl<number>(0, {nonNullable: true}),
+    extractSha256: new FormControl<string>(''),
+    imageDownloadSize: new FormControl<number>(0, {nonNullable: true}),
+    isEnabled: new FormControl<boolean>(true, {nonNullable: true}),
+    categoryId: new FormControl<string>('')
+  });
+
+  get urls() {
+    return this.imageForm.get('urls') as FormArray;
+  }
+
+  ngOnInit() {
+    if (this.image?.id) {
+      this.imageForm.patchValue({
+        name: this.image.name,
+        description: this.image.description,
+        icon: this.image.icon,
+        extractSize: this.image.extractSize,
+        extractSha256: this.image.extractSha256 || '',
+        imageDownloadSize: this.image.imageDownloadSize,
+        isEnabled: this.image.isEnabled,
+        categoryId: this.image.category?.id || ''
       });
-
-
-      // Initialisiere die Icon-Vorschau basierend auf dem aktuellen Wert
-      this.iconPreview = this.getIconUrl();
-
-      // Aktualisiere die Vorschau, wenn sich der Icon-Wert ändert
-      this.imageForm.get('icon')?.valueChanges.subscribe(() => {
-        this.iconPreview = this.getIconUrl();
+      this.image.urls.forEach(url => {
+        this.addUrl(url.url, url.isDefault);
       });
-
-
-    }
-
-    // URL-Handling:
-    get urlForms() {
-      return this.imageForm.get('urls') as FormArray;
-    }
-
-    addUrl() {
-      this.urlForms.push(this.fb.group({
-        url: ['', Validators.required],
-        isDefault: [false]
-      }));
-    }
-
-    // Getter für das Backup URLs FormArray
-    get backupUrls(): FormArray {
-      return this.imageForm.get('backupUrls') as FormArray;
-    }
-
-    addBackupUrl(): void {
-      this.backupUrls.push(this.fb.control(''));
-    }
-
-    removeBackupUrl(index: number): void {
-      this.backupUrls.removeAt(index);
-    }
-
-    getIconUrl(): string {
-      const iconValue = this.imageForm.get('icon')?.value;
-      if (!iconValue) return '';
-      return iconValue.startsWith('http') ? iconValue : `/images/icons/${iconValue}`;
-    }
-
-    updateIconPreview(): void {
-      this.iconPreview = this.getIconUrl();
-    }
-
-    onSubmit(): void {
-      if (this.imageForm.invalid) {
-        // Alle Felder als touched markieren, um die Fehleranzeigen zu triggern
-        this.imageForm.markAllAsTouched();
-        return;
-      }
-
-      const formValue = {
-        ...this.imageForm.value,
-        category: {name: this.imageForm.value.category},
-        csrfToken: 'TODO-ADD-CSRF-TOKEN' // WICHTIG!
-      };
-
-      if (formValue.id) {
-        // Bestehendes Bild updaten
-        this.imageService.updateImage(formValue).subscribe(updatedImage => {
-          this.modal.close({action: 'update', image: updatedImage});
-        });
-      } else {
-        // Neues Bild erstellen
-        formValue.id = ''; // Service generiert eine neue ID
-        this.imageService.saveImage(formValue).subscribe(newImage => {
-          this.modal.close({action: 'create', image: newImage});
-        });
+      if (this.image?.icon) {
+        this.iconPreview = this.image.icon;
       }
     }
 
   }
+
+  addUrl(url = '', isDefault = false) {
+    this.urls.push(new FormGroup({
+      url: new FormControl<string>(url, {nonNullable: true}),
+      isDefault: new FormControl<boolean>(isDefault, {nonNullable: true})
+    }));
+  }
+
+  removeUrl(index: number) {
+    this.urls.removeAt(index);
+  }
+
+  setDefaultUrl(index: number) {
+    this.urls.controls.forEach((control, i) =>
+      control.get('isDefault')?.setValue(i === index)
+    );
+  }
+
+  onSubmit() {
+    if (this.imageForm.invalid) return;
+
+    const formValue = this.imageForm.getRawValue();
+
+    const input = {
+      ...formValue,
+      urls: formValue.urls.map(u => ({
+        url: u.url,
+        isDefault: u.isDefault
+      })),
+      extractSize: Number(formValue.extractSize),
+      imageDownloadSize: Number(formValue.imageDownloadSize),
+      url: formValue.urls.length > 0 ? formValue.urls[0].url : ''
+    };
+
+    if (this.image?.id) {
+      // Update
+      this.graphql.updateImagePartial(this.image.id, input).subscribe({
+        next: () => this.modal.close(true),
+        error: (err: any) => console.error('Update failed', err)
+      });
+    } else {
+      // Create
+      this.graphql.createImage(input).subscribe({
+        next: (response) => {
+          const newImage = (response.data as { createImage: ImageFragmentFragment }).createImage;
+          this.imageCreated.emit(newImage);
+          this.modal.close(true);
+        },
+        error: (err: any) => console.error('Create failed', err)
+      });
+    }
+  }
+}

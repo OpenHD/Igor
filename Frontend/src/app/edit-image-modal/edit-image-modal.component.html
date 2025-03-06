@@ -1,46 +1,78 @@
+<!-- edit-image-modal.component.html -->
 <div class="modal-header">
-  <h4 class="modal-title">{{ image?.id ? 'Edit OS Image' : 'New OS Image' }}</h4>
-  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  <h4 class="modal-title">{{ image?.id ? 'Edit Image' : 'New Image' }}</h4>
+  <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
 </div>
+
 <div class="modal-body">
   <form [formGroup]="imageForm" (ngSubmit)="onSubmit()">
-    <div class="row">
+    <div class="row g-3">
       <!-- Left Column -->
       <div class="col-md-6">
-
         <div class="mb-3">
           <label for="imageName" class="form-label">Name *</label>
-          <input type="text" id="imageName" class="form-control" formControlName="name" required>
-          <div *ngIf="imageForm.get('name')?.touched && imageForm.get('name')?.invalid" class="text-danger">
-            <small *ngIf="imageForm.get('name')?.errors?.['required']"><small
-              *ngIf="imageForm.get('name')?.errors?.['required']">Name is required.</small></small>
+          <input type="text" id="imageName" class="form-control"
+                 formControlName="name" required>
+          <div *ngIf="imageForm.get('name')?.invalid && imageForm.get('name')?.touched"
+               class="text-danger small">
+            Name is required
           </div>
         </div>
 
         <div class="mb-3">
           <label for="imageDescription" class="form-label">Description *</label>
-          <textarea id="imageDescription" class="form-control" formControlName="description" required></textarea>
-          <div *ngIf="imageForm.get('description')?.touched && imageForm.get('description')?.invalid" class="text-danger">
-            <small *ngIf="imageForm.get('description')?.errors?.['required']">Description is required.</small>
+          <textarea id="imageDescription" class="form-control"
+                    formControlName="description" required rows="3"></textarea>
+          <div *ngIf="imageForm.get('description')?.invalid && imageForm.get('description')?.touched"
+               class="text-danger small">
+            Description is required
           </div>
         </div>
-
 
         <div class="mb-3">
           <label for="imageIcon" class="form-label">Icon URL *</label>
-          <input type="url" id="imageIcon" class="form-control" formControlName="icon" required (input)="updateIconPreview()">
+          <input type="url" id="imageIcon" class="form-control"
+                 formControlName="icon" required
+                 (input)="updateIconPreview()">
           <div class="mt-2">
-            <img [src]="iconPreview" alt="Icon Preview" style="max-width: 100px;" *ngIf="iconPreview">
+            <img [src]="iconPreview" alt="Icon preview"
+                 class="img-thumbnail"
+                 style="max-width: 100px; height: auto"
+                 *ngIf="iconPreview">
           </div>
-
+          <div *ngIf="imageForm.get('icon')?.invalid && imageForm.get('icon')?.touched"
+               class="text-danger small">
+            Valid URL required
+          </div>
         </div>
+
         <div class="mb-3">
-          <label for="imageUrl" class="form-label">Download URL *</label>
-          <input type="url" id="imageUrl" class="form-control" formControlName="url" required>
-          <div *ngIf="imageForm.get('url')?.touched && imageForm.get('url')?.invalid" class="text-danger">
-            <small *ngIf="imageForm.get('url')?.errors?.['required']">Download URL is required.</small>
-            <small *ngIf="imageForm.get('url')?.errors?.['pattern']">Invalid URL format.</small>
+          <label class="form-label">URLs</label>
+          <div formArrayName="urls">
+            <div *ngFor="let urlGroup of urls.controls; let i = index" [formGroupName]="i">
+              <input type="url"
+                     formControlName="url"
+                     class="form-control"
+                     placeholder="Image URL">
+              <button type="button"
+                      class="btn btn-outline-secondary"
+                      (click)="setDefaultUrl(i)">
+                <i class="bi"
+                   [class.bi-star-fill]="urlGroup.get('isDefault')?.value"
+                   [class.bi-star]="!urlGroup.get('isDefault')?.value"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-outline-danger"
+                      (click)="removeUrl(i)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </div>
+          <button type="button"
+                  class="btn btn-sm btn-secondary"
+                  (click)="addUrl()">
+            <i class="bi bi-plus"></i> Add URL
+          </button>
         </div>
       </div>
 
@@ -48,25 +80,11 @@
       <div class="col-md-6">
         <div class="mb-3">
           <label for="imageCategory" class="form-label">Category *</label>
-          <select id="imageCategory" class="form-select" formControlName="category">
-            <option *ngFor="let cat of categories" [value]="cat.name">
+          <select id="imageCategory" class="form-select" formControlName="categoryId">
+            <option *ngFor="let cat of categories" [value]="cat.id">
               {{ cat.name }}
             </option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Backup URLs</label>
-          <div formArrayName="backupUrls">
-            <div *ngFor="let backupCtrl of backupUrls.controls; let i = index" class="input-group mb-2">
-              <input type="url" class="form-control" [formControlName]="i" placeholder="Backup URL">
-              <button type="button" class="btn btn-outline-danger" (click)="removeBackupUrl(i)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </div>
-          <button type="button" class="btn btn-sm btn-secondary mt-2" (click)="addBackupUrl()">
-            <i class="bi bi-plus"></i> Add URL
-          </button>
+          </select>>
         </div>
         <div class="mb-3">
           <label for="extractSize" class="form-label">Extract Size (bytes) *</label>

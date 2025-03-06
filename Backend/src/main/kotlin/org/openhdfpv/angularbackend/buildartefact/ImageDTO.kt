@@ -61,7 +61,8 @@ data class ImageInput(
     val extractSize: Long,
     val extractSha256: String?,
     val imageDownloadSize: Long,
-    val categoryId: Long?
+    val categoryId: Long?,
+    val isEnabled: Boolean = true
 ) {
     fun toDTO(): ImageDTO = ImageDTO(
         name = name,
@@ -72,7 +73,8 @@ data class ImageInput(
         extractSize = extractSize,
         extractSha256 = extractSha256 ?: "",
         imageDownloadSize = imageDownloadSize,
-        categoryId = categoryId
+        categoryId = categoryId,
+        isEnabled = isEnabled
     )
 }
 

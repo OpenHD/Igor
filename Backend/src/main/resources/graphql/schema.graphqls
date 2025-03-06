@@ -104,6 +104,7 @@ input ImageInput {
     extractSize: Long!
     extractSha256: String
     imageDownloadSize: Long!
+    isEnabled: Boolean!
     categoryId: ID
 }
 

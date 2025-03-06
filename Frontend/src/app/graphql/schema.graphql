@@ -1,0 +1,167 @@
+# Scalar definitions
+scalar Long
+
+# ----------------------------
+# Query Type (Read-only operations)
+# ----------------------------
+type Query {
+  # Returns a list of all images
+  images: [Image!]!
+  # Returns a single image by ID
+  image(id: ID!): Image
+
+  # Returns all OS categories
+  osCategories: [OsCategory!]!
+
+  # Returns all ImagesLists
+  imagesLists: [ImagesList!]!
+  # Returns a single ImagesList by ID
+  imagesList(id: ID!): ImagesList
+  # Returns an ImagesList by a unique endpoint
+  imagesListByEndpoint(endpoint: String!): ImagesList
+}
+
+# ----------------------------
+# Mutation Type (Write operations)
+# ----------------------------
+type Mutation {
+  # Image mutations
+  createImage(input: ImageInput!): Image!
+  updateImage(id: ID!, input: ImageInput!): Image!
+  updateImagePartial(id: ID!, input: ImagePartialInput!): Image!
+  deleteImage(id: ID!): Boolean
+
+  # ImagesList mutations
+  createImagesList(input: ImagesListInput!): ImagesList!
+  updateImagesList(id: ID!, input: ImagesListInput!): ImagesList!
+  # Partial update for ImagesList – does NOT update associated image IDs
+  updateImagesListPartial(id: ID!, input: ImagesListPartialInput!): ImagesList!
+  deleteImagesList(id: ID!): Boolean
+
+  # OS Category mutations
+  createOsCategory(input: OsCategoryInput!): OsCategory!
+  updateOsCategory(id: ID!, input: OsCategoryInput!): OsCategory!
+  updateOsCategoryPartial(input: OsCategoryInputUpdate!): OsCategory!
+  deleteOsCategory(id: ID!): Boolean
+}
+
+# ----------------------------
+# Type Definitions
+# ----------------------------
+type Image {
+  id: ID!
+  name: String!
+  description: String!
+  icon: String!
+  url: String!
+  urls: [ImageUrl!]!
+  backupUrls: [String]
+  extractSize: Long!
+  extractSha256: String
+  imageDownloadSize: Long!
+  isEnabled: Boolean!
+  isAvailable: Boolean
+  releaseDate: String!        # ISO-8601 formatted date string
+  redirectsCount: Long
+  category: OsCategory
+  imagesLists: [ID]
+}
+
+type ImageUrl {
+  url: String!
+  isAvailable: Boolean!
+  isDefault: Boolean!
+}
+
+type ImagesList {
+  id: ID!
+  latestVersion: String!
+  url: String!
+  name: String!
+  endpoint: String!
+  description: String!
+  images: [Image!]!
+  createdAt: String!         # ISO-8601 formatted
+  updatedAt: String!         # ISO-8601 formatted
+}
+
+type OsCategory {
+  id: ID!
+  name: String!
+  description: String!
+  icon: String!
+}
+
+# ----------------------------
+# Input Types for Creation and Full Updates
+# ----------------------------
+input ImageInput {
+  name: String!
+  description: String!
+  icon: String!
+  url: String!
+  urls: [ImageUrlInput!]!
+  extractSize: Long!
+  extractSha256: String
+  imageDownloadSize: Long!
+  isEnabled: Boolean!
+  categoryId: ID
+}
+
+input ImageUrlInput {
+  url: String!
+  isDefault: Boolean!
+}
+
+input ImagesListInput {
+  latestVersion: String!
+  url: String!
+  name: String!
+  endpoint: String!
+  description: String!
+  imageIds: [ID!]!
+}
+
+input OsCategoryInput {
+  name: String!
+  description: String!
+  icon: String!
+}
+
+# ----------------------------
+# Input Types for Partial Updates
+# ----------------------------
+# Partial update for Image – all fields are optional
+input ImagePartialInput {
+  name: String
+  description: String
+  icon: String
+  url: String
+  urls: [ImageUrlInput!]
+  backupUrls: [String]
+  extractSize: Long
+  extractSha256: String
+  imageDownloadSize: Long
+  isEnabled: Boolean
+  isAvailable: Boolean
+  releaseDate: String
+  redirectsCount: Long
+  categoryId: ID
+}
+
+# Partial update for ImagesList – note: imageIds are not included here!
+input ImagesListPartialInput {
+  latestVersion: String
+  url: String
+  name: String
+  endpoint: String
+  description: String
+}
+
+# Partial update for OsCategory
+input OsCategoryInputUpdate {
+  id: ID!          # Required for identifying the category to update
+  name: String     # Optional field for partial update
+  description: String
+  icon: String
+}
