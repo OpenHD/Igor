@@ -12,7 +12,8 @@ import {Image, ImageFragmentFragment, OsCategoryFragmentFragment} from '../graph
   selector: 'app-image-management',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
-  templateUrl: './image-management.component.html'
+  templateUrl: './image-management.component.html',
+  styleUrls: ['./image-management.component.scss']
 })
 export class ImageManagementComponent {
   private modalService = inject(NgbModal);
@@ -92,5 +93,19 @@ export class ImageManagementComponent {
 
   getAvailableCount(image: ImageFragmentFragment): number {
     return image.urls.filter(url => url.isAvailable).length;
+  }
+
+  // In der ImageManagementComponent-Klasse
+  getCategoryImageCount(categoryId: string): number {
+    return this.images.filter(img => img.category?.id === categoryId).length;
+  }
+
+  getImagesForCategory(categoryId: string): ImageFragmentFragment[] {
+    return this.images.filter(img => img.category?.id === categoryId);
+  }
+
+  // Für die Sortierung der Kategorien (optional)
+  get sortedCategories() {
+    return this.categories.sort((a, b) => a.name.localeCompare(b.name));
   }
 }

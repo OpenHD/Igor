@@ -9,7 +9,8 @@ import { GraphqlService } from '../services/graphql.service';
 @Component({
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './edit-image-modal.component.html'
+  templateUrl: './edit-image-modal.component.html',
+  styleUrls: ['./edit-image-modal.component.scss']
 })
 export class EditImageModalComponent {
   @Output() imageCreated = new EventEmitter<ImageFragmentFragment>();

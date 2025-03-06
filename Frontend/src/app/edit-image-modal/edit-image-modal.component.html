@@ -1,112 +1,171 @@
 <!-- edit-image-modal.component.html -->
-<div class="modal-header">
-  <h4 class="modal-title">{{ image?.id ? 'Edit Image' : 'New Image' }}</h4>
+<div class="modal-header border-0 pb-0">
+  <h4 class="modal-title h5 fw-bold">
+    <i class="bi bi-card-image me-2"></i>
+    {{ image?.id ? 'Edit Image' : 'New Image' }}
+  </h4>
   <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
 </div>
 
 <div class="modal-body">
-  <form [formGroup]="imageForm" (ngSubmit)="onSubmit()">
-    <div class="row g-3">
+  <form [formGroup]="imageForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+    <div class="row g-4">
       <!-- Left Column -->
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label for="imageName" class="form-label">Name *</label>
+      <div class="col-lg-6">
+        <!-- Name -->
+        <div class="form-floating mb-4">
           <input type="text" id="imageName" class="form-control"
-                 formControlName="name" required>
-          <div *ngIf="imageForm.get('name')?.invalid && imageForm.get('name')?.touched"
-               class="text-danger small">
-            Name is required
+                 formControlName="name" placeholder=" " required>
+          <label for="imageName">Image Name <span class="text-danger">*</span></label>
+          <div class="invalid-feedback">
+            Please provide a valid name
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="imageDescription" class="form-label">Description *</label>
+        <!-- Description -->
+        <div class="form-floating mb-4">
           <textarea id="imageDescription" class="form-control"
-                    formControlName="description" required rows="3"></textarea>
-          <div *ngIf="imageForm.get('description')?.invalid && imageForm.get('description')?.touched"
-               class="text-danger small">
+                    formControlName="description" placeholder=" "
+                    style="height: 120px" required></textarea>
+          <label for="imageDescription">Description <span class="text-danger">*</span></label>
+          <div class="invalid-feedback">
             Description is required
           </div>
         </div>
 
-        <div class="mb-3">
-          <label for="imageIcon" class="form-label">Icon URL *</label>
-          <input type="url" id="imageIcon" class="form-control"
-                 formControlName="icon" required
-                 (input)="updateIconPreview()">
-          <div class="mt-2">
-            <img [src]="iconPreview" alt="Icon preview"
-                 class="img-thumbnail"
-                 style="max-width: 100px; height: auto"
-                 *ngIf="iconPreview">
+        <div class="mb-4">
+          <label class="form-label fw-bold">Icon <span class="text-danger">*</span></label>
+          <div class="input-group input-group-sm">
+            <input type="url" class="form-control form-control-sm"
+                   formControlName="icon"
+                   placeholder="Paste icon URL..."
+                   required
+                   (input)="updateIconPreview()">
+            <button type="button" class="btn btn-outline-secondary btn-sm"
+                    title="Refresh preview">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
           </div>
-          <div *ngIf="imageForm.get('icon')?.invalid && imageForm.get('icon')?.touched"
-               class="text-danger small">
-            Valid URL required
-          </div>
-        </div>
 
-        <div class="mb-3">
-          <label class="form-label">URLs</label>
-          <div formArrayName="urls">
-            <div *ngFor="let urlGroup of urls.controls; let i = index" [formGroupName]="i">
-              <input type="url"
-                     formControlName="url"
-                     class="form-control"
-                     placeholder="Image URL">
-              <button type="button"
-                      class="btn btn-outline-secondary"
-                      (click)="setDefaultUrl(i)">
-                <i class="bi"
-                   [class.bi-star-fill]="urlGroup.get('isDefault')?.value"
-                   [class.bi-star]="!urlGroup.get('isDefault')?.value"></i>
-              </button>
-              <button type="button"
-                      class="btn btn-outline-danger"
-                      (click)="removeUrl(i)">
-                <i class="bi bi-trash"></i>
-              </button>
+          <!-- Compact Preview -->
+          <div class="mt-2">
+            <div class="icon-preview-wrapper" [class.has-error]="imageForm.get('icon')?.invalid">
+              <div class="icon-preview-content">
+                <img [src]="iconPreview" alt="Icon preview"
+                     class="img-fluid"
+                     *ngIf="iconPreview && imageForm.get('icon')?.valid; else noPreview">
+                <ng-template #noPreview>
+                  <div class="icon-preview-fallback">
+                    <i class="bi bi-file-image"></i>
+                    <small class="d-block mt-1 text-muted">Preview</small>
+                  </div>
+                </ng-template>
+              </div>
+              <div class="icon-preview-hover">
+                <i class="bi bi-zoom-in"></i>
+              </div>
+            </div>
+            <div *ngIf="imageForm.get('icon')?.invalid" class="text-danger small mt-1">
+              Invalid or unreachable image URL
             </div>
           </div>
-          <button type="button"
-                  class="btn btn-sm btn-secondary"
-                  (click)="addUrl()">
-            <i class="bi bi-plus"></i> Add URL
-          </button>
         </div>
       </div>
 
       <!-- Right Column -->
-      <div class="col-md-6">
-        <div class="mb-3">
-          <label for="imageCategory" class="form-label">Category *</label>
-          <select id="imageCategory" class="form-select" formControlName="categoryId">
+      <div class="col-lg-6">
+        <!-- URLs -->
+        <div class="mb-4">
+          <label class="form-label fw-bold d-block">Download URLs</label>
+          <div formArrayName="urls" class="urls-container">
+            <div *ngFor="let urlGroup of urls.controls; let i = index"
+                 [formGroupName]="i" class="url-entry mb-2">
+              <div class="input-group">
+                <input type="url" formControlName="url"
+                       class="form-control"
+                       placeholder="https://example.com/image.iso"
+                       required>
+                <button type="button" class="btn btn-outline-primary"
+                        (click)="setDefaultUrl(i)"
+                        [title]="urlGroup.get('isDefault')?.value ? 'Default URL' : 'Set as default'"
+                        [class.active]="urlGroup.get('isDefault')?.value">
+                  <i class="bi"
+                     [class.bi-star-fill]="urlGroup.get('isDefault')?.value"
+                     [class.bi-star]="!urlGroup.get('isDefault')?.value"></i>
+                </button>
+                <button type="button" class="btn btn-outline-danger"
+                        (click)="removeUrl(i)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-primary w-100 mt-2"
+                  (click)="addUrl()">
+            <i class="bi bi-plus-circle me-2"></i>Add URL
+          </button>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">Category</label>
+          <select class="form-select" formControlName="categoryId">
+            <option [value]="null">No category</option>
             <option *ngFor="let cat of categories" [value]="cat.id">
-              {{ cat.name }}
+              <div class="d-flex align-items-center">
+                <img [src]="cat.icon" alt="category icon"
+                     class="me-2" width="20" height="20">
+                {{ cat.name }}
+              </div>
             </option>
-          </select>>
+          </select>
         </div>
-        <div class="mb-3">
-          <label for="extractSize" class="form-label">Extract Size (bytes) *</label>
-          <input type="number" id="extractSize" class="form-control" formControlName="extractSize" required min="0">
+
+        <!-- Technical Specs -->
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="number" class="form-control"
+                     id="extractSize" formControlName="extractSize"
+                     placeholder=" " required>
+              <label for="extractSize">Extract Size (bytes)</label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input type="text" class="form-control"
+                     id="extractSha256" formControlName="extractSha256"
+                     placeholder=" " required>
+              <label for="extractSha256">SHA256 Hash</label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="form-floating">
+              <input type="number" class="form-control"
+                     id="imageDownloadSize" formControlName="imageDownloadSize"
+                     placeholder=" " required>
+              <label for="imageDownloadSize">Download Size (bytes)</label>
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="extractSha256" class="form-label">SHA256 Hash *</label>
-          <input type="text" id="extractSha256" class="form-control" formControlName="extractSha256" required>
-        </div>
-        <div class="mb-3">
-          <label for="imageDownloadSize" class="form-label">Download Size (bytes) *</label>
-          <input type="number" id="imageDownloadSize" class="form-control" formControlName="imageDownloadSize" required min="0">
-        </div>
-        <div class="mb-3 form-check">
-          <input type="checkbox" id="imageEnabled" class="form-check-input" formControlName="isEnabled">
-          <label for="imageEnabled" class="form-check-label">Enabled</label>
+
+        <!-- Enabled Switch -->
+        <div class="form-check form-switch mt-4">
+          <input type="checkbox" class="form-check-input"
+                 id="imageEnabled" formControlName="isEnabled">
+          <label class="form-check-label fw-bold" for="imageEnabled">Enabled</label>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
-      <button type="submit" class="btn btn-primary">Save</button>
+
+    <div class="modal-footer border-0 pt-4">
+      <button type="button" class="btn btn-outline-secondary"
+              (click)="modal.dismiss()">Cancel</button>
+      <button type="submit" class="btn btn-primary px-4">
+        <i class="bi bi-save me-2"></i>Save Changes
+      </button>
     </div>
   </form>
 </div>
