@@ -7,7 +7,6 @@ WORKDIR /app/Frontend
 # Copy package files and install dependencies
 COPY ./Frontend/package*.json ./
 RUN npm install
-RUN npm ci
 
 # Remove the node_modules directory
 RUN rm -rf node_modules
@@ -17,6 +16,9 @@ COPY ./Frontend .
 
 # Install Angular CLI
 RUN npm install -g @angular/cli
+
+# Reinstall dependencies after copying the rest of the files
+RUN npm install
 
 # Generate the SSR build with Angular CLI
 RUN ng build --configuration production
