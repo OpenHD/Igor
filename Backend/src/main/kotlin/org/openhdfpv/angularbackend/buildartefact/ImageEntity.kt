@@ -53,6 +53,8 @@ data class ImageEntity(
 
     var isAvailable: Boolean = false, // automatic periodically available checks
 
+    var position: Int = 0,
+
     @Column(nullable = false)
     val initFormat: String,
 

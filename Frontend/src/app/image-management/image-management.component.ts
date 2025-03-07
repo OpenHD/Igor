@@ -21,7 +21,7 @@ export class ImageManagementComponent {
 
   images: ImageFragmentFragment[] = [];
   categories: OsCategoryFragmentFragment[] = [];
-
+  
   ngOnInit() {
     this.graphql.getImagesWithCategories().valueChanges.subscribe({
       next: ({ data }) => {

@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #00a2ec;">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">OpenHD Management</a>
+    <button class="navbar-toggler"
+            type="button"
+            (click)="isCollapsed = !isCollapsed"
+            [attr.aria-expanded]="!isCollapsed"
+            aria-controls="navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" [ngClass]="{ 'show': !isCollapsed }" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link"
+             routerLink="/images"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }">Image Management</a>
+        </li>
+        <!-- Weitere Links hier einfügen -->
+      </ul>
+    </div>
+  </div>
+</nav>

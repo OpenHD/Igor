@@ -1,0 +1,22 @@
+.navbar {
+  .nav-link {
+    cursor: pointer;
+
+    &:hover {
+      color: white !important;
+    }
+
+    &.active {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  }
+
+  .navbar-toggler {
+    border-color: rgba(255,255,255,0.5);
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+    }
+  }
+}
