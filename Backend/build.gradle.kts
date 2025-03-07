@@ -83,3 +83,5 @@ tasks.generateJava {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+
