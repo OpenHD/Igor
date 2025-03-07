@@ -15,7 +15,7 @@ export function createApollo(httpLink: HttpLink, platformId: Object) {
     // Browser: Zugriff auf window ist sicher
     graphqlUri = window.location.hostname === 'localhost'
       ? 'http://127.0.0.1:8080/graphql'
-      : `${window.location.origin}/graphql`;
+      : 'https://download.openhdfpv.org/graphql';
   } else {
     // SSR: Fallback-URI setzen
     graphqlUri = 'http://127.0.0.1:8080/graphql';
