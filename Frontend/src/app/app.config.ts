@@ -1,3 +1,5 @@
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -7,9 +9,28 @@ import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
 
-const graphqlUri = window.location.hostname === 'localhost'
-  ? 'http://127.0.0.1:8080/graphql'
-  : `${window.location.origin}/graphql`;
+export function createApollo(httpLink: HttpLink, platformId: Object) {
+  let graphqlUri: string;
+  if (isPlatformBrowser(platformId)) {
+    // Browser: Zugriff auf window ist sicher
+    graphqlUri = window.location.hostname === 'localhost'
+      ? 'http://127.0.0.1:8080/graphql'
+      : `${window.location.origin}/graphql`;
+  } else {
+    // SSR: Fallback-URI setzen
+    graphqlUri = 'http://127.0.0.1:8080/graphql';
+  }
+
+  return {
+    cache: new InMemoryCache(),
+    link: httpLink.create({ uri: graphqlUri }),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'cache-and-network',
+      },
+    }
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,20 +40,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     {
       provide: APOLLO_OPTIONS,
-      useFactory(httpLink: HttpLink) {
-        return {
-          cache: new InMemoryCache(),
-          link: httpLink.create({
-            uri: graphqlUri
-          }),
-          defaultOptions: {
-            watchQuery: {
-              fetchPolicy: 'cache-and-network',
-            },
-          }
-        };
-      },
-      deps: [HttpLink]
+      useFactory: createApollo,
+      deps: [HttpLink, PLATFORM_ID]
     },
     Apollo
   ]
