@@ -25,4 +25,4 @@ COPY --from=builder /app/dist/open-hd-management-frontend ./dist
 EXPOSE 4200
 
 # Starte den Angular SSR Server (anpassen, falls der Entry-Point abweicht)
-CMD ["node", "dist/server/main.js"]
+CMD ["node", "dist/server/server.mjs"]
