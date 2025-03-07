@@ -1,4 +1,3 @@
-// src/app/app.config.ts
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -7,6 +6,10 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
+
+const graphqlUri = window.location.hostname === 'localhost'
+  ? 'http://127.0.0.1:8080/graphql'
+  : `${window.location.origin}/graphql`;
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,7 +23,7 @@ export const appConfig: ApplicationConfig = {
         return {
           cache: new InMemoryCache(),
           link: httpLink.create({
-            uri: 'http://127.0.0.1:8080/graphql'
+            uri: graphqlUri
           }),
           defaultOptions: {
             watchQuery: {
