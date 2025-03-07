@@ -38,3 +38,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Angular Frontend ###
+src/main/resources/static/panel/**/
