@@ -14,11 +14,11 @@ jobs:
           - name: frontend
             context: ./Frontend
             dockerfile: ./Frontend/Dockerfile
-            tag: ${{ secrets.DOCKER_REPO_FRONT }}:dev
+            tag: frontend:dev
           - name: backend
             context: ./Backend
             dockerfile: ./Backend/Dockerfile
-            tag: ${{ secrets.DOCKER_REPO_BACK }}:dev
+            tag: backend:dev
 
     steps:
       - name: Checkout repository
@@ -39,4 +39,4 @@ jobs:
           context: ${{ matrix.image.context }}
           file: ${{ matrix.image.dockerfile }}
           push: true
-          tags: ${{ matrix.image.tag }}
+          tags: ${{ matrix.image.name == 'frontend' && secrets.DOCKER_REPO_FRONT || secrets.DOCKER_REPO_BACK }}:dev
