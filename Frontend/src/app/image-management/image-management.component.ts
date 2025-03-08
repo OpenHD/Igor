@@ -21,7 +21,8 @@ export class ImageManagementComponent {
 
   images: ImageFragmentFragment[] = [];
   categories: OsCategoryFragmentFragment[] = [];
-  
+  currentView: 'grid' | 'list' = 'grid';
+
   ngOnInit() {
     this.graphql.getImagesWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
@@ -106,6 +107,6 @@ export class ImageManagementComponent {
 
   // Für die Sortierung der Kategorien (optional)
   get sortedCategories() {
-    return this.categories.sort((a, b) => a.name.localeCompare(b.name));
+    return [...this.categories].sort((a, b) => a.name.localeCompare(b.name));
   }
 }
