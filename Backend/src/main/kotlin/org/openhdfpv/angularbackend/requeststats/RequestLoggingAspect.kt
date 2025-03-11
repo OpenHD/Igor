@@ -17,33 +17,44 @@ class RequestLoggingAspect(
     @Around("@annotation(logRequest)")
     fun logRequest(joinPoint: ProceedingJoinPoint, logRequest: LogRequest): Any? {
         val result = joinPoint.proceed()
-
-        // Argumente der Methode prüfen (z. B. Datei-ID oder SHA256-Wert)
         val args = joinPoint.args
-        val relatedEntityId: Long? = args.firstOrNull { it is Long } as? Long
 
-        // Logik zur Speicherung der Metadaten
         val request = Request(
             method = httpServletRequest.method,
+            type = logRequest.type,
             uri = httpServletRequest.requestURI,
-            queryParams = httpServletRequest.queryString,
-            headers = httpServletRequest.headerNames.toList()
-                .joinToString { "${it}: ${httpServletRequest.getHeader(it)}" },
+            queryParams = httpServletRequest.queryString.takeIf { !it.isNullOrEmpty() },
+            headers = extractHeaders(),
             remoteAddr = httpServletRequest.remoteAddr,
+            clientIp = IpUtils.resolveClientIp(httpServletRequest), // Wichtig!
             userAgent = httpServletRequest.getHeader("User-Agent"),
             scheme = httpServletRequest.scheme,
             protocol = httpServletRequest.protocol,
             secure = httpServletRequest.isSecure,
             referer = httpServletRequest.getHeader("Referer"),
-            origin = logRequest.origin, // Herkunft aus Annotation
-            type = logRequest.type, // Typ aus Annotation
-            relatedEntityId = if (logRequest.relatedEntity) relatedEntityId else null, // Nur wenn erlaubt
-            description = logRequest.description
+            origin = logRequest.origin,
+            relatedEntityId = resolveRelatedEntityId(logRequest, args),
+            description = logRequest.description,
+            // Neue Felder initialisieren
+            isTorExitNode = null,
+            country = null,
+            city = null,
+            lastCheckedAt = null
         )
 
-        // Speichern in der Datenbank
         requestRepository.save(request)
+        return result
+    }
 
-        return result // Rückgabe des eigentlichen Ergebnisses
+    private fun extractHeaders(): String {
+        return httpServletRequest.headerNames
+            .toList()
+            .joinToString(";") { "$it=${httpServletRequest.getHeader(it)}" }
+    }
+
+    private fun resolveRelatedEntityId(logRequest: LogRequest, args: Array<Any>): Long? {
+        return if (logRequest.relatedEntity) {
+            args.filterIsInstance<Long>().firstOrNull()
+        } else null
     }
 }

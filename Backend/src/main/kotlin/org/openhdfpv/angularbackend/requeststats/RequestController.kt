@@ -14,4 +14,9 @@ class RequestController(
     fun getAllRequests(): List<Request> {
         return requestRepository.findAll()
     }
+
+    @GetMapping("/requests/tor")
+    fun getTorRequests(): List<Request> {
+        return requestRepository.findByIsTorExitNodeTrue()
+    }
 }
