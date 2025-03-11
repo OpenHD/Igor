@@ -14,11 +14,12 @@ class OsCategoryService(
 
     // Erstellt eine neue OS-Kategorie
     fun createOsCategory(osCategory: OsCategory): OsCategory {
-        // Prüfe auf doppelte Namen
         if (osCategoryRepository.findByName(osCategory.name) != null) {
             throw IllegalArgumentException("OS-Kategorie mit Namen '${osCategory.name}' existiert bereits.")
         }
-        return osCategoryRepository.save(osCategory)
+        osCategoryRepository.incrementAllPositions()
+        val newCategory = osCategory.copy(position = 0)
+        return osCategoryRepository.save(newCategory)
     }
 
     // Aktualisiert eine bestehende Kategorie
@@ -52,7 +53,7 @@ class OsCategoryService(
 
     // Holt alle Kategorien
     @Transactional(readOnly = true)
-    fun findAllCategories(): List<OsCategory> = osCategoryRepository.findAll()
+    fun findAllCategories(): List<OsCategory> = osCategoryRepository.findAllByOrderByPositionAsc()
 
     // Holt eine Kategorie nach ID
     @Transactional(readOnly = true)
@@ -75,14 +76,34 @@ class OsCategoryService(
         val existingCategory = osCategoryRepository.findById(input.id)
             .orElseThrow { EntityNotFoundException("OS-Kategorie mit ID ${input.id} nicht gefunden") }
 
-        return osCategoryRepository.save(
-            existingCategory.copy(
-                name = input.name ?: existingCategory.name,
-                description = input.description ?: existingCategory.description,
-                icon = input.icon ?: existingCategory.icon
-            )
-        )
-    }
+        input.name?.let { newName ->
+            if (newName != existingCategory.name && osCategoryRepository.findByName(newName) != null) {
+                throw IllegalArgumentException("OS-Kategorie mit Namen '$newName' existiert bereits.")
+            }
+            existingCategory.name = newName
+        }
 
+        input.description?.let { existingCategory.description = it }
+        input.icon?.let { existingCategory.icon = it }
+
+        input.position?.let { newPosition ->
+            if (newPosition != existingCategory.position) {
+                if (newPosition == 0) {
+                    // Increment positions of all categories
+                    osCategoryRepository.incrementAllPositions()
+                } else {
+                    // Adjust positions of categories between old and new positions
+                    if (newPosition < existingCategory.position) {
+                        osCategoryRepository.incrementPositionsBetween(newPosition, existingCategory.position)
+                    } else {
+                        osCategoryRepository.decrementPositionsBetween(existingCategory.position, newPosition)
+                    }
+                }
+                existingCategory.position = newPosition
+            }
+        }
+
+        return osCategoryRepository.save(existingCategory)
+    }
 
 }

@@ -12,13 +12,16 @@ data class OsCategory(
     val id: Long? = null,
 
     @Column(nullable = false, unique = true)
-    val name: String = "", // Default added
+    var name: String = "", // Default added
 
     @Column(nullable = false)
-    val description: String = "", // Default added
+    var description: String = "", // Default added
 
     @Column(nullable = false)
-    val icon: String = "", // Default added
+    var icon: String = "", // Default added
+
+    @Column(nullable = false)
+    var position: Int = 0,
 
     // Erstellungszeitpunkt
     @Column(name = "created_at", nullable = false, updatable = false)

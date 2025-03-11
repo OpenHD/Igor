@@ -5,5 +5,6 @@ data class OsCategoryInputUpdate(
     val id: Long,          // Erforderlich für Identifikation
     val name: String?,      // Optional
     val description: String?,
-    val icon: String?
+    val icon: String?,
+    val position: Int?
 )

@@ -29,12 +29,21 @@ repositories {
 
 dependencies {
 
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.postgresql:postgresql")
+
     // HTMX
     implementation("org.webjars.npm:htmx.org:1.9.10")
 
     // Alpine.js
     implementation("org.webjars.npm:alpinejs:3.13.5")
 
+
+    implementation("org.apache.httpcomponents.client5:httpclient5")
+    implementation("org.apache.httpcomponents.core5:httpcore5")
+    implementation("org.springframework.retry:spring-retry")
+    implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("com.graphql-java:graphql-java-extended-scalars")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
@@ -56,7 +65,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.session:spring-session-core")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    //developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
