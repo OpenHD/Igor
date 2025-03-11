@@ -197,6 +197,7 @@ export type OsCategory = {
   icon: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  position: Scalars['Int']['output'];
 };
 
 export type OsCategoryInput = {
@@ -210,6 +211,7 @@ export type OsCategoryInputUpdate = {
   icon?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
+  position?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Query = {
@@ -237,25 +239,26 @@ export type QueryImagesListByEndpointArgs = {
   endpoint: Scalars['String']['input'];
 };
 
+export type ImageFragmentFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
+
+export type OsCategoryFragmentFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
+
 export type GetAllImagesWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllImagesWithCategoriesQuery = { __typename?: 'Query', images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string } | null }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string }> };
+export type GetAllImagesWithCategoriesQuery = { __typename?: 'Query', images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
+
+export type GetOsCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOsCategoriesQuery = { __typename?: 'Query', osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
 
 export type CreateImageMutationVariables = Exact<{
   input: ImageInput;
 }>;
 
 
-export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string } | null } };
-
-export type UpdateImagePartialMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: ImagePartialInput;
-}>;
-
-
-export type UpdateImagePartialMutation = { __typename?: 'Mutation', updateImagePartial: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string } | null } };
+export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
 
 export type DeleteImageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -264,9 +267,34 @@ export type DeleteImageMutationVariables = Exact<{
 
 export type DeleteImageMutation = { __typename?: 'Mutation', deleteImage?: boolean | null };
 
-export type ImageFragmentFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string } | null };
+export type UpdateImagePartialMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: ImagePartialInput;
+}>;
 
-export type OsCategoryFragmentFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string };
+
+export type UpdateImagePartialMutation = { __typename?: 'Mutation', updateImagePartial: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
+
+export type CreateOsCategoryMutationVariables = Exact<{
+  input: OsCategoryInput;
+}>;
+
+
+export type CreateOsCategoryMutation = { __typename?: 'Mutation', createOsCategory: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } };
+
+export type UpdateOsCategoryPartialMutationVariables = Exact<{
+  input: OsCategoryInputUpdate;
+}>;
+
+
+export type UpdateOsCategoryPartialMutation = { __typename?: 'Mutation', updateOsCategoryPartial: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } };
+
+export type DeleteOsCategoryMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteOsCategoryMutation = { __typename?: 'Mutation', deleteOsCategory?: boolean | null };
 
 export const OsCategoryFragmentFragmentDoc = gql`
     fragment OsCategoryFragment on OsCategory {
@@ -274,6 +302,7 @@ export const OsCategoryFragmentFragmentDoc = gql`
   name
   description
   icon
+  position
 }
     `;
 export const ImageFragmentFragmentDoc = gql`
@@ -321,6 +350,24 @@ ${OsCategoryFragmentFragmentDoc}`;
       super(apollo);
     }
   }
+export const GetOsCategoriesDocument = gql`
+    query GetOsCategories {
+  osCategories {
+    ...OsCategoryFragment
+  }
+}
+    ${OsCategoryFragmentFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetOsCategoriesGQL extends Apollo.Query<GetOsCategoriesQuery, GetOsCategoriesQueryVariables> {
+    document = GetOsCategoriesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
 export const CreateImageDocument = gql`
     mutation CreateImage($input: ImageInput!) {
   createImage(input: $input) {
@@ -334,6 +381,22 @@ export const CreateImageDocument = gql`
   })
   export class CreateImageGQL extends Apollo.Mutation<CreateImageMutation, CreateImageMutationVariables> {
     document = CreateImageDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeleteImageDocument = gql`
+    mutation DeleteImage($id: ID!) {
+  deleteImage(id: $id)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DeleteImageGQL extends Apollo.Mutation<DeleteImageMutation, DeleteImageMutationVariables> {
+    document = DeleteImageDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -357,17 +420,53 @@ export const UpdateImagePartialDocument = gql`
       super(apollo);
     }
   }
-export const DeleteImageDocument = gql`
-    mutation DeleteImage($id: ID!) {
-  deleteImage(id: $id)
+export const CreateOsCategoryDocument = gql`
+    mutation CreateOsCategory($input: OsCategoryInput!) {
+  createOsCategory(input: $input) {
+    ...OsCategoryFragment
+  }
+}
+    ${OsCategoryFragmentFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class CreateOsCategoryGQL extends Apollo.Mutation<CreateOsCategoryMutation, CreateOsCategoryMutationVariables> {
+    document = CreateOsCategoryDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const UpdateOsCategoryPartialDocument = gql`
+    mutation UpdateOsCategoryPartial($input: OsCategoryInputUpdate!) {
+  updateOsCategoryPartial(input: $input) {
+    ...OsCategoryFragment
+  }
+}
+    ${OsCategoryFragmentFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UpdateOsCategoryPartialGQL extends Apollo.Mutation<UpdateOsCategoryPartialMutation, UpdateOsCategoryPartialMutationVariables> {
+    document = UpdateOsCategoryPartialDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeleteOsCategoryDocument = gql`
+    mutation DeleteOsCategory($id: ID!) {
+  deleteOsCategory(id: $id)
 }
     `;
 
   @Injectable({
     providedIn: 'root'
   })
-  export class DeleteImageGQL extends Apollo.Mutation<DeleteImageMutation, DeleteImageMutationVariables> {
-    document = DeleteImageDocument;
+  export class DeleteOsCategoryGQL extends Apollo.Mutation<DeleteOsCategoryMutation, DeleteOsCategoryMutationVariables> {
+    document = DeleteOsCategoryDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

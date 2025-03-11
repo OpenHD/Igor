@@ -5,8 +5,18 @@ import {
   GetAllImagesWithCategoriesDocument,
   CreateImageDocument,
   UpdateImagePartialDocument,
-  DeleteImageDocument, ImageInput, ImagePartialInput, GetAllImagesWithCategoriesQuery
+  DeleteImageDocument,
+  ImageInput,
+  ImagePartialInput,
+  GetAllImagesWithCategoriesQuery,
+  OsCategoryInputUpdate,
+  GetOsCategoriesDocument,
+  OsCategoryInput,
+  CreateOsCategoryDocument,
+  UpdateOsCategoryPartialDocument,
+  DeleteOsCategoryDocument
 } from '../graphql/generated';
+import {Observable} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GraphqlService {
@@ -40,6 +50,43 @@ export class GraphqlService {
     return this.apollo.mutate({
       mutation: DeleteImageDocument,
       variables: { id }
+    });
+  }
+
+  getOsCategories() {
+    return this.apollo.watchQuery({
+      query: GetOsCategoriesDocument,
+      fetchPolicy: 'cache-and-network'
+    });
+  }
+
+  createOsCategory(input: OsCategoryInput): Observable<any> {
+    return this.apollo.mutate({
+      mutation: CreateOsCategoryDocument,
+      variables: { input },
+      refetchQueries: [GetOsCategoriesDocument]
+    });
+  }
+
+  updateOsCategoryPartial(input: OsCategoryInputUpdate): Observable<any> {
+    return this.apollo.mutate({
+      mutation: UpdateOsCategoryPartialDocument,
+      variables: { input },
+      optimisticResponse: (vars) => ({
+        __typename: 'Mutation',
+        updateOsCategoryPartial: {
+          ...vars.input,
+          __typename: 'OsCategory'
+        }
+      })
+    });
+  }
+
+  deleteOsCategory(id: string): Observable<any> {
+    return this.apollo.mutate({
+      mutation: DeleteOsCategoryDocument,
+      variables: { id },
+      refetchQueries: [GetOsCategoriesDocument]
     });
   }
 }

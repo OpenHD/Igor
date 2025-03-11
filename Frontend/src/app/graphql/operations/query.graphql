@@ -1,0 +1,88 @@
+# ----------------------------
+# Fragments
+# ----------------------------
+
+fragment ImageFragment on Image {
+  id
+  name
+  description
+  icon
+  urls {
+    url
+    isAvailable
+    isDefault
+  }
+  extractSize
+  extractSha256
+  imageDownloadSize
+  isEnabled
+  category {
+    ...OsCategoryFragment
+  }
+  releaseDate
+  url
+  redirectsCount
+}
+
+fragment OsCategoryFragment on OsCategory {
+  id
+  name
+  description
+  icon
+  position
+}
+
+# ----------------------------
+# Queries
+# ----------------------------
+
+query GetAllImagesWithCategories {
+  images {
+    ...ImageFragment
+  }
+  osCategories {
+    ...OsCategoryFragment
+  }
+}
+
+query GetOsCategories {
+  osCategories {
+    ...OsCategoryFragment
+  }
+}
+
+# ----------------------------
+# Mutations
+# ----------------------------
+
+mutation CreateImage($input: ImageInput!) {
+  createImage(input: $input) {
+    ...ImageFragment
+  }
+}
+
+mutation DeleteImage($id: ID!) {
+  deleteImage(id: $id)
+}
+
+mutation UpdateImagePartial($id: ID!, $input: ImagePartialInput!) {
+  updateImagePartial(id: $id, input: $input) {
+    ...ImageFragment
+  }
+}
+
+mutation CreateOsCategory($input: OsCategoryInput!) {
+  createOsCategory(input: $input) {
+    ...OsCategoryFragment
+  }
+}
+
+mutation UpdateOsCategoryPartial($input: OsCategoryInputUpdate!) {
+  updateOsCategoryPartial(input: $input) {
+    ...OsCategoryFragment
+  }
+}
+
+mutation DeleteOsCategory($id: ID!) {
+  deleteOsCategory(id: $id)
+}

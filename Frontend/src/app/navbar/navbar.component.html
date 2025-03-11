@@ -10,13 +10,12 @@
     </button>
     <div class="collapse navbar-collapse" [ngClass]="{ 'show': !isCollapsed }" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item">
+        <li class="nav-item" *ngFor="let link of navLinks">
           <a class="nav-link"
-             routerLink="/images"
+             [routerLink]="link.path"
              routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: true }">Image Management</a>
+             [routerLinkActiveOptions]="{ exact: true }">{{ link.label }}</a>
         </li>
-        <!-- Weitere Links hier einfügen -->
       </ul>
     </div>
   </div>

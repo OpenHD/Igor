@@ -90,6 +90,7 @@ type OsCategory {
   name: String!
   description: String!
   icon: String!
+  position: Int!
 }
 
 # ----------------------------
@@ -164,4 +165,5 @@ input OsCategoryInputUpdate {
   name: String     # Optional field for partial update
   description: String
   icon: String
+  position: Int
 }
