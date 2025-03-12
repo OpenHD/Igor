@@ -64,9 +64,9 @@ class ImageGraphQLController(
 
     @MutationMapping
     fun createImagesList(@Argument input: ImagesListInput): ImagesList {
-        val imageEntities = input.imageIds.map { imageId ->
+        val imageEntities = input.imageIds?.map { imageId ->
             imageService.findById(UUID.fromString(imageId))
-        }.toSet()
+        }?.toSet() ?: emptySet()
 
         return imageListService.createImagesList(
             ImagesList(
@@ -83,9 +83,13 @@ class ImageGraphQLController(
 
     @MutationMapping
     fun updateImagesList(@Argument id: Long, @Argument input: ImagesListInput): ImagesList {
-        val imageEntities = input.imageIds.map { imageId ->
+        val existingList = imageListService.getImagesListById(id)
+            ?: throw EntityNotFoundException("ImagesList mit ID $id nicht gefunden.")
+
+        val imageEntities = input.imageIds?.map { imageId ->
             imageService.findById(UUID.fromString(imageId))
-        }.toSet()
+        }?.toSet() ?: existingList.imageEntities
+
         val updatedList = ImagesList(
             id = id,
             latestVersion = input.latestVersion,

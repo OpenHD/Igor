@@ -68,7 +68,6 @@ class ImageService(
 
     fun deleteAll() = buildImagesRepository.deleteAll()
 
-    // ImageService.kt
     fun saveFromDto(dto: ImageDTO): ImageEntity {
         val foundCategory = dto.categoryId?.let {
             osCategoryService.findCategoryById(it)

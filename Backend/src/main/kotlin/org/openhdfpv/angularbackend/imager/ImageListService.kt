@@ -109,6 +109,7 @@ class ImageListService(
         )
     }
 
+
     // ImagesList löschen
     fun deleteImagesList(imagesListId: Long) {
         val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
@@ -196,17 +197,11 @@ class ImageListService(
     }
 
     fun updateImagesListPartial(id: Long, input: ImagesListPartialInput): ImagesList {
-        val existingList = imagesListRepository.findById(id)
-            .orElseThrow { EntityNotFoundException("ImagesList mit ID $id nicht gefunden.") }
-        return imagesListRepository.save(
-            existingList.copy(
-                latestVersion = input.latestVersion ?: existingList.latestVersion,
-                url = input.url ?: existingList.url,
-                name = input.name ?: existingList.name,
-                endpoint = input.endpoint ?: existingList.endpoint,
-                description = input.description ?: existingList.description
-            )
-        )
+        val existingList = imagesListRepository.findById(id).orElseThrow {
+            EntityNotFoundException("ImagesList mit ID $id nicht gefunden.")
+        }
+        existingList.updateFromPartialInput(input)
+        return imagesListRepository.save(existingList)
     }
 
     fun findImagesListsByImageId(imageId: UUID): List<Long> {

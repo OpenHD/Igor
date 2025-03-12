@@ -6,5 +6,5 @@ data class ImagesListInput(
     val name: String,
     val endpoint: String,
     val description: String,
-    val imageIds: List<String>
+    val imageIds: List<String>? = null
 )

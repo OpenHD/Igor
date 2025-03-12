@@ -120,7 +120,7 @@ input ImagesListInput {
     name: String!
     endpoint: String!
     description: String!
-    imageIds: [ID!]!
+    imageIds: [ID]
 }
 
 input OsCategoryInput {

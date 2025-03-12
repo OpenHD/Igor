@@ -72,6 +72,7 @@ data class ImageEntity(
     @UpdateTimestamp
     val updatedAt: LocalDateTime = LocalDateTime.MIN
 ) {
+
     fun getCurrentAvailableUrl(): String? {
         // Zuerst wird nach der als default markierten und verfügbaren URL gesucht
         val defaultAvailable = urls.firstOrNull { it.isDefault && it.isAvailable }
