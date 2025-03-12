@@ -29,14 +29,7 @@ class UrlAvailabilityService(
                 }
             }
 
-            val legacyAvailable = isUrlReachable(entity.url)
             var requiresUpdate = false
-
-            if (entity.isAvailable != legacyAvailable) {
-                logger.info("Änderung von isAvailable für Legacy-URL ${entity.url} in Entity ${entity.name}: $legacyAvailable")
-                entity.isAvailable = legacyAvailable
-                requiresUpdate = true
-            }
 
             if (updatedUrls != entity.urls) {
                 entity.urls = updatedUrls

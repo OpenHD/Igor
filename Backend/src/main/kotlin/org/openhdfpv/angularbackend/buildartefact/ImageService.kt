@@ -20,7 +20,7 @@ class ImageService(
             val updatedEntity = entity.copy(redirectsCount = entity.redirectsCount + 1)
             buildImagesRepository.save(updatedEntity)
             ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", entity.url)
+                .header("Location", entity.getCurrentAvailableUrl())
                 .build()
         } ?: ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("ImageEntity not found.")
@@ -79,7 +79,6 @@ class ImageService(
                 name = dto.name
                 description = dto.description
                 icon = dto.icon
-                url = dto.url
                 backupUrls = dto.backupUrls
                 extractSize = dto.extractSize
                 extractSha256 = dto.extractSha256
@@ -99,7 +98,6 @@ class ImageService(
                 name = dto.name,
                 description = dto.description,
                 icon = dto.icon,
-                url = dto.url,
                 backupUrls = dto.backupUrls,
                 extractSize = dto.extractSize,
                 extractSha256 = dto.extractSha256,
@@ -123,7 +121,6 @@ class ImageService(
         input.name?.let { existingImage.name = it }
         input.description?.let { existingImage.description = it }
         input.icon?.let { existingImage.icon = it }
-        input.url?.let { existingImage.url = it }
         input.urls?.let { urls ->
             existingImage.urls = urls.map { ImageUrl(it.url, isDefault = it.isDefault) }
         }
@@ -132,7 +129,6 @@ class ImageService(
         input.extractSha256?.let { existingImage.extractSha256 = it }
         input.imageDownloadSize?.let { existingImage.imageDownloadSize = it }
         input.isEnabled?.let { existingImage.isEnabled = it }
-        input.isAvailable?.let { existingImage.isAvailable = it }
         input.releaseDate?.let { existingImage.releaseDate = it }
         input.redirectsCount?.let { existingImage.redirectsCount = it }
         input.categoryId?.let {

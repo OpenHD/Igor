@@ -97,7 +97,6 @@ export class EditImageModalComponent {
       })),
       extractSize: Number(formValue.extractSize),
       imageDownloadSize: Number(formValue.imageDownloadSize),
-      url: formValue.urls.length > 0 ? formValue.urls[0].url : ''
     };
 
     if (this.image?.id) {

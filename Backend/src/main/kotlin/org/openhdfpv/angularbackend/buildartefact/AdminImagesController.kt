@@ -45,7 +45,6 @@ class AdminImagesController(
             name = "",
             description = "",
             icon = "",
-            url = "",
             backupUrls = emptyList(),
             extractSize = 0,
             extractSha256 = "",

@@ -131,7 +131,6 @@ class DummyDataLoader(
         releaseDate = imageJson.releaseDate,
         initFormat = imageJson.initFormat ?: "systemd",
         category = category,
-        url = imageJson.url,
     )
 
     private fun customExchangeStrategies(objectMapper: ObjectMapper) =

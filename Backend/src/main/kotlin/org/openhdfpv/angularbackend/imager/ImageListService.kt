@@ -149,7 +149,7 @@ class ImageListService(
                 merged.add(existingImage.copy(
                     name = newImage.name,
                     description = newImage.description,
-                    url = newImage.url,
+                    urls = newImage.urls,
                     releaseDate = newImage.releaseDate
                 ))
             } else {

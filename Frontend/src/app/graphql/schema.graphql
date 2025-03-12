@@ -53,14 +53,12 @@ type Image {
   name: String!
   description: String!
   icon: String!
-  url: String!
   urls: [ImageUrl!]!
   backupUrls: [String]
   extractSize: Long!
   extractSha256: String
   imageDownloadSize: Long!
   isEnabled: Boolean!
-  isAvailable: Boolean
   releaseDate: String!        # ISO-8601 formatted date string
   redirectsCount: Long
   category: OsCategory
@@ -100,7 +98,6 @@ input ImageInput {
   name: String!
   description: String!
   icon: String!
-  url: String!
   urls: [ImageUrlInput!]!
   extractSize: Long!
   extractSha256: String
@@ -137,14 +134,12 @@ input ImagePartialInput {
   name: String
   description: String
   icon: String
-  url: String
   urls: [ImageUrlInput!]
   backupUrls: [String]
   extractSize: Long
   extractSha256: String
   imageDownloadSize: Long
   isEnabled: Boolean
-  isAvailable: Boolean
   releaseDate: String
   redirectsCount: Long
   categoryId: ID

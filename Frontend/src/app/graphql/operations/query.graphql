@@ -20,7 +20,6 @@ fragment Image on Image {
     ...OsCategory
   }
   releaseDate
-  url
   redirectsCount
 }
 
