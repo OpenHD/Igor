@@ -12,65 +12,26 @@ import java.util.*
 
 @Entity
 data class ImageEntity(
-    @Id @org.hibernate.annotations.UuidGenerator(style = UuidGenerator.Style.AUTO)
-    val id: UUID? = null,
-
-    // Wichtige
-    @Column(nullable = false)
-    var name: String,
-
-    @Column(nullable = false)
-    var description: String,
-
-    @Column(nullable = false)
-    var icon: String,
-
-    @Column(nullable = false)
-    var url: String,
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "image_urls", joinColumns = [JoinColumn(name = "image_id")])
-    var urls: List<ImageUrl> = emptyList(),
-
+    @Id @UuidGenerator(style = UuidGenerator.Style.AUTO) val id: UUID? = null,
+    @Column(nullable = false) var name: String,
+    @Column(nullable = false) var description: String,
+    @Column(nullable = false) var icon: String,
+    @Column(nullable = false) var url: String,
+    @ElementCollection(fetch = FetchType.EAGER) @CollectionTable(name = "image_urls", joinColumns = [JoinColumn(name = "image_id")]) var urls: List<ImageUrl> = emptyList(),
     var extractSize: Long,
-    @Column(name = "extract_sha256", nullable = true, unique = false)
-    var extractSha256: String? = null,
-
+    @Column(name = "extract_sha256", nullable = true, unique = false) var extractSha256: String? = null,
     var imageDownloadSize: Long,
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "backup_urls", nullable = true)
-    var backupUrls: List<String> = emptyList(),
-
+    @ElementCollection(fetch = FetchType.EAGER) @Column(name = "backup_urls", nullable = true) var backupUrls: List<String> = emptyList(),
     var redirectsCount: Long = 0L,
-
-    @Column(nullable = false)
-    var releaseDate: String,
-
+    @Column(nullable = false) var releaseDate: String,
     var isEnabled: Boolean = true,
-
     val isDeleted: Boolean = false,
-
-    var isAvailable: Boolean = false, // automatic periodically available checks
-
+    var isAvailable: Boolean = false,
     var position: Int = 0,
-
-    @Column(nullable = false)
-    val initFormat: String,
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = true)
-    var category: OsCategory? = null,
-
-    // Erstellungszeitpunkt
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
-    val createdAt: LocalDateTime = LocalDateTime.MIN,
-
-    // Aktualisierungszeitpunkt
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
-    val updatedAt: LocalDateTime = LocalDateTime.MIN
+    @Column(nullable = false) val initFormat: String,
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "category_id", nullable = true) var category: OsCategory? = null,
+    @Column(name = "created_at", nullable = false, updatable = false) @CreationTimestamp val createdAt: LocalDateTime = LocalDateTime.MIN,
+    @Column(name = "updated_at", nullable = false) @UpdateTimestamp val updatedAt: LocalDateTime = LocalDateTime.MIN
 ) {
 
     fun getCurrentAvailableUrl(): String? {
