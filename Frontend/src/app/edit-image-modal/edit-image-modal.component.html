@@ -129,6 +129,9 @@
                      id="extractSize" formControlName="extractSize"
                      placeholder=" " required>
               <label for="extractSize">Extract Size (bytes)</label>
+              <small class="form-text text-muted">
+                {{ formatBytes(imageForm.get('extractSize')?.value || 0) }}
+              </small>
             </div>
           </div>
 
@@ -147,9 +150,13 @@
                      id="imageDownloadSize" formControlName="imageDownloadSize"
                      placeholder=" " required>
               <label for="imageDownloadSize">Download Size (bytes)</label>
+              <small class="form-text text-muted">
+                {{ formatBytes(imageForm.get('imageDownloadSize')?.value || 0) }}
+              </small>
             </div>
           </div>
         </div>
+
 
         <!-- Enabled Switch -->
         <div class="form-check form-switch mt-4">
