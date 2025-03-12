@@ -32,6 +32,16 @@ fragment OsCategoryFragment on OsCategory {
   position
 }
 
+fragment ImageListFragment on ImagesList {
+  id
+  name
+  endpoint
+  description
+  images {
+    ...ImageFragment
+  }
+}
+
 # ----------------------------
 # Queries
 # ----------------------------
@@ -46,6 +56,21 @@ query GetAllImagesWithCategories {
 }
 
 query GetOsCategories {
+  osCategories {
+    ...OsCategoryFragment
+  }
+}
+
+query GetAllImagesListsWithCategories {
+  imagesLists {
+    id
+    name
+    endpoint
+    description
+    images {
+      ...ImageFragment
+    }
+  }
   osCategories {
     ...OsCategoryFragment
   }

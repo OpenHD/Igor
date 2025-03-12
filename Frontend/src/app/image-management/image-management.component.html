@@ -22,43 +22,121 @@
     </div>
 
     <div class="card-body">
-      <div *ngFor="let category of sortedCategories" class="category-section mb-4">
-        <div class="d-flex align-items-center mb-3 p-2 category-header">
-          <img [src]="category.icon.startsWith('http') ? category.icon : '/images/icons/' + category.icon"
-               alt="category icon"
-               class="me-2"
-               width="32"
-               height="32"
-               style="object-fit: contain;">
-          <h5 class="mb-0 me-2">
-            {{ category.name }}
-          </h5>
-          <span class="badge bg-secondary ms-auto">
-            <i class="bi bi-images me-1"></i>{{ getCategoryImageCount(category.id) }}
-          </span>
-        </div>
+      <!-- Tabs für ImagesLists -->
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item" *ngFor="let list of imagesLists">
+          <a class="nav-link" [class.active]="selectedListId === list.id" (click)="selectedListId = list.id">
+            {{ list.name }}
+          </a>
+        </li>
+      </ul>
 
-        <!-- Grid View -->
-        <div *ngIf="currentView === 'grid'" class="row g-4">
-          <div *ngFor="let image of getImagesForCategory(category.id)"
-               class="col-12 col-md-6 col-lg-4 col-xl-3">
-            <div class="card h-100 shadow-sm image-card"
-                 (click)="openEditModal(image)"
-                 [class.border-primary]="image.isEnabled">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                  <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
-                       alt="icon"
-                       class="me-3"
-                       width="48"
-                       height="48"
-                       style="object-fit: contain;">
-                  <h6 class="card-title mb-0">{{ image.name }}</h6>
+      <!-- Inhalt der ausgewählten ImagesList -->
+      <div *ngIf="selectedList">
+        <!-- Kategorien und Images -->
+        <div *ngFor="let category of getCategoriesForList(selectedList)" class="category-section mb-4">
+          <div class="d-flex align-items-center mb-3 p-2 category-header">
+            <img [src]="category.icon.startsWith('http') ? category.icon : '/images/icons/' + category.icon"
+                 alt="category icon"
+                 class="me-2"
+                 width="32"
+                 height="32"
+                 style="object-fit: contain;">
+            <h5 class="mb-0 me-2">{{ category.name }}</h5>
+            <span class="badge bg-secondary ms-auto">
+              <i class="bi bi-images me-1"></i>{{ getImagesForCategoryInList(selectedList, category.id).length }}
+            </span>
+          </div>
+
+          <!-- Grid View -->
+          <div *ngIf="currentView === 'grid'" class="row g-4">
+            <div *ngFor="let image of getImagesForCategoryInList(selectedList, category.id)"
+                 class="col-12 col-md-6 col-lg-4 col-xl-3">
+              <div class="card h-100 shadow-sm image-card"
+                   (click)="openEditModal(image)"
+                   [class.border-primary]="image.isEnabled">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
+                         alt="icon"
+                         class="me-3"
+                         width="48"
+                         height="48"
+                         style="object-fit: contain;">
+                    <h6 class="card-title mb-0">{{ image.name }}</h6>
+                  </div>
+
+                  <p class="card-text small text-muted">{{ image.description }}</p>
+
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <select class="form-select form-select-sm"
+                            [ngModel]="image.category?.id"
+                            (ngModelChange)="updateCategory(image, $event)"
+                            (click)="$event.stopPropagation()">
+                      <option *ngFor="let cat of categories" [value]="cat.id">
+                        {{ cat.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="d-flex justify-content-between small">
+                    <span class="badge d-flex align-items-center"
+                          [class.bg-warning]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length"
+                          [class.bg-success]="getAvailableCount(image) === image.urls.length"
+                          [class.bg-danger]="getAvailableCount(image) === 0">
+                      {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
+                    </span>
+                    <span class="text-muted">
+                      <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
+                    </span>
+                  </div>
                 </div>
 
-                <p class="card-text small text-muted">{{ image.description }}</p>
+                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           [checked]="image.isEnabled"
+                           (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
+                  </div>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="deleteImage(image, $event)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
+          <!-- List View -->
+          <div *ngIf="currentView === 'list'" class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+              <tr>
+                <th>Icon</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Availability</th>
+                <th>Redirects</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let image of getImagesForCategoryInList(selectedList, category.id)"
+                  (click)="openEditModal(image)"
+                  style="cursor: pointer">
+                <td>
+                  <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
+                       alt="icon"
+                       width="32"
+                       height="32"
+                       style="object-fit: contain">
+                </td>
+                <td>{{ image.name }}</td>
+                <td class="small text-muted">{{ image.description }}</td>
+                <td>
                   <select class="form-select form-select-sm"
                           [ngModel]="image.category?.id"
                           (ngModelChange)="updateCategory(image, $event)"
@@ -67,107 +145,40 @@
                       {{ cat.name }}
                     </option>
                   </select>
-                </div>
-
-                <div class="d-flex justify-content-between small">
-                  <span class="badge d-flex align-items-center"
-                        [class.bg-warning]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length"
-                        [class.bg-success]="getAvailableCount(image) === image.urls.length"
-                        [class.bg-danger]="getAvailableCount(image) === 0">
-                    {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
-                  </span>
-                  <span class="text-muted">
-                    <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                <div class="form-check form-switch">
-                  <input class="form-check-input"
-                         type="checkbox"
-                         [checked]="image.isEnabled"
-                         (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
-                </div>
-                <button class="btn btn-sm btn-outline-danger"
-                        (click)="deleteImage(image, $event)">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </div>
+                </td>
+                <td>
+                    <span class="badge d-flex align-items-center"
+                          [ngClass]="{
+                            'bg-warning': getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length,
+                            'bg-success': getAvailableCount(image) === image.urls.length,
+                            'bg-danger': getAvailableCount(image) === 0
+                          }">
+                      {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
+                    </span>
+                </td>
+                <td>
+                    <span class="text-muted">
+                      <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
+                    </span>
+                </td>
+                <td>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           [checked]="image.isEnabled"
+                           (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
+                  </div>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-danger"
+                          (click)="$event.stopPropagation(); deleteImage(image, $event)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-
-        <!-- List View -->
-        <div *ngIf="currentView === 'list'" class="table-responsive">
-          <table class="table table-hover align-middle">
-            <thead>
-            <tr>
-              <th>Icon</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Availability</th>
-              <th>Redirects</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let image of getImagesForCategory(category.id)"
-                (click)="openEditModal(image)"
-                style="cursor: pointer">
-              <td>
-                <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
-                     alt="icon"
-                     width="32"
-                     height="32"
-                     style="object-fit: contain">
-              </td>
-              <td>{{ image.name }}</td>
-              <td class="small text-muted">{{ image.description }}</td>
-              <td>
-                <select class="form-select form-select-sm"
-                        [ngModel]="image.category?.id"
-                        (ngModelChange)="updateCategory(image, $event)"
-                        (click)="$event.stopPropagation()">
-                  <option *ngFor="let cat of categories" [value]="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </td>
-              <td>
-                  <span class="badge d-flex align-items-center"
-                        [ngClass]="{
-                          'bg-warning': getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length,
-                          'bg-success': getAvailableCount(image) === image.urls.length,
-                          'bg-danger': getAvailableCount(image) === 0
-                        }">
-                    {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
-                  </span>
-              </td>
-              <td>
-                  <span class="text-muted">
-                    <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
-                  </span>
-              </td>
-              <td>
-                <div class="form-check form-switch">
-                  <input class="form-check-input"
-                         type="checkbox"
-                         [checked]="image.isEnabled"
-                         (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
-                </div>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-outline-danger"
-                        (click)="$event.stopPropagation(); deleteImage(image, $event)">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

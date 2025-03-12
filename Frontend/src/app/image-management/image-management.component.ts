@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditImageModalComponent } from '../edit-image-modal/edit-image-modal.component';
 import {GraphqlService} from '../services/graphql.service';
-import {Image, ImageFragmentFragment, OsCategoryFragmentFragment} from '../graphql/generated';
+import {Image, ImageFragmentFragment, OsCategoryFragmentFragment, ImageListFragmentFragment} from '../graphql/generated';
 
 @Component({
   selector: 'app-image-management',
@@ -22,15 +22,24 @@ export class ImageManagementComponent {
   images: ImageFragmentFragment[] = [];
   categories: OsCategoryFragmentFragment[] = [];
   currentView: 'grid' | 'list' = 'grid';
+  imagesLists: ImageListFragmentFragment[] = [];
+  selectedListId: string | null = null;
 
   ngOnInit() {
-    this.graphql.getImagesWithCategories().valueChanges.subscribe({
+    this.graphql.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
-        this.images = data.images;
+        this.imagesLists = data.imagesLists;
         this.categories = data.osCategories;
+        if (this.imagesLists.length > 0) {
+          this.selectedListId = this.imagesLists[0].id;
+        }
       },
-      error: (err: Error) => console.error('Error loading data', err)
+      error: (err) => console.error('Error loading data', err)
     });
+  }
+
+  get selectedList(): ImageListFragmentFragment | undefined {
+    return this.imagesLists.find(list => list.id === this.selectedListId);
   }
 
   selectImage(image: Image) {
@@ -76,12 +85,12 @@ export class ImageManagementComponent {
     this.graphql.updateImagePartial(image.id, { isEnabled }).subscribe();
   }
 
-  deleteImage(image: any, event: Event) {
+  deleteImage(image: ImageFragmentFragment, event: Event) {
     event.stopPropagation();
     if (confirm(`Delete ${image.name}?`)) {
       this.graphql.deleteImage(image.id).subscribe({
         next: () => {
-          this.images = this.images.filter(img => img.id !== image.id);
+          this.graphql.getImagesListsWithCategories().refetch();
         },
         error: (err) => console.error('Delete failed', err)
       });
@@ -109,4 +118,18 @@ export class ImageManagementComponent {
   get sortedCategories() {
     return [...this.categories].sort((a, b) => a.name.localeCompare(b.name));
   }
+
+  getCategoriesForList(list: ImageListFragmentFragment): OsCategoryFragmentFragment[] {
+    const categories = list.images
+      .map(image => image.category)
+      .filter((cat): cat is OsCategoryFragmentFragment => !!cat);
+    const uniqueCategories = Array.from(new Map(categories.map(cat => [cat.id, cat])).values());
+    return uniqueCategories.sort((a, b) => a.position - b.position || a.name.localeCompare(b.name));
+  }
+
+  getImagesForCategoryInList(list: ImageListFragmentFragment, categoryId: string): ImageFragmentFragment[] {
+    return list.images.filter(image => image.category?.id === categoryId);
+  }
+
+
 }

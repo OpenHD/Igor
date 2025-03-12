@@ -14,7 +14,7 @@ import {
   OsCategoryInput,
   CreateOsCategoryDocument,
   UpdateOsCategoryPartialDocument,
-  DeleteOsCategoryDocument
+  DeleteOsCategoryDocument, GetAllImagesListsWithCategoriesQuery, GetAllImagesListsWithCategoriesDocument
 } from '../graphql/generated';
 import {Observable} from 'rxjs';
 
@@ -87,6 +87,13 @@ export class GraphqlService {
       mutation: DeleteOsCategoryDocument,
       variables: { id },
       refetchQueries: [GetOsCategoriesDocument]
+    });
+  }
+
+  getImagesListsWithCategories() {
+    return this.apollo.watchQuery<GetAllImagesListsWithCategoriesQuery>({
+      query: GetAllImagesListsWithCategoriesDocument,
+      fetchPolicy: 'cache-and-network'
     });
   }
 }

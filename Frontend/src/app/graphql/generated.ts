@@ -96,7 +96,7 @@ export type ImagesList = {
 export type ImagesListInput = {
   description: Scalars['String']['input'];
   endpoint: Scalars['String']['input'];
-  imageIds: Array<Scalars['ID']['input']>;
+  imageIds?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   latestVersion: Scalars['String']['input'];
   name: Scalars['String']['input'];
   url: Scalars['String']['input'];
@@ -243,6 +243,8 @@ export type ImageFragmentFragment = { __typename?: 'Image', id: string, name: st
 
 export type OsCategoryFragmentFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
 
+export type ImageListFragmentFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
+
 export type GetAllImagesWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -252,6 +254,11 @@ export type GetOsCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetOsCategoriesQuery = { __typename?: 'Query', osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
+
+export type GetAllImagesListsWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllImagesListsWithCategoriesQuery = { __typename?: 'Query', imagesLists: Array<{ __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
 
 export type CreateImageMutationVariables = Exact<{
   input: ImageInput;
@@ -328,6 +335,17 @@ export const ImageFragmentFragmentDoc = gql`
   redirectsCount
 }
     ${OsCategoryFragmentFragmentDoc}`;
+export const ImageListFragmentFragmentDoc = gql`
+    fragment ImageListFragment on ImagesList {
+  id
+  name
+  endpoint
+  description
+  images {
+    ...ImageFragment
+  }
+}
+    ${ImageFragmentFragmentDoc}`;
 export const GetAllImagesWithCategoriesDocument = gql`
     query GetAllImagesWithCategories {
   images {
@@ -363,6 +381,34 @@ export const GetOsCategoriesDocument = gql`
   })
   export class GetOsCategoriesGQL extends Apollo.Query<GetOsCategoriesQuery, GetOsCategoriesQueryVariables> {
     document = GetOsCategoriesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetAllImagesListsWithCategoriesDocument = gql`
+    query GetAllImagesListsWithCategories {
+  imagesLists {
+    id
+    name
+    endpoint
+    description
+    images {
+      ...ImageFragment
+    }
+  }
+  osCategories {
+    ...OsCategoryFragment
+  }
+}
+    ${ImageFragmentFragmentDoc}
+${OsCategoryFragmentFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetAllImagesListsWithCategoriesGQL extends Apollo.Query<GetAllImagesListsWithCategoriesQuery, GetAllImagesListsWithCategoriesQueryVariables> {
+    document = GetAllImagesListsWithCategoriesDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

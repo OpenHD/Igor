@@ -71,3 +71,26 @@ img[alt="icon"] {
     }
   }
 }
+
+.nav-tabs {
+  border-bottom: 2px solid var(--bs-primary);
+
+  .nav-link {
+    color: var(--bs-primary);
+    border: none;
+    position: relative;
+
+    &.active {
+      background-color: transparent;
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--bs-primary);
+      }
+    }
+  }
+}
