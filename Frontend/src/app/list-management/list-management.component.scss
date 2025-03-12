@@ -1,47 +1,78 @@
-/* Nav-Tabs-Styles ähnlich dem Vorbild */
-.custom-tabs .nav-link {
-  cursor: pointer;
-  position: relative;
-  border: none;
-  color: var(--bs-secondary);
-  transition: all 0.2s ease;
+// Custom Tabs
+.nav-tabs-card {
+  --nav-tabs-border-color: rgba(var(--bs-primary-rgb), 0.2);
+  --nav-link-color: var(--bs-secondary);
+  --nav-link-hover-color: var(--bs-primary);
+
+  border-bottom: 2px solid var(--nav-tabs-border-color);
+
+  .nav-link {
+    border: none;
+    border-radius: var(--bs-border-radius);
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+
+    &:hover:not(.active) {
+      background-color: rgba(var(--bs-primary-rgb), 0.05);
+    }
+
+    &.active {
+      color: var(--bs-primary);
+      background-color: rgba(var(--bs-primary-rgb), 0.1);
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--bs-primary);
+      }
+    }
+  }
 }
 
-.custom-tabs .nav-link:hover:not(.active) {
-  color: var(--bs-primary);
-  background: rgba(var(--bs-primary-rgb), 0.1);
+.card {
+  &-header {
+    background-color: rgba(var(--bs-primary-rgb), 0.03);
+  }
+
+  &-title {
+    color: var(--bs-primary);
+    font-weight: 600;
+  }
 }
 
-.custom-tabs .nav-link.active {
-  color: var(--bs-primary);
+// Form Enhancements
+.form-label {
   font-weight: 500;
-  background: transparent;
+  color: var(--bs-gray-700);
 }
 
-.custom-tabs .nav-link.active .active-indicator {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--bs-primary);
-  border-radius: 3px 3px 0 0;
+.btn-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 }
 
-/* Card-Details */
-.card-title {
-  font-weight: 600;
-  color: var(--bs-primary);
+// Spinner Animation
+.spinner {
+  animation: spin 1s linear infinite;
 }
 
-.card-text {
-  color: var(--bs-body-color);
-}
-
-/* Buttons */
-.btn-outline-primary:hover,
-.btn-outline-danger:hover,
-.btn-outline-secondary:hover {
-  transform: scale(1.05);
-  transition: transform 0.2s ease;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
