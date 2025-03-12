@@ -41,6 +41,7 @@ class ImageListService(
                 "url" to imagesList.url // Vollständige URL
             ),
             "os_list" to imagesList.imageEntities.groupBy { it.category }
+                .toSortedMap(compareBy { it?.position }) // Sortieren nach Position
                 .mapNotNull { (category, imageEntities) ->
                     val availableSubitems = imageEntities
                         .filter { it.isEnabled && !it.isDeleted && it.getAvailable() }
@@ -119,57 +120,64 @@ class ImageListService(
     }
 
     fun mergeOrCreateImagesList(newData: ImagesList): ImagesList {
-        // Prüfen, ob eine ImagesList mit dem gleichen 'endpoint' bereits existiert
-        val existingList = imagesListRepository.findByEndpoint(newData.endpoint)
+        val existingList = imagesListRepository.findByEndpointWithImages(newData.endpoint)
 
         return if (existingList != null) {
-            // Merge Logik: Bestehende Daten aktualisieren
+            // Filtere nur neue Images, die noch nicht in der Liste sind
+            val existingImageIds = existingList.imageEntities.map { it.id }.toSet()
+            val newImagesToAdd = newData.imageEntities.filter { it.id !in existingImageIds }
+
             val mergedList = existingList.copy(
+                latestVersion = newData.latestVersion,
+                url = newData.url,
                 name = newData.name,
+                endpoint = newData.endpoint,
                 description = newData.description,
-                imageEntities = mergeImageEntities(existingList.imageEntities, newData.imageEntities)
+                imageEntities = existingList.imageEntities + newImagesToAdd
             )
             imagesListRepository.save(mergedList)
         } else {
-            // Neuen Eintrag erstellen
             imagesListRepository.save(newData)
         }
-
     }
 
     private fun mergeImageEntities(existingImages: Set<ImageEntity>, newImages: Set<ImageEntity>): Set<ImageEntity> {
         val merged = existingImages.toMutableSet()
-
-        // Alle neuen Einträge hinzufügen oder bestehende aktualisieren
         newImages.forEach { newImage ->
-            val existingImage = merged.firstOrNull { it.id == newImage.id }
+            val existingImage = merged.firstOrNull { it.extractSha256 == newImage.extractSha256 }
             if (existingImage != null) {
-                // Update vorhandener Einträge
-                merged.remove(existingImage)
-                merged.add(existingImage.copy(
+                // URLs zusammenführen und vorhandenes Image aktualisieren
+                val mergedUrls = (existingImage.urls + newImage.urls).distinctBy { it.url }
+                val updatedImage = existingImage.copy(
+                    urls = mergedUrls,
                     name = newImage.name,
                     description = newImage.description,
-                    urls = newImage.urls,
                     releaseDate = newImage.releaseDate
-                ))
+                )
+                merged.remove(existingImage)
+                merged.add(updatedImage)
             } else {
-                // Neues Bild hinzufügen
                 merged.add(newImage)
             }
         }
-
         return merged
     }
 
-    // ImageListService.kt
     fun addImageToImagesList(imagesListId: Long, imageEntity: ImageEntity): ImagesList {
         val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
-            IllegalArgumentException("ImagesList mit ID $imagesListId nicht gefunden.")
+            IllegalArgumentException("ImagesList nicht gefunden")
         }
-        val updatedList = imagesList.copy(imageEntities = imagesList.imageEntities + imageEntity)
-        return imagesListRepository.save(updatedList)
-    }
 
+        // Prüfe ob das Image bereits in der Liste ist
+        if (!imagesList.imageEntities.any { it.id == imageEntity.id }) {
+            val updatedList = imagesList.copy(
+                imageEntities = imagesList.imageEntities + imageEntity
+            )
+            return imagesListRepository.save(updatedList)
+        }
+        return imagesList
+    }
+    
     fun removeImageFromImagesList(imagesListId: Long, imageEntity: ImageEntity): ImagesList {
         val imagesList = imagesListRepository.findById(imagesListId).orElseThrow {
             IllegalArgumentException("ImagesList mit ID $imagesListId nicht gefunden.")

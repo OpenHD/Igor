@@ -28,7 +28,10 @@ class DummyDataLoader(
     private val imageService: ImageService
 ) {
 
-    private val jsonUrl = "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-development-releases.json"
+    private val jsonUrls = listOf(
+        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-download-index.json",
+        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-development-releases.json"
+    )
 
     @Bean
     fun dummyDataInitializer(objectMapper: ObjectMapper): CommandLineRunner {
@@ -41,19 +44,21 @@ class DummyDataLoader(
                 .exchangeStrategies(customExchangeStrategies(objectMapper))
                 .build()
 
-            processJsonSource(webClient)
+            jsonUrls.forEach { url ->
+                processJsonSource(webClient, url)
+            }
         }
     }
 
-    private fun processJsonSource(webClient: WebClient) {
+    private fun processJsonSource(webClient: WebClient, jsonUrl: String) {
         val jsonData = webClient.get()
             .uri(jsonUrl)
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono<OpenHdData>()
-            .block() ?: throw RuntimeException("Daten konnten nicht geladen werden")
+            .block() ?: throw RuntimeException("Daten konnten nicht geladen werden: $jsonUrl")
 
-        val listName = deriveListNameFromUrl()
+        val listName = deriveListNameFromUrl(jsonUrl)
         val endpoint = generateEndpoint(listName)
         val savedImages = mutableListOf<ImageEntity>()
 
@@ -88,7 +93,7 @@ class DummyDataLoader(
                 url = jsonData.imager.url,
                 name = listName,
                 endpoint = endpoint,
-                description = "Automatisch generierte Liste",
+                description = "Automatisch generierte Liste von $jsonUrl",
                 imageEntities = savedImages.toSet()
             )
         )
@@ -142,12 +147,12 @@ class DummyDataLoader(
             }
             .build()
 
-    private fun deriveListNameFromUrl(): String {
+    private fun deriveListNameFromUrl(jsonUrl: String): String {
         return jsonUrl.substringAfterLast('/')
             .substringBeforeLast('.')
             .replace(Regex("[_-]+"), " ")
-                .replace(Regex("[^\\w\\s]"), "")
-                .trim()
+            .replace(Regex("[^\\w\\s]"), "")
+            .trim()
     }
 
     private fun generateEndpoint(listName: String): String {
