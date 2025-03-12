@@ -1,12 +1,47 @@
-.list-group-item {
-  transition: background-color 0.3s ease;
+/* Nav-Tabs-Styles ähnlich dem Vorbild */
+.custom-tabs .nav-link {
+  cursor: pointer;
+  position: relative;
+  border: none;
+  color: var(--bs-secondary);
+  transition: all 0.2s ease;
 }
 
-.list-group-item:hover {
-  background-color: #f8f9fa;
+.custom-tabs .nav-link:hover:not(.active) {
+  color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), 0.1);
 }
 
-/* Optional: Weitere Anpassungen für die Eingabefelder */
-input.form-control, textarea.form-control {
-  font-size: 0.95rem;
+.custom-tabs .nav-link.active {
+  color: var(--bs-primary);
+  font-weight: 500;
+  background: transparent;
+}
+
+.custom-tabs .nav-link.active .active-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--bs-primary);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Card-Details */
+.card-title {
+  font-weight: 600;
+  color: var(--bs-primary);
+}
+
+.card-text {
+  color: var(--bs-body-color);
+}
+
+/* Buttons */
+.btn-outline-primary:hover,
+.btn-outline-danger:hover,
+.btn-outline-secondary:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }

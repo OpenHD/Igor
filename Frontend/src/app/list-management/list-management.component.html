@@ -2,107 +2,134 @@
   <div class="card shadow">
     <!-- Header -->
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">Image Lists</h4>
-      <button class="btn btn-light btn-sm" (click)="focusNewListInput()">
-        <i class="bi bi-plus-lg"></i> New List
-      </button>
+      <h4 class="card-title mb-0">Image List Management</h4>
+      <div class="d-flex gap-2">
+        <button class="btn btn-light btn-sm" (click)="toggleNewListForm(); $event.stopPropagation()">
+          <i class="bi bi-plus-lg"></i> New List
+        </button>
+      </div>
     </div>
 
     <div class="card-body">
-      <!-- Loading & Error States -->
+      <!-- Loading and Error Messages -->
       <div *ngIf="loading" class="alert alert-info">
-        <i class="bi bi-arrow-repeat me-2"></i> Loading image lists...
+        <i class="bi bi-arrow-repeat me-2"></i> Loading lists...
       </div>
       <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
         {{ error }}
         <button type="button" class="btn-close" (click)="error = null"></button>
       </div>
 
-      <!-- Neuer Listeneintrag -->
-      <div class="mb-3" *ngIf="!loading && !error">
+      <!-- Form for New List -->
+      <div *ngIf="isCreatingNewList" class="mb-4">
         <form (ngSubmit)="createList()">
-          <div class="row g-2 align-items-center">
-            <div class="col-md-3">
-              <input #newListInput type="text" class="form-control" placeholder="List Name"
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label for="newListName" class="form-label">List Name</label>
+              <input #newListInput id="newListName" type="text" class="form-control" placeholder="List Name"
                      [(ngModel)]="newList.name" name="name" required>
             </div>
-            <div class="col-md-3">
-              <input type="text" class="form-control" placeholder="Endpoint"
+            <div class="col-md-4">
+              <label for="newListEndpoint" class="form-label">Endpoint</label>
+              <input id="newListEndpoint" type="text" class="form-control" placeholder="Endpoint"
                      [(ngModel)]="newList.endpoint" name="endpoint">
             </div>
-            <div class="col-md-3">
-              <input type="text" class="form-control" placeholder="Latest Version"
+            <div class="col-md-4">
+              <label for="newListLatestVersion" class="form-label">Latest Version</label>
+              <input id="newListLatestVersion" type="text" class="form-control" placeholder="Latest Version"
                      [(ngModel)]="newList.latestVersion" name="latestVersion">
             </div>
-            <div class="col-md-3">
-              <input type="text" class="form-control" placeholder="URL"
+            <div class="col-md-6">
+              <label for="newListUrl" class="form-label">URL</label>
+              <input id="newListUrl" type="text" class="form-control" placeholder="URL"
                      [(ngModel)]="newList.url" name="url">
             </div>
-            <div class="col-md-12 mt-2">
-              <textarea class="form-control" placeholder="Description"
+            <div class="col-md-6">
+              <label for="newListDescription" class="form-label">Description</label>
+              <textarea id="newListDescription" class="form-control" placeholder="Description"
                         [(ngModel)]="newList.description" name="description"></textarea>
             </div>
-            <div class="col-md-2">
-              <button class="btn btn-success w-100 mt-2" type="submit" [disabled]="!newList.name?.trim()">
-                <i class="bi bi-plus-circle me-2"></i> Add New
+            <div class="col-12 text-end">
+              <button class="btn btn-success" type="submit" [disabled]="!newList.name?.trim()">
+                <i class="bi bi-plus-circle me-1"></i> Create List
+              </button>
+              <button class="btn btn-secondary ms-2" type="button" (click)="toggleNewListForm()">
+                Cancel
               </button>
             </div>
           </div>
         </form>
       </div>
 
-      <!-- Liste der Image Lists -->
-      <ul class="list-group">
-        <li class="list-group-item" *ngFor="let list of imageLists; trackBy: trackById">
-          <!-- Anzeige vs. Bearbeitung -->
-          <div *ngIf="!list.isEditing; else editTemplate" (click)="startEditing(list)" style="cursor: pointer;">
-            <h5 class="mb-1">{{ list.name }}</h5>
-            <p class="mb-0 small text-muted">{{ list.description || 'No description provided' }}</p>
-            <p class="mb-0 small"><strong>Endpoint:</strong> {{ list.endpoint }}</p>
-            <p class="mb-0 small"><strong>Latest Version:</strong> {{ list.latestVersion }}</p>
-            <p class="mb-0 small"><strong>URL:</strong> {{ list.url }}</p>
-          </div>
-
-          <!-- Bearbeitungs-Template -->
-          <ng-template #editTemplate>
-            <div class="w-100">
-              <div class="mb-2">
-                <label class="form-label small">List Name</label>
-                <input type="text" class="form-control" [(ngModel)]="list.editedName">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">Endpoint</label>
-                <input type="text" class="form-control" [(ngModel)]="list.editedEndpoint">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">Latest Version</label>
-                <input type="text" class="form-control" [(ngModel)]="list.editedLatestVersion">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">URL</label>
-                <input type="text" class="form-control" [(ngModel)]="list.editedUrl">
-              </div>
-              <div class="mb-2">
-                <label class="form-label small">Description</label>
-                <textarea class="form-control" [(ngModel)]="list.editedDescription"></textarea>
-              </div>
-            </div>
-          </ng-template>
-
-          <!-- Aktion-Buttons -->
-          <div class="btn-group mt-2">
-            <button *ngIf="list.isEditing" class="btn btn-sm btn-outline-success" (click)="saveList(list)">
-              <i class="bi bi-check-lg"></i>
-            </button>
-            <button *ngIf="list.isEditing" class="btn btn-sm btn-outline-secondary" (click)="cancelEditing(list)">
-              <i class="bi bi-x-lg"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-danger" (click)="deleteList(list.id)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+      <!-- Nav-Tabs for Existing Lists -->
+      <ul class="nav nav-tabs mb-4 custom-tabs">
+        <li class="nav-item" *ngFor="let list of imageLists; trackBy: trackById">
+          <a class="nav-link"
+             [class.active]="selectedListId === list.id"
+             (click)="setActiveList(list.id, $event)"
+             role="button">
+            {{ list.name }}
+            <span *ngIf="selectedListId === list.id" class="active-indicator"></span>
+          </a>
         </li>
       </ul>
+
+      <!-- Details of Selected List -->
+      <div *ngIf="selectedList">
+        <div class="card mb-4">
+          <div class="card-body">
+            <!-- Display Mode -->
+            <div *ngIf="!selectedList.isEditing; else editMode">
+              <h5 class="card-title">{{ selectedList.name }}</h5>
+              <p class="card-text">{{ selectedList.description || 'No description' }}</p>
+              <p class="mb-1"><strong>Endpoint:</strong> {{ selectedList.endpoint }}</p>
+              <p class="mb-1"><strong>Latest Version:</strong> {{ selectedList.latestVersion }}</p>
+              <p class="mb-1"><strong>URL:</strong> {{ selectedList.url }}</p>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary btn-sm me-2" (click)="startEditing(selectedList)">
+                  <i class="bi bi-pencil"></i> Edit
+                </button>
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteList(selectedList.id, $event)">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+            <!-- Edit Mode -->
+            <ng-template #editMode>
+              <form (ngSubmit)="saveList(selectedList)">
+                <div class="mb-3">
+                  <label class="form-label">List Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="selectedList.editedName" name="editedName" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Endpoint</label>
+                  <input type="text" class="form-control" [(ngModel)]="selectedList.editedEndpoint" name="editedEndpoint">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Latest Version</label>
+                  <input type="text" class="form-control" [(ngModel)]="selectedList.editedLatestVersion" name="editedLatestVersion">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">URL</label>
+                  <input type="text" class="form-control" [(ngModel)]="selectedList.editedUrl" name="editedUrl">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <textarea class="form-control" [(ngModel)]="selectedList.editedDescription" name="editedDescription"></textarea>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button class="btn btn-success btn-sm me-2" type="submit">
+                    <i class="bi bi-check-lg"></i> Save
+                  </button>
+                  <button class="btn btn-secondary btn-sm" type="button" (click)="cancelEditing(selectedList)">
+                    <i class="bi bi-x-lg"></i> Cancel
+                  </button>
+                </div>
+              </form>
+            </ng-template>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
