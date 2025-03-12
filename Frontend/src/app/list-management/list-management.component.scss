@@ -1,0 +1,12 @@
+.list-group-item {
+  transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Optional: Weitere Anpassungen für die Eingabefelder */
+input.form-control, textarea.form-control {
+  font-size: 0.95rem;
+}

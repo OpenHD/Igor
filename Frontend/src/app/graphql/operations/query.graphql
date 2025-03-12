@@ -37,6 +37,8 @@ fragment ImageList on ImagesList {
   name
   endpoint
   description
+  url
+  latestVersion
   images {
     ...Image
   }
@@ -67,6 +69,8 @@ query GetAllImagesListsWithCategories {
     name
     endpoint
     description
+    url
+    latestVersion
     images {
       ...Image
     }
@@ -110,4 +114,20 @@ mutation UpdateOsCategoryPartial($input: OsCategoryInputUpdate!) {
 
 mutation DeleteOsCategory($id: ID!) {
   deleteOsCategory(id: $id)
+}
+
+mutation CreateImagesList($input: ImagesListInput!) {
+  createImagesList(input: $input) {
+    ...ImageList
+  }
+}
+
+mutation UpdateImagesListPartial($id: ID!, $input: ImagesListPartialInput!) {
+  updateImagesListPartial(id: $id, input: $input) {
+    ...ImageList
+  }
+}
+
+mutation DeleteImagesList($id: ID!) {
+  deleteImagesList(id: $id)
 }

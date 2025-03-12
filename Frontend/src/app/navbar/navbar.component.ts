@@ -19,7 +19,8 @@ export class NavbarComponent {
 
   navLinks = [
     { path: '/images', label: 'Image Management' },
-    { path: '/categories', label: 'OS Categories' }
+    { path: '/categories', label: 'OS Categories' },
+    { path: '/lists', label: 'List Management' },
     // Weitere Links hier hinzufügen
   ];
 }

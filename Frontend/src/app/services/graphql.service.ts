@@ -14,7 +14,11 @@ import {
   OsCategoryInput,
   CreateOsCategoryDocument,
   UpdateOsCategoryPartialDocument,
-  DeleteOsCategoryDocument, GetAllImagesListsWithCategoriesQuery, GetAllImagesListsWithCategoriesDocument
+  DeleteOsCategoryDocument,
+  GetAllImagesListsWithCategoriesQuery,
+  GetAllImagesListsWithCategoriesDocument,
+  ImagesListInput,
+  CreateImagesListDocument, ImagesListPartialInput, UpdateImagesListPartialDocument, DeleteImagesListDocument
 } from '../graphql/generated';
 import {Observable} from 'rxjs';
 
@@ -96,4 +100,28 @@ export class GraphqlService {
       fetchPolicy: 'cache-and-network'
     });
   }
+
+  createImagesList(input: ImagesListInput): Observable<any> {
+    return this.apollo.mutate({
+      mutation: CreateImagesListDocument,
+      variables: { input },
+      refetchQueries: [GetAllImagesListsWithCategoriesDocument]
+    });
+  }
+
+  updateImagesListPartial(id: string, input: ImagesListPartialInput): Observable<any> {
+    return this.apollo.mutate({
+      mutation: UpdateImagesListPartialDocument,
+      variables: { id, input }
+    });
+  }
+
+  deleteImagesList(id: string): Observable<any> {
+    return this.apollo.mutate({
+      mutation: DeleteImagesListDocument,
+      variables: { id },
+      refetchQueries: [GetAllImagesListsWithCategoriesDocument]
+    });
+  }
+
 }
