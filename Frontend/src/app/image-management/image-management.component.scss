@@ -72,25 +72,42 @@ img[alt="icon"] {
   }
 }
 
-.nav-tabs {
-  border-bottom: 2px solid var(--bs-primary);
-
+.custom-tabs {
   .nav-link {
-    color: var(--bs-primary);
-    border: none;
+    cursor: pointer !important;
     position: relative;
+    border: none;
+    color: var(--bs-secondary);
+    transition: all 0.2s ease;
+
+    &:hover:not(.active) {
+      color: var(--bs-primary);
+      background: rgba(var(--bs-primary-rgb), 0.1);
+    }
 
     &.active {
-      background-color: transparent;
-      &::after {
-        content: '';
+      color: var(--bs-primary);
+      font-weight: 500;
+      background: transparent;
+
+      .active-indicator {
         position: absolute;
-        bottom: -2px;
+        bottom: -1px;
         left: 0;
         right: 0;
-        height: 2px;
+        height: 3px;
         background: var(--bs-primary);
+        border-radius: 3px 3px 0 0;
       }
     }
+  }
+}
+
+// Eventuell benötigte Anpassungen für die View-Switches
+.btn-group .btn {
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
   }
 }

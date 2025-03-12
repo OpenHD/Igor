@@ -3,7 +3,7 @@ import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Image, ImageFragmentFragment, OsCategoryFragmentFragment } from '../graphql/generated';
+import { Image, ImageFragment, OsCategoryFragment } from '../graphql/generated';
 import { GraphqlService } from '../services/graphql.service';
 
 @Component({
@@ -13,11 +13,11 @@ import { GraphqlService } from '../services/graphql.service';
   styleUrls: ['./edit-image-modal.component.scss']
 })
 export class EditImageModalComponent {
-  @Output() imageCreated = new EventEmitter<ImageFragmentFragment>();
+  @Output() imageCreated = new EventEmitter<ImageFragment>();
 
   modal = inject(NgbActiveModal);
-  image?: ImageFragmentFragment;
-  categories: OsCategoryFragmentFragment[] = [];
+  image?: ImageFragment;
+  categories: OsCategoryFragment[] = [];
   iconPreview?: string;
   graphql = inject(GraphqlService);
 
@@ -110,7 +110,7 @@ export class EditImageModalComponent {
       // Create
       this.graphql.createImage(input).subscribe({
         next: (response) => {
-          const newImage = (response.data as { createImage: ImageFragmentFragment }).createImage;
+          const newImage = (response.data as { createImage: ImageFragment }).createImage;
           this.imageCreated.emit(newImage);
           this.modal.close(true);
         },

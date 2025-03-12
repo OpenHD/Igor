@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { GraphqlService } from '../services/graphql.service';
 import {
-  OsCategoryFragmentFragment,
+  OsCategoryFragment,
   GetOsCategoriesDocument,
   UpdateOsCategoryPartialDocument
 } from '../graphql/generated';
@@ -25,7 +25,7 @@ export class OsCategoryManagementComponent implements AfterViewInit {
 
   @ViewChild('newCategoryInput') newCategoryInput!: ElementRef;
 
-  categories: (OsCategoryFragmentFragment & {
+  categories: (OsCategoryFragment & {
     isEditing?: boolean;
     editedName?: string;
     editedDescription?: string;
@@ -59,8 +59,8 @@ export class OsCategoryManagementComponent implements AfterViewInit {
       next: ({ data }) => {
         const categoriesCopy = [...(data as any).osCategories];
         this.categories = categoriesCopy
-          .sort((a: OsCategoryFragmentFragment, b: OsCategoryFragmentFragment) => a.position - b.position)
-          .map((c: OsCategoryFragmentFragment) => ({
+          .sort((a: OsCategoryFragment, b: OsCategoryFragment) => a.position - b.position)
+          .map((c: OsCategoryFragment) => ({
             ...c,
             isEditing: false,
             editedName: c.name,
@@ -176,7 +176,7 @@ export class OsCategoryManagementComponent implements AfterViewInit {
     setTimeout(() => this.error = null, 5000);
   }
 
-  trackByCategoryId(index: number, category: OsCategoryFragmentFragment) {
+  trackByCategoryId(index: number, category: OsCategoryFragment) {
     return category.id;
   }
 }

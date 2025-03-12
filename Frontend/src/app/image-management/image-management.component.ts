@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditImageModalComponent } from '../edit-image-modal/edit-image-modal.component';
 import {GraphqlService} from '../services/graphql.service';
-import {Image, ImageFragmentFragment, OsCategoryFragmentFragment, ImageListFragmentFragment} from '../graphql/generated';
+import {Image, ImageFragment, OsCategoryFragment, ImageListFragment} from '../graphql/generated';
 
 @Component({
   selector: 'app-image-management',
@@ -19,26 +19,42 @@ export class ImageManagementComponent {
   private modalService = inject(NgbModal);
   private graphql = inject(GraphqlService);
 
-  images: ImageFragmentFragment[] = [];
-  categories: OsCategoryFragmentFragment[] = [];
+  images: ImageFragment[] = [];
+  categories: OsCategoryFragment[] = [];
   currentView: 'grid' | 'list' = 'grid';
-  imagesLists: ImageListFragmentFragment[] = [];
+  imagesLists: ImageListFragment[] = [];
   selectedListId: string | null = null;
 
   ngOnInit() {
     this.graphql.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
+        const previousSelectedId = this.selectedListId; // Vorherige ID speichern
         this.imagesLists = data.imagesLists;
         this.categories = data.osCategories;
+
+        // Behalte die ausgewählte Liste, wenn sie noch existiert
         if (this.imagesLists.length > 0) {
-          this.selectedListId = this.imagesLists[0].id;
+          const existingList = this.imagesLists.find(list => list.id === previousSelectedId);
+          this.selectedListId = existingList ? existingList.id : this.imagesLists[0].id;
+        } else {
+          this.selectedListId = null;
         }
       },
       error: (err) => console.error('Error loading data', err)
     });
   }
 
-  get selectedList(): ImageListFragmentFragment | undefined {
+  trackListById(index: number, list: ImageListFragment) {
+    return list.id;
+  }
+
+  setActiveList(listId: string, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectedListId = listId;
+  }
+
+  get selectedList(): ImageListFragment | undefined {
     return this.imagesLists.find(list => list.id === this.selectedListId);
   }
 
@@ -46,12 +62,12 @@ export class ImageManagementComponent {
     this.openEditModal(image);
   }
 
-  getAvailability(image: ImageFragmentFragment): string {
+  getAvailability(image: ImageFragment): string {
     const available = image.urls.filter(u => u.isAvailable).length;
     return `${available}/${image.urls.length}`;
   }
 
-  openEditModal(image?: ImageFragmentFragment) {
+  openEditModal(image?: ImageFragment) {
     const modalRef = this.modalService.open(EditImageModalComponent, { size: 'xl' });
     modalRef.componentInstance.categories = this.categories;
 
@@ -59,7 +75,7 @@ export class ImageManagementComponent {
       modalRef.componentInstance.image = { ...image };
     }
 
-    modalRef.componentInstance.imageCreated.subscribe((newImage: ImageFragmentFragment) => {
+    modalRef.componentInstance.imageCreated.subscribe((newImage: ImageFragment) => {
       this.images = [...this.images, newImage]; // Use spread operator to add new image
     });
 
@@ -74,18 +90,33 @@ export class ImageManagementComponent {
     // Handle create/update logic
   }
 
-  updateCategory(image: Image, categoryId: string) {
+  updateCategory(image: ImageFragment, categoryId: string) {
     this.graphql.updateImagePartial(image.id, { categoryId }).subscribe({
-      next: () => console.log('Update successful'),
-      error: (err) => console.error('Update failed', err)
+      next: () => {
+        // Direktes Update im State
+        const updatedImage = {...image, category: this.categories.find(c => c.id === categoryId)};
+        this.imagesLists = this.imagesLists.map(list => ({
+          ...list,
+          images: list.images.map(img => img.id === image.id ? updatedImage : img)
+        }));
+      }
     });
   }
 
-  updateStatus(image: ImageFragmentFragment, isEnabled: boolean) {
-    this.graphql.updateImagePartial(image.id, { isEnabled }).subscribe();
+  updateStatus(image: ImageFragment, isEnabled: boolean) {
+    this.graphql.updateImagePartial(image.id, { isEnabled }).subscribe({
+      next: () => {
+        // Manuelles Update des Zustands ohne Neuladen der gesamten Liste
+        const updatedImage = {...image, isEnabled};
+        this.imagesLists = this.imagesLists.map(list => ({
+          ...list,
+          images: list.images.map(img => img.id === image.id ? updatedImage : img)
+        }));
+      }
+    });
   }
 
-  deleteImage(image: ImageFragmentFragment, event: Event) {
+  deleteImage(image: ImageFragment, event: Event) {
     event.stopPropagation();
     if (confirm(`Delete ${image.name}?`)) {
       this.graphql.deleteImage(image.id).subscribe({
@@ -97,11 +128,11 @@ export class ImageManagementComponent {
     }
   }
 
-  trackById(index: number, item: ImageFragmentFragment) {
+  trackById(index: number, item: ImageFragment) {
     return item.id;
   }
 
-  getAvailableCount(image: ImageFragmentFragment): number {
+  getAvailableCount(image: ImageFragment): number {
     return image.urls.filter(url => url.isAvailable).length;
   }
 
@@ -110,7 +141,7 @@ export class ImageManagementComponent {
     return this.images.filter(img => img.category?.id === categoryId).length;
   }
 
-  getImagesForCategory(categoryId: string): ImageFragmentFragment[] {
+  getImagesForCategory(categoryId: string): ImageFragment[] {
     return this.images.filter(img => img.category?.id === categoryId);
   }
 
@@ -119,15 +150,15 @@ export class ImageManagementComponent {
     return [...this.categories].sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  getCategoriesForList(list: ImageListFragmentFragment): OsCategoryFragmentFragment[] {
+  getCategoriesForList(list: ImageListFragment): OsCategoryFragment[] {
     const categories = list.images
       .map(image => image.category)
-      .filter((cat): cat is OsCategoryFragmentFragment => !!cat);
+      .filter((cat): cat is OsCategoryFragment => !!cat);
     const uniqueCategories = Array.from(new Map(categories.map(cat => [cat.id, cat])).values());
     return uniqueCategories.sort((a, b) => a.position - b.position || a.name.localeCompare(b.name));
   }
 
-  getImagesForCategoryInList(list: ImageListFragmentFragment, categoryId: string): ImageFragmentFragment[] {
+  getImagesForCategoryInList(list: ImageListFragment, categoryId: string): ImageFragment[] {
     return list.images.filter(image => image.category?.id === categoryId);
   }
 

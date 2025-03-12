@@ -239,11 +239,11 @@ export type QueryImagesListByEndpointArgs = {
   endpoint: Scalars['String']['input'];
 };
 
-export type ImageFragmentFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
+export type ImageFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
 
-export type OsCategoryFragmentFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
+export type OsCategoryFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
 
-export type ImageListFragmentFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
+export type ImageListFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, url: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
 
 export type GetAllImagesWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -303,8 +303,8 @@ export type DeleteOsCategoryMutationVariables = Exact<{
 
 export type DeleteOsCategoryMutation = { __typename?: 'Mutation', deleteOsCategory?: boolean | null };
 
-export const OsCategoryFragmentFragmentDoc = gql`
-    fragment OsCategoryFragment on OsCategory {
+export const OsCategoryFragmentDoc = gql`
+    fragment OsCategory on OsCategory {
   id
   name
   description
@@ -312,8 +312,8 @@ export const OsCategoryFragmentFragmentDoc = gql`
   position
 }
     `;
-export const ImageFragmentFragmentDoc = gql`
-    fragment ImageFragment on Image {
+export const ImageFragmentDoc = gql`
+    fragment Image on Image {
   id
   name
   description
@@ -328,35 +328,35 @@ export const ImageFragmentFragmentDoc = gql`
   imageDownloadSize
   isEnabled
   category {
-    ...OsCategoryFragment
+    ...OsCategory
   }
   releaseDate
   url
   redirectsCount
 }
-    ${OsCategoryFragmentFragmentDoc}`;
-export const ImageListFragmentFragmentDoc = gql`
-    fragment ImageListFragment on ImagesList {
+    ${OsCategoryFragmentDoc}`;
+export const ImageListFragmentDoc = gql`
+    fragment ImageList on ImagesList {
   id
   name
   endpoint
   description
   images {
-    ...ImageFragment
+    ...Image
   }
 }
-    ${ImageFragmentFragmentDoc}`;
+    ${ImageFragmentDoc}`;
 export const GetAllImagesWithCategoriesDocument = gql`
     query GetAllImagesWithCategories {
   images {
-    ...ImageFragment
+    ...Image
   }
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
-    ${ImageFragmentFragmentDoc}
-${OsCategoryFragmentFragmentDoc}`;
+    ${ImageFragmentDoc}
+${OsCategoryFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -371,10 +371,10 @@ ${OsCategoryFragmentFragmentDoc}`;
 export const GetOsCategoriesDocument = gql`
     query GetOsCategories {
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
-    ${OsCategoryFragmentFragmentDoc}`;
+    ${OsCategoryFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -394,15 +394,15 @@ export const GetAllImagesListsWithCategoriesDocument = gql`
     endpoint
     description
     images {
-      ...ImageFragment
+      ...Image
     }
   }
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
-    ${ImageFragmentFragmentDoc}
-${OsCategoryFragmentFragmentDoc}`;
+    ${ImageFragmentDoc}
+${OsCategoryFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -417,10 +417,10 @@ ${OsCategoryFragmentFragmentDoc}`;
 export const CreateImageDocument = gql`
     mutation CreateImage($input: ImageInput!) {
   createImage(input: $input) {
-    ...ImageFragment
+    ...Image
   }
 }
-    ${ImageFragmentFragmentDoc}`;
+    ${ImageFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -451,10 +451,10 @@ export const DeleteImageDocument = gql`
 export const UpdateImagePartialDocument = gql`
     mutation UpdateImagePartial($id: ID!, $input: ImagePartialInput!) {
   updateImagePartial(id: $id, input: $input) {
-    ...ImageFragment
+    ...Image
   }
 }
-    ${ImageFragmentFragmentDoc}`;
+    ${ImageFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -469,10 +469,10 @@ export const UpdateImagePartialDocument = gql`
 export const CreateOsCategoryDocument = gql`
     mutation CreateOsCategory($input: OsCategoryInput!) {
   createOsCategory(input: $input) {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
-    ${OsCategoryFragmentFragmentDoc}`;
+    ${OsCategoryFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
@@ -487,10 +487,10 @@ export const CreateOsCategoryDocument = gql`
 export const UpdateOsCategoryPartialDocument = gql`
     mutation UpdateOsCategoryPartial($input: OsCategoryInputUpdate!) {
   updateOsCategoryPartial(input: $input) {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
-    ${OsCategoryFragmentFragmentDoc}`;
+    ${OsCategoryFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'

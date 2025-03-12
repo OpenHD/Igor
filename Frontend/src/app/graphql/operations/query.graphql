@@ -2,7 +2,7 @@
 # Fragments
 # ----------------------------
 
-fragment ImageFragment on Image {
+fragment Image on Image {
   id
   name
   description
@@ -17,14 +17,14 @@ fragment ImageFragment on Image {
   imageDownloadSize
   isEnabled
   category {
-    ...OsCategoryFragment
+    ...OsCategory
   }
   releaseDate
   url
   redirectsCount
 }
 
-fragment OsCategoryFragment on OsCategory {
+fragment OsCategory on OsCategory {
   id
   name
   description
@@ -32,13 +32,13 @@ fragment OsCategoryFragment on OsCategory {
   position
 }
 
-fragment ImageListFragment on ImagesList {
+fragment ImageList on ImagesList {
   id
   name
   endpoint
   description
   images {
-    ...ImageFragment
+    ...Image
   }
 }
 
@@ -48,16 +48,16 @@ fragment ImageListFragment on ImagesList {
 
 query GetAllImagesWithCategories {
   images {
-    ...ImageFragment
+    ...Image
   }
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
 
 query GetOsCategories {
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
 
@@ -68,11 +68,11 @@ query GetAllImagesListsWithCategories {
     endpoint
     description
     images {
-      ...ImageFragment
+      ...Image
     }
   }
   osCategories {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
 
@@ -82,7 +82,7 @@ query GetAllImagesListsWithCategories {
 
 mutation CreateImage($input: ImageInput!) {
   createImage(input: $input) {
-    ...ImageFragment
+    ...Image
   }
 }
 
@@ -92,19 +92,19 @@ mutation DeleteImage($id: ID!) {
 
 mutation UpdateImagePartial($id: ID!, $input: ImagePartialInput!) {
   updateImagePartial(id: $id, input: $input) {
-    ...ImageFragment
+    ...Image
   }
 }
 
 mutation CreateOsCategory($input: OsCategoryInput!) {
   createOsCategory(input: $input) {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
 
 mutation UpdateOsCategoryPartial($input: OsCategoryInputUpdate!) {
   updateOsCategoryPartial(input: $input) {
-    ...OsCategoryFragment
+    ...OsCategory
   }
 }
 

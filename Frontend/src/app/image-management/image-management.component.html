@@ -6,16 +6,16 @@
         <div class="btn-group">
           <button class="btn btn-light btn-sm"
                   [class.active]="currentView === 'grid'"
-                  (click)="currentView = 'grid'">
+                  (click)="currentView = 'grid'; $event.stopPropagation()">
             <i class="bi bi-grid"></i>
           </button>
           <button class="btn btn-light btn-sm"
                   [class.active]="currentView === 'list'"
-                  (click)="currentView = 'list'">
+                  (click)="currentView = 'list'; $event.stopPropagation()">
             <i class="bi bi-list"></i>
           </button>
         </div>
-        <button class="btn btn-light btn-sm" (click)="openEditModal()">
+        <button class="btn btn-light btn-sm" (click)="openEditModal(); $event.stopPropagation()">
           <i class="bi bi-plus-lg"></i> New OS Image
         </button>
       </div>
@@ -23,10 +23,14 @@
 
     <div class="card-body">
       <!-- Tabs für ImagesLists -->
-      <ul class="nav nav-tabs mb-4">
-        <li class="nav-item" *ngFor="let list of imagesLists">
-          <a class="nav-link" [class.active]="selectedListId === list.id" (click)="selectedListId = list.id">
+      <ul class="nav nav-tabs mb-4 custom-tabs">
+        <li class="nav-item" *ngFor="let list of imagesLists; trackBy: trackListById">
+          <a class="nav-link"
+             [class.active]="selectedListId === list.id"
+             (click)="setActiveList(list.id, $event)"
+             role="button">
             {{ list.name }}
+            <span *ngIf="selectedListId === list.id" class="active-indicator"></span>
           </a>
         </li>
       </ul>
