@@ -14,13 +14,14 @@ interface BuildImagesRepository : JpaRepository<ImageEntity, UUID> {
 
     @Query(
         """
-    SELECT i.* FROM image_entity i
-    JOIN image_urls u ON i.id = u.image_id
-    WHERE 
-        i.is_deleted = false 
-        AND u.is_available = true 
-        AND split_part(u.url, '/', -1) = :filename
-    """,
+        SELECT i.* FROM image_entity i
+        JOIN image_urls u ON i.id = u.image_id
+        WHERE 
+            i.is_deleted = false 
+            AND u.is_available = true 
+            AND split_part(u.url, '/', -1) = :filename
+        LIMIT 1
+        """,
         nativeQuery = true
     )
     fun findByFilenameCustomQuery(@Param("filename") filename: String): ImageEntity?

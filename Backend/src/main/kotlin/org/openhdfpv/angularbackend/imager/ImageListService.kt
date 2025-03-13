@@ -53,7 +53,7 @@ class ImageListService(
                                 "icon" to imageEntity.icon,
                                 "url" to if (redirectEnabled) generateFullUrl(
                                     request,
-                                    "/download/image/id/${imageEntity.id}"
+                                    "/download/image/filename/${imageEntity.getCurrentAvailableFilename()}"
                                 ) else imageEntity.getCurrentAvailableUrl(),
                                 "extract_size" to imageEntity.extractSize,
                                 "extract_sha256" to imageEntity.extractSha256,

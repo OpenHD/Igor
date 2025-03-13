@@ -77,8 +77,9 @@ class DummyDataLoader(
                 val existingImage = imageService.findBySha256(sha256)
 
                 if (existingImage != null) {
-                    handleExistingImage(existingImage, imageJson.url)
-                    savedImages.add(existingImage)
+                    // Merge anhand von SHA, dabei wird das gesamte imageJson berücksichtigt
+                    val mergedImage = handleExistingImage(existingImage, imageJson)
+                    savedImages.add(mergedImage)
                 } else {
                     val newImage = createNewImageEntity(imageJson, osCategory)
                     imageService.save(newImage)
@@ -99,22 +100,37 @@ class DummyDataLoader(
         )
     }
 
-    private fun handleExistingImage(existingImage: ImageEntity, newUrl: String) {
-        // Check if URL already exists
-        val urlExists = existingImage.urls.any { it.url == newUrl }
+    private fun handleExistingImage(existingImage: ImageEntity, imageJson: ImageJson): ImageEntity {
+        var updated = false
 
-        if (!urlExists) {
-            val newImageUrl = ImageUrl(
-                url = newUrl,
+        // Merge der URL: Falls die neue URL noch nicht in der Liste vorhanden ist, hinzufügen
+        if (existingImage.urls.none { it.url == imageJson.url }) {
+            val newUrlEntry = ImageUrl(
+                url = imageJson.url,
                 isAvailable = false,
                 isDefault = false
             )
-            val updatedImage = existingImage.copy(
-                urls = existingImage.urls + newImageUrl
-            )
-            imageService.save(updatedImage)
+            existingImage.urls = existingImage.urls + newUrlEntry
+            updated = true
         }
+
+        // Beispielhafter Merge weiterer Felder, falls im bestehenden Image noch nicht befüllt:
+        if (existingImage.description.isBlank() && imageJson.description.isNotBlank()) {
+            existingImage.description = imageJson.description
+            updated = true
+        }
+        if (existingImage.releaseDate.isBlank() && imageJson.releaseDate.isNotBlank()) {
+            existingImage.releaseDate = imageJson.releaseDate
+            updated = true
+        }
+        // Weitere Merge-Regeln können hier ergänzt werden
+
+        if (updated) {
+            imageService.save(existingImage)
+        }
+        return existingImage
     }
+
 
     private fun createNewImageEntity(
         imageJson: ImageJson,

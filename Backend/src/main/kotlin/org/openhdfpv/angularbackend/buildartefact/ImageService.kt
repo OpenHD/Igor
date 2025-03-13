@@ -207,4 +207,4 @@ class ImageService(
 }
 
 class NoUrlAvailableException(message: String) : RuntimeException(message)
-class InvalidFilenameException(message: String) : RuntimeException(message
+class InvalidFilenameException(message: String) : RuntimeException(message)

@@ -34,6 +34,7 @@ class DownloadRedirect(
         return imageService.handleRedirect(imageEntity)
     }
 
+    @LogRequest(type = "DOWNLOAD", origin = "ImageDownload", relatedEntity = true, description = "Redirect by filename")
     @GetMapping("/filename/{filename}")
     fun handleRedirect(@PathVariable filename: String): ResponseEntity<Any> {
         return try {

@@ -5,6 +5,6 @@ package org.openhdfpv.angularbackend.requeststats
 annotation class LogRequest(
     val type: String,
     val origin: String,
-    val relatedEntity: Boolean = false,
+    val relatedEntity: Boolean = false, // Optionales Zusatzfeld für Beziehung zu einer Entität
     val description: String = "" // Optionales Zusatzfeld für Beschreibung
 )

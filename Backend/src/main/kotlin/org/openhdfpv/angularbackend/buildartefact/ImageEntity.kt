@@ -58,6 +58,10 @@ data class ImageEntity(
             }?.url
     }
 
+    fun getCurrentAvailableFilename(): String? {
+        return getCurrentAvailableUrl()?.substringAfterLast('/')
+    }
+
     fun getAvailableUrlsCount(): Pair<Int, Int> {
         val availableCount = urls.count { it.isAvailable }
         val totalCount = urls.size
