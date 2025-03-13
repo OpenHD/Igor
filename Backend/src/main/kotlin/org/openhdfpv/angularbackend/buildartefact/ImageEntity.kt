@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.UuidGenerator
 import org.openhdfpv.angularbackend.oscategory.OsCategory
+import java.net.URI
 import java.time.LocalDateTime
 import java.util.*
 
@@ -44,6 +45,17 @@ data class ImageEntity(
 
     fun getAvailable(): Boolean {
         return getCurrentAvailableUrl() != null
+    }
+
+    fun getUrlByFilename(filename: String): String? {
+        return urls
+            .asSequence()
+            .filter { it.isAvailable }
+            .sortedByDescending { it.isDefault }
+            .firstOrNull { url ->
+                val urlFilename = url.url.substringAfterLast('/')
+                urlFilename.equals(filename, ignoreCase = true)
+            }?.url
     }
 
     fun getAvailableUrlsCount(): Pair<Int, Int> {

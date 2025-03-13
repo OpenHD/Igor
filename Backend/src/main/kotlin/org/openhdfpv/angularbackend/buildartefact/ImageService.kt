@@ -66,6 +66,34 @@ class ImageService(
 
     fun findAllNonDeleted(): List<ImageEntity> = buildImagesRepository.findByIsDeletedFalse()
 
+    @Throws(EntityNotFoundException::class)
+    fun findByFilename(filename: String): ImageEntity {
+        return buildImagesRepository.findByFilenameCustomQuery(filename)
+            ?: throw EntityNotFoundException("Image with filename '$filename' not found")
+    }
+
+    fun handleRedirectByFilename(filename: String): ResponseEntity<Any> {
+        return try {
+            val imageEntity = findByFilename(filename)
+            val redirectUrl = imageEntity.getUrlByFilename(filename)
+                ?: throw NoUrlAvailableException("No available URL for filename '$filename'")
+
+            val updatedEntity = imageEntity.copy(redirectsCount = imageEntity.redirectsCount + 1)
+            buildImagesRepository.save(updatedEntity)
+
+            ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", redirectUrl)
+                .build()
+        } catch (e: EntityNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("error" to e.message))
+        } catch (e: NoUrlAvailableException) {
+            ResponseEntity.status(HttpStatus.GONE)
+                .body(mapOf("error" to e.message))
+        }
+    }
+
+
     fun deleteAll() = buildImagesRepository.deleteAll()
 
     fun saveFromDto(dto: ImageDTO): ImageEntity {
@@ -177,3 +205,6 @@ class ImageService(
     }
 
 }
+
+class NoUrlAvailableException(message: String) : RuntimeException(message)
+class InvalidFilenameException(message: String) : RuntimeException(message

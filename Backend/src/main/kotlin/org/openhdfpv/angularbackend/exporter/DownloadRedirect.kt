@@ -2,12 +2,15 @@ package org.openhdfpv.angularbackend.exporter
 
 import org.openhdfpv.angularbackend.buildartefact.BuildImagesRepository
 import org.openhdfpv.angularbackend.buildartefact.ImageService
+import org.openhdfpv.angularbackend.buildartefact.NoUrlAvailableException
 import org.openhdfpv.angularbackend.requeststats.LogRequest
+import org.openhdfpv.angularbackend.special.EntityNotFoundException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
 import java.util.*
 
 @RestController
@@ -29,6 +32,19 @@ class DownloadRedirect(
     fun redirectToImageUrlById(@PathVariable id: UUID): ResponseEntity<Any> {
         val imageEntity = imageService.findById(id)
         return imageService.handleRedirect(imageEntity)
+    }
+
+    @GetMapping("/filename/{filename}")
+    fun handleRedirect(@PathVariable filename: String): ResponseEntity<Any> {
+        return try {
+            imageService.handleRedirectByFilename(filename)
+        } catch (e: EntityNotFoundException) {
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("error" to "Image not found"))
+        } catch (e: NoUrlAvailableException) {
+            ResponseEntity.status(HttpStatus.GONE)
+                .body(mapOf("error" to "No valid download URL available"))
+        }
     }
 
 
