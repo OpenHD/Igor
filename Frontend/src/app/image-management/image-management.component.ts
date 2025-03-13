@@ -70,6 +70,7 @@ export class ImageManagementComponent {
   openEditModal(image?: ImageFragment) {
     const modalRef = this.modalService.open(EditImageModalComponent, { size: 'xl' });
     modalRef.componentInstance.categories = this.categories;
+    modalRef.componentInstance.imagesLists = this.imagesLists; // <-- Hinzufügen
 
     if (image) {
       modalRef.componentInstance.image = { ...image };

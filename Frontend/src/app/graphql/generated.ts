@@ -43,6 +43,7 @@ export type ImageInput = {
   extractSize: Scalars['Long']['input'];
   icon: Scalars['String']['input'];
   imageDownloadSize: Scalars['Long']['input'];
+  imagesLists?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   isEnabled: Scalars['Boolean']['input'];
   name: Scalars['String']['input'];
   urls: Array<ImageUrlInput>;
@@ -56,6 +57,7 @@ export type ImagePartialInput = {
   extractSize?: InputMaybe<Scalars['Long']['input']>;
   icon?: InputMaybe<Scalars['String']['input']>;
   imageDownloadSize?: InputMaybe<Scalars['Long']['input']>;
+  imagesLists?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   isEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   redirectsCount?: InputMaybe<Scalars['Long']['input']>;
@@ -234,16 +236,16 @@ export type QueryImagesListByEndpointArgs = {
   endpoint: Scalars['String']['input'];
 };
 
-export type ImageFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
+export type ImageFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
 
 export type OsCategoryFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
 
-export type ImageListFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
+export type ImageListFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
 
 export type GetAllImagesWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllImagesWithCategoriesQuery = { __typename?: 'Query', images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
+export type GetAllImagesWithCategoriesQuery = { __typename?: 'Query', images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
 
 export type GetOsCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -253,14 +255,14 @@ export type GetOsCategoriesQuery = { __typename?: 'Query', osCategories: Array<{
 export type GetAllImagesListsWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllImagesListsWithCategoriesQuery = { __typename?: 'Query', imagesLists: Array<{ __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
+export type GetAllImagesListsWithCategoriesQuery = { __typename?: 'Query', imagesLists: Array<{ __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
 
 export type CreateImageMutationVariables = Exact<{
   input: ImageInput;
 }>;
 
 
-export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
+export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
 
 export type DeleteImageMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -275,7 +277,7 @@ export type UpdateImagePartialMutationVariables = Exact<{
 }>;
 
 
-export type UpdateImagePartialMutation = { __typename?: 'Mutation', updateImagePartial: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
+export type UpdateImagePartialMutation = { __typename?: 'Mutation', updateImagePartial: { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null } };
 
 export type CreateOsCategoryMutationVariables = Exact<{
   input: OsCategoryInput;
@@ -303,7 +305,7 @@ export type CreateImagesListMutationVariables = Exact<{
 }>;
 
 
-export type CreateImagesListMutation = { __typename?: 'Mutation', createImagesList: { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> } };
+export type CreateImagesListMutation = { __typename?: 'Mutation', createImagesList: { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> } };
 
 export type UpdateImagesListPartialMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -311,7 +313,7 @@ export type UpdateImagesListPartialMutationVariables = Exact<{
 }>;
 
 
-export type UpdateImagesListPartialMutation = { __typename?: 'Mutation', updateImagesListPartial: { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> } };
+export type UpdateImagesListPartialMutation = { __typename?: 'Mutation', updateImagesListPartial: { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> } };
 
 export type DeleteImagesListMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -349,6 +351,7 @@ export const ImageFragmentDoc = gql`
   }
   releaseDate
   redirectsCount
+  imagesLists
 }
     ${OsCategoryFragmentDoc}`;
 export const ImageListFragmentDoc = gql`

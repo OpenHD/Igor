@@ -106,6 +106,28 @@
           </button>
         </div>
 
+        <!-- Images Lists -->
+        <div class="mb-4">
+          <label class="form-label fw-bold">Assign to Lists <span class="text-danger">*</span></label>
+          <div class="form-check-group">
+            <div *ngFor="let list of imagesLists" class="form-check">
+              <input class="form-check-input"
+                     type="checkbox"
+                     [id]="'list-' + list.id"
+                     [checked]="(imageForm.get('imagesLists')?.value || []).includes(Number(list.id))"
+                     (change)="toggleListSelection(list.id)">
+              <label class="form-check-label" [for]="'list-' + list.id">
+                {{ list.name }}
+              </label>
+            </div>
+          </div>
+          <div *ngIf="imageForm.get('imagesLists')?.invalid &&
+              (imageForm.get('imagesLists')?.touched || imageForm.get('imagesLists')?.dirty)"
+               class="text-danger small mt-1">
+            At least one list must be selected.
+          </div>
+        </div>
+
         <!-- Category -->
         <div class="mb-4">
           <label class="form-label fw-bold">Category</label>

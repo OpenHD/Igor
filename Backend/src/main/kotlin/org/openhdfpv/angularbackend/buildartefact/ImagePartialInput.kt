@@ -12,5 +12,6 @@ data class ImagePartialInput(
     val isEnabled: Boolean? = null,
     val releaseDate: String? = null,
     val redirectsCount: Long? = null,
-    val categoryId: Long? = null
+    val categoryId: Long? = null,
+    val imagesLists: List<Long>? = null
 )

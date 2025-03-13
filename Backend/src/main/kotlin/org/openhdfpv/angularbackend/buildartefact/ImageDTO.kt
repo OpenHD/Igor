@@ -24,9 +24,6 @@ data class ImageDTO(
     @field:NotBlank(message = "Icon URL darf nicht leer sein")
     val icon: String,
 
-    @field:NotBlank(message = "Download URL darf nicht leer sein")
-    val url: String,
-
     val urls: List<ImageUrlDTO> = emptyList(),
 
     val backupUrls: List<String> = emptyList(),
@@ -43,12 +40,11 @@ data class ImageDTO(
     val isEnabled: Boolean = true,
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    val isAvailable: Boolean = false,
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     val redirectsCount: Long = 0,
 
-    val categoryId: Long?
+    val categoryId: Long?,
+
+    val imagesLists: List<Long>? = null
 )
 
 // Input-Klassen für GraphQL (nur die Felder, die auch geändert/gesetzt werden sollen)
@@ -56,25 +52,25 @@ data class ImageInput(
     val name: String,
     val description: String,
     val icon: String,
-    val url: String,
     val urls: List<ImageUrlInput>,
     val extractSize: Long,
     val extractSha256: String?,
     val imageDownloadSize: Long,
     val categoryId: Long?,
-    val isEnabled: Boolean = true
+    val isEnabled: Boolean = true,
+    val imagesLists: List<Long>? = null
 ) {
     fun toDTO(): ImageDTO = ImageDTO(
         name = name,
         description = description,
         icon = icon,
-        url = url,
         urls = urls.map { ImageUrlDTO(it.url, it.isDefault) },
         extractSize = extractSize,
         extractSha256 = extractSha256 ?: "",
         imageDownloadSize = imageDownloadSize,
         categoryId = categoryId,
-        isEnabled = isEnabled
+        isEnabled = isEnabled,
+        imagesLists = imagesLists ?: emptyList()
     )
 }
 

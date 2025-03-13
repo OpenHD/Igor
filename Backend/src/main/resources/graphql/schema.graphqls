@@ -104,6 +104,7 @@ input ImageInput {
     imageDownloadSize: Long!
     isEnabled: Boolean!
     categoryId: ID
+    imagesLists: [Long]
 }
 
 input ImageUrlInput {
@@ -143,6 +144,7 @@ input ImagePartialInput {
     releaseDate: String
     redirectsCount: Long
     categoryId: ID
+    imagesLists: [Long]
 }
 
 # Partial update for ImagesList – note: imageIds are not included here!

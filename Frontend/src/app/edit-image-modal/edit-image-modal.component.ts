@@ -3,7 +3,7 @@ import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Image, ImageFragment, OsCategoryFragment } from '../graphql/generated';
+import {Image, ImageFragment, ImageListFragment, OsCategoryFragment} from '../graphql/generated';
 import { GraphqlService } from '../services/graphql.service';
 
 @Component({
@@ -20,6 +20,7 @@ export class EditImageModalComponent {
   categories: OsCategoryFragment[] = [];
   iconPreview?: string;
   graphql = inject(GraphqlService);
+  imagesLists: ImageListFragment[] = [];
 
   updateIconPreview() {
     this.iconPreview = this.imageForm.get('icon')?.value;
@@ -38,12 +39,17 @@ export class EditImageModalComponent {
     extractSha256: new FormControl<string>(''),
     imageDownloadSize: new FormControl<number>(0, {nonNullable: true}),
     isEnabled: new FormControl<boolean>(true, {nonNullable: true}),
-    categoryId: new FormControl<string>('')
+    categoryId: new FormControl<string>(''),
+    imagesLists: new FormControl<number[]>([], {
+      nonNullable: true,
+      validators: [Validators.required]
+    }),
   });
 
   get urls() {
     return this.imageForm.get('urls') as FormArray;
   }
+
 
   ngOnInit() {
     if (this.image?.id) {
@@ -64,8 +70,28 @@ export class EditImageModalComponent {
         this.iconPreview = this.image.icon;
       }
     }
-
+    if (this.image?.imagesLists) {
+      const listIds = this.image.imagesLists.map(id => Number(id));
+      this.imageForm.patchValue({
+        imagesLists: listIds
+      });
+    }
   }
+
+  toggleListSelection(listId: string) {
+    const numericId = Number(listId);
+    const currentLists = this.imageForm.get('imagesLists')?.value || [];
+    const index = currentLists.indexOf(numericId);
+
+    if (index === -1) {
+      this.imageForm.get('imagesLists')?.setValue([...currentLists, numericId]);
+    } else {
+      const newValue = currentLists.filter(id => id !== numericId);
+      this.imageForm.get('imagesLists')?.setValue(newValue);
+    }
+    this.imageForm.get('imagesLists')?.markAsTouched();
+  }
+
 
   addUrl(url = '', isDefault = false) {
     this.urls.push(new FormGroup({
@@ -91,6 +117,7 @@ export class EditImageModalComponent {
 
     const input = {
       ...formValue,
+      imagesLists: formValue.imagesLists,
       urls: formValue.urls.map(u => ({
         url: u.url,
         isDefault: u.isDefault
@@ -125,4 +152,6 @@ export class EditImageModalComponent {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
+
+  protected readonly Number = Number;
 }

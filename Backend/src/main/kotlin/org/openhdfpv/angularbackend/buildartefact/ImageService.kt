@@ -73,7 +73,7 @@ class ImageService(
             osCategoryService.findCategoryById(it)
         }
 
-        return if (dto.id != null) {
+        val savedImage = if (dto.id != null) {
             val existingImage = findById(dto.id)
             existingImage.apply {
                 name = dto.name
@@ -109,15 +109,35 @@ class ImageService(
                     )
                 },
                 category = foundCategory,
-                releaseDate = "", // Setzen Sie hier Standardwerte
+                releaseDate = "", // Set default values
                 initFormat = ""
             )
             save(newImage)
         }
+
+        // Process imagesLists associations
+        dto.imagesLists?.let { listIds ->
+            val currentLists = imageListService.findImagesListsByImageId(savedImage.id!!)
+            val newListIds = listIds.toSet()
+
+            // Remove from old lists
+            currentLists.filter { it !in newListIds }.forEach { listId ->
+                imageListService.removeImageFromImagesList(listId, savedImage)
+            }
+
+            // Add to new lists
+            newListIds.filter { it !in currentLists }.forEach { listId ->
+                imageListService.addImageToImagesList(listId, savedImage)
+            }
+        }
+
+        return savedImage
     }
 
     fun updateImagePartial(id: UUID, input: ImagePartialInput): ImageEntity {
         val existingImage = findById(id)
+
+        // Update basic fields
         input.name?.let { existingImage.name = it }
         input.description?.let { existingImage.description = it }
         input.icon?.let { existingImage.icon = it }
@@ -134,7 +154,26 @@ class ImageService(
         input.categoryId?.let {
             existingImage.category = osCategoryService.findCategoryById(it)
         }
-        return save(existingImage)
+
+        val updatedImage = save(existingImage)
+
+        // Process imagesLists if provided
+        input.imagesLists?.let { listIds ->
+            val currentLists = imageListService.findImagesListsByImageId(id)
+            val newListIds = listIds.toSet()
+
+            // Remove from old lists
+            currentLists.filter { it !in newListIds }.forEach { listId ->
+                imageListService.removeImageFromImagesList(listId, updatedImage)
+            }
+
+            // Add to new lists
+            newListIds.filter { it !in currentLists }.forEach { listId ->
+                imageListService.addImageToImagesList(listId, updatedImage)
+            }
+        }
+
+        return updatedImage
     }
 
 }

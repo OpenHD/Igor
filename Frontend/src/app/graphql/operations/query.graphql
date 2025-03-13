@@ -21,6 +21,7 @@ fragment Image on Image {
   }
   releaseDate
   redirectsCount
+  imagesLists
 }
 
 fragment OsCategory on OsCategory {
