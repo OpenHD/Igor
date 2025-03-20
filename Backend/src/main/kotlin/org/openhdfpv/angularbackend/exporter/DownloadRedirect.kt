@@ -49,7 +49,7 @@ class DownloadRedirect(
     }
 
 
-
+    // this route for example need authentication
     @GetMapping("/summary")
     fun getRedirectsSummary(): ResponseEntity<List<Map<String, Any>>> {
         val images = buildImagesRepository.findAll()

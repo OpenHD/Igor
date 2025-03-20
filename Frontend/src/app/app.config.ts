@@ -1,47 +1,56 @@
 import { isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { PLATFORM_ID, ApplicationConfig, inject } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { APOLLO_OPTIONS, Apollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client/core';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ConfigService } from './services/config.service';
+import { setContext } from '@apollo/client/link/context';
 
-export function createApollo(httpLink: HttpLink, platformId: Object) {
-  let graphqlUri: string;
-  if (isPlatformBrowser(platformId)) {
-    // Browser: Zugriff auf window ist sicher
-    graphqlUri = window.location.hostname === 'localhost'
-      ? 'http://127.0.0.1:8080/graphql'
-      : 'https://download.openhdfpv.org/graphql';
-  } else {
-    // SSR: Fallback-URI setzen
-    graphqlUri = 'http://127.0.0.1:8080/graphql';
-  }
+export function createApollo(httpLink: HttpLink, platformId: Object, config: ConfigService) {
+  const authLink = setContext((operation, context) => {
+    const token = isPlatformBrowser(platformId)
+      ? localStorage.getItem('auth_token')
+      : '';
+    return {
+      headers: {
+        ...context['headers'],
+        Authorization: token ? `Bearer ${token}` : ''
+      }
+    };
+  });
 
   return {
     cache: new InMemoryCache(),
-    link: httpLink.create({ uri: graphqlUri }),
+    link: authLink.concat(
+      httpLink.create({
+        uri: config.graphqlEndpoint
+      })
+    ),
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: 'cache-and-network',
-      },
+        fetchPolicy: 'cache-and-network'
+      }
     }
   };
 }
 
+
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch()),
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    ConfigService,
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
-      deps: [HttpLink, PLATFORM_ID]
+      deps: [HttpLink, PLATFORM_ID, ConfigService]
     },
     Apollo
   ]

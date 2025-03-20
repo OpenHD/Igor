@@ -1,4 +1,3 @@
-// src/app/services/graphql.service.ts
 import { Injectable, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import {
@@ -18,9 +17,12 @@ import {
   GetAllImagesListsWithCategoriesQuery,
   GetAllImagesListsWithCategoriesDocument,
   ImagesListInput,
-  CreateImagesListDocument, ImagesListPartialInput, UpdateImagesListPartialDocument, DeleteImagesListDocument
+  CreateImagesListDocument,
+  ImagesListPartialInput,
+  UpdateImagesListPartialDocument,
+  DeleteImagesListDocument
 } from '../graphql/generated';
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GraphqlService {
@@ -38,7 +40,7 @@ export class GraphqlService {
       mutation: CreateImageDocument,
       variables: { input },
       update: (cache, { data }) => {
-        // Cache Update Logic
+        // Cache-Update-Logik (ggf. implementieren)
       }
     });
   }
@@ -123,5 +125,4 @@ export class GraphqlService {
       refetchQueries: [GetAllImagesListsWithCategoriesDocument]
     });
   }
-
 }

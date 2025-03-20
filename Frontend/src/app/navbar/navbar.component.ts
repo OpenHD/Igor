@@ -1,18 +1,14 @@
 import { Component } from '@angular/core';
-import {RouterLink, RouterLinkActive} from '@angular/router';
-import {NgClass, NgForOf} from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import {NgIf, NgForOf, NgClass} from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [
-    RouterLinkActive,
-    NgClass,
-    NgForOf,
-    RouterLink
-  ],
+  standalone: true,
+  imports: [RouterLink, RouterLinkActive, NgIf, NgForOf, NgClass],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss',
-  standalone: true
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
   isCollapsed = true;
@@ -20,7 +16,16 @@ export class NavbarComponent {
   navLinks = [
     { path: '/images', label: 'Image Management' },
     { path: '/categories', label: 'OS Categories' },
-    { path: '/lists', label: 'List Management' },
-    // Weitere Links hier hinzufügen
+    { path: '/lists', label: 'List Management' }
   ];
+
+  constructor(public authService: AuthService) {}
+
+  toggleNavbar(): void {
+    this.isCollapsed = !this.isCollapsed;
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
 }

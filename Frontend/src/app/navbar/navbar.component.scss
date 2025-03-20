@@ -1,8 +1,8 @@
-// navbar.component.scss
-
 .navbar {
   .nav-link {
     cursor: pointer;
+    transition: color 0.2s ease;
+    position: relative;
 
     &:hover {
       color: white !important;
@@ -10,7 +10,15 @@
 
     &.active {
       font-weight: bold;
-      text-decoration: underline;
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: white;
+      }
     }
   }
 
