@@ -45,7 +45,7 @@
           <div class="col-12 col-md-6">
             <label for="newListEndpoint" class="form-label">API Endpoint</label>
             <div class="input-group">
-              <span class="input-group-text">/api/image_list/</span>
+              <span class="input-group-text">/image_list/</span>
               <input id="newListEndpoint"
                      type="text"
                      class="form-control"
@@ -149,7 +149,7 @@
               <dl class="row mb-0">
                 <dt class="col-sm-3 text-muted">API Endpoint</dt>
                 <dd class="col-sm-9">
-                  <code>/api/image_list/{{ selectedList.endpoint || 'not-set' }}</code>
+                  <code>/image_list/{{ selectedList.endpoint || 'not-set' }}</code>
                 </dd>
 
                 <dt class="col-sm-3 text-muted">Latest Version</dt>
@@ -187,7 +187,7 @@
                   <div class="col-12 col-md-6">
                     <label class="form-label">API Endpoint</label>
                     <div class="input-group">
-                      <span class="input-group-text">/api/image_list/</span>
+                      <span class="input-group-text">/image_list/</span>
                       <input type="text"
                              class="form-control"
                              [(ngModel)]="selectedList.editedEndpoint"

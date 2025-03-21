@@ -54,6 +54,8 @@ class SecurityConfig(
                 auth
                     .requestMatchers(
                         "/api/**",
+                        "/image_list/**",
+                        "/image_lists/**",
                         "/download/**",
                         "/graphiql",
                         "/graphql",
