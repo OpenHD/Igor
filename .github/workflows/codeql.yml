@@ -54,7 +54,7 @@ jobs:
 
         # ===== Frontend (TypeScript) =====
         - language: javascript-typescript
-          build-mode: autobuild  # Funktioniert unverändert
+          build-mode: none  # Funktioniert unverändert
           project-dir: ./Frontend  # Pfad zum TypeScript-Projekt
 
         # ===== GitHub Actions =====
