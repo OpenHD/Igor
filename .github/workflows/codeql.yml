@@ -43,10 +43,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - language: actions
-          build-mode: none
         - language: java-kotlin
           build-mode: autobuild
+          # Speicher-Einstellungen nur für Java/Kotlin
+          env:
+            JAVA_TOOL_OPTIONS: "-Xmx4g"
+            GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dkotlin.daemon.jvmargs=-Xmx4g"
+        - language: actions
+          build-mode: none
         - language: javascript-typescript
           build-mode: none
         # CodeQL supports the following values keywords for 'language': 'actions', 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
@@ -79,6 +83,13 @@ jobs:
 
         # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
+
+      env:
+          # Wichtig für Autobuild im Backend-Ordner
+          CODEQL_WORKING_DIR: ./Backend  # Pfad zum Kotlin-Projekt
+          # Erbe die Matrix-Env-Variablen
+          JAVA_TOOL_OPTIONS: ${{ matrix.env.JAVA_TOOL_OPTIONS }}
+          GRADLE_OPTS: ${{ matrix.env.GRADLE_OPTS }}   
 
     # If the analyze step fails for one of the languages you are analyzing with
     # "We were unable to automatically build your code", modify the matrix above
