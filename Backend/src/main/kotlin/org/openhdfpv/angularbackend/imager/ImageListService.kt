@@ -16,9 +16,9 @@ class ImageListService(
 ) {
 
     fun getAllImagesLists(): List<ImagesList> {
-        return imagesListRepository.findAll().map {
-            // Sicherstellen, dass imageEntities nicht null ist
-            it.copy(imageEntities = it.imageEntities ?: emptySet())
+        return imagesListRepository.findAll().map { imagesList ->
+            val filteredImages = imagesList.imageEntities.filter { !it.isDeleted }
+            imagesList.copy(imageEntities = filteredImages.toSet())
         }
     }
 
