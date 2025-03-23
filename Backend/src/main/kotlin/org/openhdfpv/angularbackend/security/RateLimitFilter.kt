@@ -42,7 +42,7 @@ class RateLimitFilter : OncePerRequestFilter() {
     }
 
     private fun createNewBucket(): Bucket {
-        val limit = Bandwidth.classic(4, Refill.intervally(4, Duration.ofMinutes(1)))
+        val limit = Bandwidth.classic(4, Refill.intervally(8, Duration.ofMinutes(1)))
         return Bucket4j.builder().addLimit(limit).build()
     }
 }
