@@ -45,7 +45,7 @@ class RateLimitFilter : OncePerRequestFilter() {
     }
 
     private fun createNewBucket(): Bucket {
-        val limit = Bandwidth.classic(4, Refill.intervally(8, Duration.ofMinutes(1)))
+        val limit = Bandwidth.classic(20, Refill.intervally(1, Duration.ofHours(12)))
         return Bucket.builder().addLimit(limit).build()
     }
 }
