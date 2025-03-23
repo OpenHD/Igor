@@ -59,6 +59,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
     implementation("nl.basjes.parse.useragent:yauaa:7.30.0")
+    implementation("com.bucket4j:bucket4j-core:8.1.0")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")

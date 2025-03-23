@@ -25,7 +25,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 @EnableMethodSecurity
 class SecurityConfig(
     private val userService: UserService,
-    private val jwtUtil: JwtUtil
+    private val jwtUtil: JwtUtil,
+    private val rateLimitFilter: RateLimitFilter
 ) {
 
     @Bean
@@ -70,6 +71,8 @@ class SecurityConfig(
                     .anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())
+            .addFilterBefore(JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(rateLimitFilter, JwtFilter::class.java)
             .addFilterBefore(JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
