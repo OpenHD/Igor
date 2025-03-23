@@ -18,8 +18,8 @@ data class Request(
     @Column(nullable = true) val protocol: String? = null,
     @Column(nullable = true) val secure: Boolean? = null,
     @Column(nullable = true) val referer: String? = null,
-    @Column(nullable = true) val origin: String? = null, // Das neue Feld für die Herkunft
-    @Column(nullable = true) val relatedEntityId: Long? = null, // NEUES Feld zur Speicherung von IDs der verknüpften Entität
+    @Column(nullable = true) val origin: String? = null,
+    @Column(nullable = true) val relatedEntityId: Long? = null,
     @Column(nullable = false, updatable = false) @CreationTimestamp val timestamp: LocalDateTime = LocalDateTime.MIN,
     val description: String? = null,
 

@@ -58,6 +58,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+    implementation("nl.basjes.parse.useragent:yauaa:7.30.0")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -78,6 +79,9 @@ dependencies {
 
     // Annotation Processing
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 }
 
 kotlin {

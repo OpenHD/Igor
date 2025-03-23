@@ -59,10 +59,11 @@ class SecurityConfig(
                         "/download/**",
                         "/graphiql",
                         "/graphql",
-                        "/v3/api-docs/**",
                         "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/api-docs/**",
                         "/actuator/health",
-                        "/error"
+                        "/error",
                     ).permitAll()
                     .requestMatchers("/graphql").hasRole("USER")
                     .requestMatchers("/actuator/**").hasRole("ADMIN")
