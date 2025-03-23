@@ -2,11 +2,11 @@ package org.openhdfpv.angularbackend.security
 
 import io.github.bucket4j.Bandwidth
 import io.github.bucket4j.Bucket
-import io.github.bucket4j.Bucket4j
 import io.github.bucket4j.Refill
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Duration
@@ -15,6 +15,8 @@ import java.util.concurrent.ConcurrentHashMap
 @Component
 class RateLimitFilter : OncePerRequestFilter() {
 
+    // Umbenennen, um Namenskonflikte mit der Basisklasse zu vermeiden
+    private val rateLimitLogger = LoggerFactory.getLogger(RateLimitFilter::class.java)
     private val buckets = ConcurrentHashMap<String, Bucket>()
 
     override fun doFilterInternal(
@@ -24,15 +26,16 @@ class RateLimitFilter : OncePerRequestFilter() {
     ) {
         if (request.requestURI.startsWith("/download/")) {
             val ip = getClientIP(request)
+            val userAgent = request.getHeader("User-Agent") ?: "Unknown User-Agent"
             val bucket = buckets.computeIfAbsent(ip) { createNewBucket() }
 
             if (!bucket.tryConsume(1)) {
+                rateLimitLogger.info("Rate limit exceeded for IP: $ip, User-Agent: $userAgent")
                 response.status = 429
                 response.writer.write("Too many requests")
                 return
             }
         }
-
         filterChain.doFilter(request, response)
     }
 
@@ -43,6 +46,6 @@ class RateLimitFilter : OncePerRequestFilter() {
 
     private fun createNewBucket(): Bucket {
         val limit = Bandwidth.classic(4, Refill.intervally(8, Duration.ofMinutes(1)))
-        return Bucket4j.builder().addLimit(limit).build()
+        return Bucket.builder().addLimit(limit).build()
     }
 }
