@@ -29,8 +29,8 @@ class DummyDataLoader(
 ) {
 
     private val jsonUrls = listOf(
-        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-download-index.json",
-        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/refs/heads/master/src/OpenHD-development-releases.json"
+        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/3990d6aac346e5adf4f384453ad3ba81559e43b5/src/OpenHD-download-index.json",
+        "https://raw.githubusercontent.com/OpenHD/OpenHD-ImageWriter/3990d6aac346e5adf4f384453ad3ba81559e43b5/src/OpenHD-development-releases.json"
     )
 
     @Bean
