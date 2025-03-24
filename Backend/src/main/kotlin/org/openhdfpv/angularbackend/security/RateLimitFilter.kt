@@ -27,10 +27,12 @@ class RateLimitFilter : OncePerRequestFilter() {
         if (request.requestURI.startsWith("/download/")) {
             val ip = getClientIP(request)
             val userAgent = request.getHeader("User-Agent") ?: "Unknown User-Agent"
+            val requestMethod = request.method
+            val requestURI = request.requestURI
             val bucket = buckets.computeIfAbsent(ip) { createNewBucket() }
 
             if (!bucket.tryConsume(1)) {
-                rateLimitLogger.info("Rate limit exceeded for IP: $ip, User-Agent: $userAgent")
+                rateLimitLogger.info("Rate limit exceeded for IP: $ip, User-Agent: $userAgent, Method: $requestMethod, Endpoint: $requestURI")
                 response.status = 429
                 response.writer.write("Too many requests")
                 return
