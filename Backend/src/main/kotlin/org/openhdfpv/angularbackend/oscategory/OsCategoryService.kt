@@ -18,30 +18,30 @@ class OsCategoryService(
             throw IllegalArgumentException("OS-Kategorie mit Namen '${osCategory.name}' existiert bereits.")
         }
         osCategoryRepository.incrementAllPositions()
-        val newCategory = osCategory.copy(position = 0)
-        return osCategoryRepository.save(newCategory)
+        osCategory.position = 0
+        return osCategoryRepository.save(osCategory)
     }
+
 
     // Aktualisiert eine bestehende Kategorie
     fun updateOsCategory(categoryId: Long, updatedData: OsCategory): OsCategory {
         val existingCategory = osCategoryRepository.findById(categoryId)
             .orElseThrow { EntityNotFoundException("OS-Kategorie mit ID $categoryId nicht gefunden") }
 
-        // Prüfe Namenskonflikt mit anderen Kategorien
-        updatedData.name.takeIf { it != existingCategory.name }?.let { newName ->
-            osCategoryRepository.findByName(newName)?.let {
-                throw IllegalArgumentException("OS-Kategorie mit Namen '$newName' existiert bereits.")
+        // Namenskonflikt prüfen und direkt die Felder aktualisieren
+        if (updatedData.name != existingCategory.name) {
+            osCategoryRepository.findByName(updatedData.name)?.let {
+                throw IllegalArgumentException("OS-Kategorie mit Namen '${updatedData.name}' existiert bereits.")
             }
         }
 
-        return osCategoryRepository.save(
-            existingCategory.copy(
-                name = updatedData.name,
-                description = updatedData.description,
-                icon = updatedData.icon
-            )
-        )
+        existingCategory.name = updatedData.name
+        existingCategory.description = updatedData.description
+        existingCategory.icon = updatedData.icon
+
+        return osCategoryRepository.save(existingCategory)
     }
+
 
     // Löscht eine Kategorie
     fun deleteOsCategory(categoryId: Long) {

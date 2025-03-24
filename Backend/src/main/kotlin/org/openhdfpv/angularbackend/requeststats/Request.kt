@@ -5,32 +5,43 @@ import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 @Entity
-data class Request(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
-    @Column(nullable = true) val method: String? = null,
-    @Column(nullable = true) val type: String? = null, // NEUES Feld für den Request-Typ
-    @Column(nullable = false) val uri: String,
-    @Column val queryParams: String? = null,
-    @Column(columnDefinition = "TEXT") val headers: String? = null,
-    @Column(nullable = false) val remoteAddr: String,
-    @Column(nullable = true) val userAgent: String? = null,
-    @Column(nullable = true) val scheme: String? = null,
-    @Column(nullable = true) val protocol: String? = null,
-    @Column(nullable = true) val secure: Boolean? = null,
-    @Column(nullable = true) val referer: String? = null,
-    @Column(nullable = true) val origin: String? = null,
-    @Column(nullable = true) val relatedEntityId: Long? = null,
-    @Column(nullable = false, updatable = false) @CreationTimestamp val timestamp: LocalDateTime = LocalDateTime.MIN,
-    val description: String? = null,
+@Table(name = "request")
+open class Request(
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) open var id: Long? = null,
+    @Column(nullable = true) open var method: String? = null,
+    @Column(nullable = true) open var type: String? = null, // NEUES Feld für den Request-Typ
+    @Column(nullable = false) open var uri: String,
+    @Column(nullable = true) open var queryParams: String? = null,
+    @Column(columnDefinition = "TEXT") open var headers: String? = null,
+    @Column(nullable = false) open var remoteAddr: String,
+    @Column(nullable = true) open var userAgent: String? = null,
+    @Column(nullable = true) open var scheme: String? = null,
+    @Column(nullable = true) open var protocol: String? = null,
+    @Column(nullable = true) open var secure: Boolean? = null,
+    @Column(nullable = true) open var referer: String? = null,
+    @Column(nullable = true) open var origin: String? = null,
+    @Column(nullable = true) open var relatedEntityId: Long? = null,
+    @Column(nullable = false, updatable = false) @CreationTimestamp open var timestamp: LocalDateTime = LocalDateTime.MIN,
+    @Column(nullable = true) open var description: String? = null,
+    @Column(nullable = false) open var clientIp: String,
+    @Column(nullable = true) open var isTorExitNode: Boolean? = null,
+    @Column(nullable = true) open var country: String? = null,
+    @Column(nullable = true) open var countryCode: String? = null,
+    @Column(nullable = true) open var city: String? = null,
+    @Column(nullable = true) open var lat: Double? = null,
+    @Column(nullable = true) open var lon: Double? = null,
+    @Column(nullable = true) open var isp: String? = null,
+    @Column(nullable = true) open var asn: String? = null,
+    @Column(nullable = true) open var lastCheckedAt: LocalDateTime? = null
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Request) return false
+        if (id == null || other.id == null) return false
+        return id == other.id
+    }
 
-    @Column(nullable = false) val clientIp: String,
-    @Column(nullable = true) var isTorExitNode: Boolean? = null,
-    @Column(nullable = true) var country: String? = null,
-    @Column(nullable = true) var countryCode: String? = null,
-    @Column(nullable = true) var city: String? = null,
-    @Column(nullable = true) var lat: Double? = null,
-    @Column(nullable = true) var lon: Double? = null,
-    @Column(nullable = true) var isp: String? = null,
-    @Column(nullable = true) var asn: String? = null,
-    @Column(nullable = true) var lastCheckedAt: LocalDateTime? = null
-)
+    override fun hashCode(): Int = id?.hashCode() ?: 0
+
+    override fun toString(): String = "Request(id=$id, uri='$uri', remoteAddr='$remoteAddr', clientIp='$clientIp', timestamp=$timestamp)"
+}
