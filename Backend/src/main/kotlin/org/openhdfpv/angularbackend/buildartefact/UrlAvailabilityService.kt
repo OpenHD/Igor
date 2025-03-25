@@ -13,7 +13,7 @@ class UrlAvailabilityService(
 
     private val logger = LoggerFactory.getLogger(UrlAvailabilityService::class.java)
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 900000) // 15 minutes
     fun checkUrlAvailability() {
         // Use service method to get non-deleted entities
         val entities = imageService.findAllNonDeleted()
