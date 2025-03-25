@@ -95,7 +95,7 @@ class DummyDataLoader(
                 name = listName,
                 endpoint = endpoint,
                 description = "Automatisch generierte Liste von $jsonUrl",
-                imageEntities = savedImages.toSet()
+                imageEntities = savedImages.toMutableSet()
             )
         )
     }
@@ -110,7 +110,7 @@ class DummyDataLoader(
                 isAvailable = false,
                 isDefault = false
             )
-            existingImage.urls = existingImage.urls + newUrlEntry
+            existingImage.urls += newUrlEntry
             updated = true
         }
 
@@ -139,7 +139,7 @@ class DummyDataLoader(
         name = imageJson.name.trim(),
         description = imageJson.description,
         icon = imageJson.icon,
-        urls = listOf(
+        urls = mutableListOf(
             ImageUrl(
                 url = imageJson.url,
                 isAvailable = false,

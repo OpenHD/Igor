@@ -9,21 +9,34 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "images_list")
 open class ImagesList(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) open var id: Long? = null,
-    @Column(nullable = false) open var latestVersion: String = "",
-    @Column(nullable = false) open var url: String = "",
-    @Column(nullable = false, unique = true) open var name: String = "",
-    @Column(nullable = false, unique = true) open var endpoint: String = "",
-    @Column(nullable = false) open var description: String = "",
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    open var id: Long? = null,
+    @Column(nullable = false)
+    open var latestVersion: String = "",
+    @Column(nullable = false)
+    open var url: String = "",
+    @Column(nullable = false, unique = true)
+    open var name: String = "",
+    @Column(nullable = false, unique = true)
+    open var endpoint: String = "",
+    @Column(nullable = false)
+    open var description: String = "",
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "list_images",
         joinColumns = [JoinColumn(name = "list_id")],
         inverseJoinColumns = [JoinColumn(name = "image_id")]
-    ) open var imageEntities: Set<ImageEntity> = HashSet(),
-    @Column(name = "created_at", nullable = false, updatable = false) @CreationTimestamp open var createdAt: LocalDateTime = LocalDateTime.MIN,
-    @Column(name = "updated_at", nullable = false) @UpdateTimestamp open var updatedAt: LocalDateTime = LocalDateTime.MIN
-) {
+    )
+    // Use a concrete generic type (MutableSet) to avoid raw type issues.
+    open var imageEntities: MutableSet<ImageEntity> = mutableSetOf(),
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    open var createdAt: LocalDateTime = LocalDateTime.MIN,
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    open var updatedAt: LocalDateTime = LocalDateTime.MIN
+)
+{
 
     fun updateFromInput(input: ImagesListInput, imageEntities: Set<ImageEntity>) {
         this.latestVersion = input.latestVersion
@@ -31,8 +44,9 @@ open class ImagesList(
         this.name = input.name
         this.endpoint = input.endpoint
         this.description = input.description
-        this.imageEntities = imageEntities
+        this.imageEntities = imageEntities.toMutableSet() // Convert to MutableSet
     }
+
 
     fun updateFromPartialInput(input: ImagesListPartialInput) {
         input.latestVersion?.let { this.latestVersion = it }

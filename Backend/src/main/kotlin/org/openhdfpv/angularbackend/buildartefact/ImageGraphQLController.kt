@@ -84,7 +84,7 @@ class ImageGraphQLController(
                 name = input.name,
                 endpoint = input.endpoint,
                 description = input.description,
-                imageEntities = imageEntities
+                imageEntities = imageEntities.toMutableSet()
             )
         )
     }
@@ -106,7 +106,7 @@ class ImageGraphQLController(
             name = input.name,
             endpoint = input.endpoint,
             description = input.description,
-            imageEntities = imageEntities
+            imageEntities = imageEntities.toMutableSet()
         )
         return imageListService.updateImagesList(id, updatedList)
     }

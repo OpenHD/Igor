@@ -11,14 +11,15 @@ import java.util.*
 @Service
 class ImageService(
     private val buildImagesRepository: BuildImagesRepository,
-    private val imageListService: ImageListService, // Statt ImagesListRepository
+    private val imageListService: ImageListService, // Instead of ImagesListRepository
     private val osCategoryService: OsCategoryService
 ) {
 
     fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
         imageEntity?.let { entity ->
-            val updatedEntity = entity.copy(redirectsCount = entity.redirectsCount + 1)
-            buildImagesRepository.save(updatedEntity)
+            // Increment the redirect count directly (instead of using copy())
+            entity.redirectsCount = entity.redirectsCount + 1
+            buildImagesRepository.save(entity)
             ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", entity.getCurrentAvailableUrl())
                 .build()
@@ -40,8 +41,9 @@ class ImageService(
     fun delete(id: UUID) {
         val imageEntity = buildImagesRepository.findById(id)
             .orElseThrow { EntityNotFoundException("ImageEntity with ID $id not found") }
-        val updatedImageEntity = imageEntity.copy(isDeleted = true)
-        buildImagesRepository.save(updatedImageEntity)
+        // Set the isDeleted flag directly (instead of using copy())
+        imageEntity.isDeleted = true
+        buildImagesRepository.save(imageEntity)
     }
 
     fun addImageToImagesList(imageId: UUID, imagesListId: Long) {
@@ -56,12 +58,10 @@ class ImageService(
 
     fun updateImageCategory(imageId: UUID, categoryId: Long?): ImageEntity {
         val imageEntity = findById(imageId)
-        val category = categoryId?.let {
-            // Beispiel: osCategoryRepository.findById(it).orElse(null)
-            null
-        }
-        val updatedImageEntity = imageEntity.copy(category = category)
-        return save(updatedImageEntity)
+        val category = categoryId?.let { osCategoryService.findCategoryById(it) }
+        // Directly set the new category value
+        imageEntity.category = category
+        return save(imageEntity)
     }
 
     fun findAllNonDeleted(): List<ImageEntity> = buildImagesRepository.findByIsDeletedFalse()
@@ -77,10 +77,9 @@ class ImageService(
             val imageEntity = findByFilename(filename)
             val redirectUrl = imageEntity.getUrlByFilename(filename)
                 ?: throw NoUrlAvailableException("No available URL for filename '$filename'")
-
-            val updatedEntity = imageEntity.copy(redirectsCount = imageEntity.redirectsCount + 1)
-            buildImagesRepository.save(updatedEntity)
-
+            // Increment the redirect count directly
+            imageEntity.redirectsCount = imageEntity.redirectsCount + 1
+            buildImagesRepository.save(imageEntity)
             ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", redirectUrl)
                 .build()
@@ -93,14 +92,10 @@ class ImageService(
         }
     }
 
-
     fun deleteAll() = buildImagesRepository.deleteAll()
 
     fun saveFromDto(dto: ImageDTO): ImageEntity {
-        val foundCategory = dto.categoryId?.let {
-            osCategoryService.findCategoryById(it)
-        }
-
+        val foundCategory = dto.categoryId?.let { osCategoryService.findCategoryById(it) }
         val savedImage = if (dto.id != null) {
             val existingImage = findById(dto.id)
             existingImage.apply {
@@ -117,7 +112,7 @@ class ImageService(
                         url = urlDto.url,
                         isDefault = urlDto.isDefault
                     )
-                }
+                }.toMutableList()
                 category = foundCategory
             }
             save(existingImage)
@@ -135,9 +130,9 @@ class ImageService(
                         url = urlDto.url,
                         isDefault = urlDto.isDefault
                     )
-                },
+                }.toMutableList(),
                 category = foundCategory,
-                releaseDate = "", // Set default values
+                releaseDate = "", // Set default value
                 initFormat = ""
             )
             save(newImage)
@@ -165,12 +160,12 @@ class ImageService(
     fun updateImagePartial(id: UUID, input: ImagePartialInput): ImageEntity {
         val existingImage = findById(id)
 
-        // Update basic fields
+        // Update basic fields directly
         input.name?.let { existingImage.name = it }
         input.description?.let { existingImage.description = it }
         input.icon?.let { existingImage.icon = it }
         input.urls?.let { urls ->
-            existingImage.urls = urls.map { ImageUrl(it.url, isDefault = it.isDefault) }
+            existingImage.urls = urls.map { ImageUrl(it.url, isDefault = it.isDefault) }.toMutableList()
         }
         input.backupUrls?.let { existingImage.backupUrls = it }
         input.extractSize?.let { existingImage.extractSize = it }
@@ -182,10 +177,9 @@ class ImageService(
         input.categoryId?.let {
             existingImage.category = osCategoryService.findCategoryById(it)
         }
-
         val updatedImage = save(existingImage)
 
-        // Process imagesLists if provided
+        // Update imagesLists associations if provided
         input.imagesLists?.let { listIds ->
             val currentLists = imageListService.findImagesListsByImageId(id)
             val newListIds = listIds.toSet()
@@ -194,16 +188,13 @@ class ImageService(
             currentLists.filter { it !in newListIds }.forEach { listId ->
                 imageListService.removeImageFromImagesList(listId, updatedImage)
             }
-
             // Add to new lists
             newListIds.filter { it !in currentLists }.forEach { listId ->
                 imageListService.addImageToImagesList(listId, updatedImage)
             }
         }
-
         return updatedImage
     }
-
 }
 
 class NoUrlAvailableException(message: String) : RuntimeException(message)

@@ -8,51 +8,49 @@ import org.springframework.stereotype.Service
 
 @Service
 class UrlAvailabilityService(
-    private val imageService: ImageService // Changed from repository to service
+    private val imageService: ImageService // Using service to fetch and save entities
 ) {
 
     private val logger = LoggerFactory.getLogger(UrlAvailabilityService::class.java)
 
     @Scheduled(fixedRate = 900000) // 15 minutes
     fun checkUrlAvailability() {
-        // Use service method to get non-deleted entities
+        // Get all non-deleted image entities
         val entities = imageService.findAllNonDeleted()
 
         for (entity in entities) {
-            val updatedUrls = entity.urls.map { imageUrl ->
+            var requiresUpdate = false
+
+            // Iterate through each image URL in the entity
+            entity.urls.forEach { imageUrl ->
                 val available = isUrlReachable(imageUrl.url)
+                // Check if the current availability status is different from the new status
                 if (imageUrl.isAvailable != available) {
-                    logger.info("Änderung von isAvailable für URL ${imageUrl.url} in Entity ${entity.name}: $available")
-                    imageUrl.copy(isAvailable = available)
-                } else {
-                    imageUrl
+                    logger.info("Changing isAvailable for URL ${imageUrl.url} in Entity ${entity.name} to $available")
+                    // Update the availability directly
+                    imageUrl.isAvailable = available
+                    requiresUpdate = true
                 }
             }
 
-            var requiresUpdate = false
-
-            if (updatedUrls != entity.urls) {
-                entity.urls = updatedUrls
-                requiresUpdate = true
-            }
-
+            // Save the entity only if at least one URL's status was changed
             if (requiresUpdate) {
-                imageService.save(entity) // Use service to save changes
+                imageService.save(entity)
             }
         }
     }
 
     /**
-     * Prüft, ob eine URL erreichbar ist
+     * Checks if a URL is reachable.
      */
     private fun isUrlReachable(url: String): Boolean {
         return try {
             val connection = URL(url).openConnection() as HttpURLConnection
-            connection.connectTimeout = 5000 // Timeout für Verbindung
-            connection.requestMethod = "HEAD" // HEAD-Anfrage, um nur Header abzurufen
-            connection.responseCode in 200..399 // 2xx und 3xx Codes gelten als verfügbar
+            connection.connectTimeout = 5000 // Connection timeout in milliseconds
+            connection.requestMethod = "HEAD" // Use HEAD request to fetch only the headers
+            connection.responseCode in 200..399 // HTTP status codes 2xx and 3xx are considered available
         } catch (e: Exception) {
-            false // Bei einer Exception gilt die URL als nicht verfügbar
+            false // If an exception occurs, the URL is considered not available
         }
     }
 }
