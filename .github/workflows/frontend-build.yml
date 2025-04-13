@@ -47,9 +47,19 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: './Frontend/pnpm-lock.yaml' # Important: Path relative to repo root
 
+      - name: Check paths and files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Listing files in current directory (should be Frontend):"
+          ls -la
+          echo "Listing files in repository root:"
+          ls -la .. 
+        # No working-directory here, runs in default ./Frontend
+
       - name: Install Dependencies
-        # No need for working-directory here if set in defaults
-        run: pnpm install --frozen-lockfile # Use --frozen-lockfile for CI consistency
+        # working-directory: ./Frontend # Can be explicit if defaults removed
+        run: pnpm install --frozen-lockfile
 
       - name: Build Frontend Application
         # Replace 'build' with the actual name of your build script in package.json
