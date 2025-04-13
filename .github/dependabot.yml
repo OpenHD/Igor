@@ -1,0 +1,60 @@
+# .github/dependabot.yml
+
+# Use version 2 of the Dependabot configuration syntax
+version: 2
+updates:
+  # Enable version updates for Gradle (Backend: Kotlin/Java)
+  - package-ecosystem: "gradle"
+    # Look for `build.gradle` or `build.gradle.kts` in the Backend directory
+    directory: "/Backend"
+    # Check for updates daily
+    schedule:
+      interval: "daily"
+    # Limit the number of open PRs for Gradle updates
+    open-pull-requests-limit: 10
+    # Optional: Customize commit messages
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Optional: Add labels to PRs
+    labels:
+      - "dependencies"
+      - "backend"
+
+  # Enable version updates for npm/yarn/pnpm (Frontend: TypeScript/JavaScript)
+  - package-ecosystem: "npm" # This handles npm, yarn, AND pnpm
+    # Look for `package.json` and lockfile (`pnpm-lock.yaml`) in the Frontend directory
+    directory: "/Frontend"
+    # Check for updates daily
+    schedule:
+      interval: "daily"
+    # Limit the number of open PRs for frontend updates
+    open-pull-requests-limit: 10
+    # Optional: Customize commit messages
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    # Optional: Add labels to PRs
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for workflow files in `.github/workflows`
+    directory: "/"
+    # Check for updates daily
+    schedule:
+      interval: "daily"
+    # Limit the number of open PRs for Actions updates
+    open-pull-requests-limit: 5
+    # Optional: Customize commit messages
+    commit-message:
+      prefix: "ci(deps)"
+      include: "scope"
+    # Optional: Add labels to PRs
+    labels:
+      - "dependencies"
+      - "github_actions"
