@@ -60,8 +60,8 @@ importers:
         specifier: ^10.0.3
         version: 10.0.3(@angular/core@19.2.3(rxjs@7.8.2)(zone.js@0.15.0))(@apollo/client@3.13.5(graphql-ws@6.0.4(graphql@16.10.0)(ws@8.18.0))(graphql@16.10.0)(subscriptions-transport-ws@0.11.0(graphql@16.10.0)))(graphql@16.10.0)(rxjs@7.8.2)
       bootstrap:
-        specifier: ^5.3.3
-        version: 5.3.3(@popperjs/core@2.11.8)
+        specifier: ^5.3.5
+        version: 5.3.5(@popperjs/core@2.11.8)
       bootstrap-icons:
         specifier: 1.11.3
         version: 1.11.3
@@ -83,7 +83,7 @@ importers:
     devDependencies:
       '@angular-devkit/build-angular':
         specifier: ^19.2.4
-        version: 19.2.4(3d5196405dcb288c16f8d34fb3104f63)
+        version: 19.2.4(5udn4zcjr6rlvishx5itamg5c4)
       '@angular/cli':
         specifier: ^19.2.4
         version: 19.2.4(@types/node@22.13.11)(chokidar@4.0.3)
@@ -2515,8 +2515,8 @@ packages:
   bootstrap-icons@1.11.3:
     resolution: {integrity: sha512-+3lpHrCw/it2/7lBL15VR0HEumaBss0+f/Lb6ZvHISn1mlK83jjFpooTLsMWbIjJMDjDjOExMsTxnXSIT4k4ww==}
 
-  bootstrap@5.3.3:
-    resolution: {integrity: sha512-8HLCdWgyoMguSO9o+aH+iuZ+aht+mzW0u3HIMzVu7Srrpv7EBBxTnrFlSCskwdY1+EOFQSm7uMJhNQHkdPcmjg==}
+  bootstrap@5.3.5:
+    resolution: {integrity: sha512-ct1CHKtiobRimyGzmsSldEtM03E8fcEX4Tb3dGXz1V8faRwM50+vfHwTzOxB3IlKO7m+9vTH3s/3C6T2EAPeTA==}
     peerDependencies:
       '@popperjs/core': ^2.11.8
 
@@ -5490,13 +5490,13 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular-devkit/build-angular@19.2.4(3d5196405dcb288c16f8d34fb3104f63)':
+  '@angular-devkit/build-angular@19.2.4(5udn4zcjr6rlvishx5itamg5c4)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.4(chokidar@4.0.3)
       '@angular-devkit/build-webpack': 0.1902.4(chokidar@4.0.3)(webpack-dev-server@5.2.0(webpack@5.98.0))(webpack@5.98.0(esbuild@0.25.1))
       '@angular-devkit/core': 19.2.4(chokidar@4.0.3)
-      '@angular/build': 19.2.4(162b1fd85081045957df9d2d2772346d)
+      '@angular/build': 19.2.4(hjns6ubsxx64hngvnih5xchgoq)
       '@angular/compiler-cli': 19.2.3(@angular/compiler@19.2.3)(typescript@5.8.2)
       '@babel/core': 7.26.10
       '@babel/generator': 7.26.10
@@ -5608,7 +5608,7 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@angular/build@19.2.4(162b1fd85081045957df9d2d2772346d)':
+  '@angular/build@19.2.4(hjns6ubsxx64hngvnih5xchgoq)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.1902.4(chokidar@4.0.3)
@@ -8323,7 +8323,7 @@ snapshots:
 
   bootstrap-icons@1.11.3: {}
 
-  bootstrap@5.3.3(@popperjs/core@2.11.8):
+  bootstrap@5.3.5(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
 
