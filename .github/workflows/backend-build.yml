@@ -1,0 +1,87 @@
+name: Backend Build & Dependency Check
+
+on:
+  # Trigger the workflow on push events to the main branch
+  push:
+    branches: [ "main" ]
+    paths: # Optional: Only run if files in Backend directory or related files change
+      - 'Backend/**'
+      - '.github/workflows/backend-build.yml'
+
+  # Trigger the workflow on pull request events targeting the main branch
+  pull_request:
+    branches: [ "main" ]
+    paths: # Optional: Only run if files in Backend directory or related files change
+      - 'Backend/**'
+      - '.github/workflows/backend-build.yml'
+
+jobs:
+  # Job to build the backend application
+  build-backend:
+    name: Build Backend (Gradle)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Permission to read repository contents
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Java (GraalVM as specified in original, potentially for build performance/features)
+      # Enables Gradle caching for faster subsequent builds
+      - name: Set up JDK 21 (GraalVM)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'graalvm' # Using GraalVM as specified
+          cache: 'gradle' # Cache Gradle dependencies and wrappers
+
+      # The gradle/actions/setup-gradle step is often not strictly needed
+      # if you use the wrapper and setup-java caching. Relying on ./gradlew is robust.
+      # - name: Setup Gradle (Optional, often handled by wrapper + setup-java cache)
+      #   uses: gradle/actions/setup-gradle@v4.0.0
+      #   with:
+      #     build-root-directory: ./Backend
+
+      - name: Build Backend with Gradle
+        # Execute gradle commands within the Backend directory
+        working-directory: ./Backend
+        # Run clean build, skip tests (-x test), use no daemon, and pass JVM args
+        # These JVM args seem important based on your CodeQL config
+        run: |
+          ./gradlew clean build -x test \
+            --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=2g" \
+            -Dkotlin.daemon.jvmargs="-Xmx4g"
+
+  # Job to submit dependency information to GitHub's Dependency Graph
+  # This helps with security scanning (Dependabot alerts, CodeQL)
+  submit-dependency-graph:
+    name: Submit Dependency Graph (Gradle)
+    runs-on: ubuntu-latest
+    needs: build-backend # Ensure this job runs only after a successful build
+    permissions:
+      contents: write # Needs write permission to submit dependency graph
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Java (Temurin is sufficient and common for this task)
+      # Re-enable Gradle caching for this job as well
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin' # Standard Temurin JDK is fine here
+          cache: 'gradle' # Reuse Gradle cache
+
+      # Use the dedicated Gradle action to generate and submit the dependency graph
+      - name: Generate and Submit Dependency Graph
+        uses: gradle/actions/dependency-submission@v4.0.0 # Use the specific action version
+        with:
+          # Specify the root of the Gradle project to scan
+          build-root-directory: ./Backend
+          # Optional: Pass specific arguments if needed for dependency resolution
+          # Using less memory might be sufficient here compared to the full build
+          # additional-arguments: '-Dorg.gradle.jvmargs="-Xmx2g"' # Example if needed
