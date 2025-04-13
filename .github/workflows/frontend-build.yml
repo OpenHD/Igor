@@ -4,14 +4,14 @@ on:
   # Trigger the workflow on push events to the main branch
   push:
     branches: [ "main" ]
-    paths: # Optional: Only run if files in Frontend directory change
+    paths: # Optional: Only run if files in Frontend directory or this workflow change
       - 'Frontend/**'
       - '.github/workflows/frontend-build.yml'
 
   # Trigger the workflow on pull request events targeting the main branch
   pull_request:
     branches: [ "main" ]
-    paths: # Optional: Only run if files in Frontend directory change
+    paths: # Optional: Only run if files in Frontend directory or this workflow change
       - 'Frontend/**'
       - '.github/workflows/frontend-build.yml'
 
@@ -20,7 +20,7 @@ jobs:
     name: Build Frontend
     runs-on: ubuntu-latest # Use a standard Linux runner
 
-    # Define default working directory for steps that need it
+    # Define default working directory for steps running within the Frontend folder
     defaults:
       run:
         working-directory: ./Frontend
@@ -29,46 +29,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Setup pnpm using the dedicated action
       # Documentation: https://github.com/pnpm/action-setup
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8 # Specify your desired pnpm version, or omit for latest
+          # Specify your desired pnpm version. Using a specific major version like '8'
+          # helps ensure consistency between local dev and CI if you use v8 locally.
+          version: 8
 
+      # Setup Node.js using the actions/setup-node action
       # Documentation: https://github.com/actions/setup-node
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          # Specify the Node.js version your project uses
-          # You can use LTS versions like '18.x', '20.x', or specific versions '18.17.0'
-          # Or read from a .node-version file: node-version-file: './Frontend/.node-version'
-          node-version: '20.x'
-          # Cache pnpm dependencies based on the lock file
+          # Specify the Node.js version your project uses (e.g., '18.x', '20.x')
+          # Ensure this matches the version used in your Dockerfile and local dev if possible
+          node-version: '20.x' # ADJUST THIS TO YOUR PROJECT'S NODE VERSION
+          # Enable caching for pnpm. This is crucial for performance.
           cache: 'pnpm'
-          cache-dependency-path: './Frontend/pnpm-lock.yaml' # Important: Path relative to repo root
+          # Specify the path to the lock file RELATIVE TO THE REPOSITORY ROOT
+          # This is used to generate the cache key.
+          cache-dependency-path: './Frontend/pnpm-lock.yaml'
 
-      - name: Check paths and files
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Listing files in current directory (should be Frontend):"
-          ls -la
-          echo "Listing files in repository root:"
-          ls -la .. 
-        # No working-directory here, runs in default ./Frontend
-
-      - name: Install Dependencies
-        # working-directory: ./Frontend # Can be explicit if defaults removed
+      - name: Install Dependencies (Frozen Lockfile)
+        # Runs 'pnpm install --frozen-lockfile' in the ./Frontend directory (due to defaults)
+        # --frozen-lockfile ensures that pnpm fails if the lockfile is not
+        # up-to-date with package.json, guaranteeing reproducible builds.
+        # THIS STEP WILL FAIL if your committed pnpm-lock.yaml is not synchronized!
         run: pnpm install --frozen-lockfile
 
       - name: Build Frontend Application
+        # Runs 'pnpm run build' (or your specific build script) in ./Frontend
         # Replace 'build' with the actual name of your build script in package.json
-        # e.g., build:prod, generate, etc.
-        run: pnpm run build
+        # e.g., build:prod, generate, compile, etc.
+        run: pnpm run build # ADJUST 'build' IF YOUR SCRIPT IS NAMED DIFFERENTLY
 
-      # Optional: Add a step to upload build artifacts if needed
+      # Optional: Add a step to upload build artifacts if needed for deployment etc.
       # - name: Upload Build Artifacts
       #   uses: actions/upload-artifact@v4
       #   with:
-      #     name: frontend-build
-      #     path: ./Frontend/dist # Adjust path to your build output directory
+      #     name: frontend-build-artifact
+      #     # Adjust path to your build output directory (relative to repo root)
+      #     path: ./Frontend/dist
