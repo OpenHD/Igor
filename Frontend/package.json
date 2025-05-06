@@ -28,7 +28,7 @@
     "@ng-bootstrap/ng-bootstrap": "18.0.0",
     "@popperjs/core": "^2.11.8",
     "apollo-angular": "^10.0.3",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.6",
     "bootstrap-icons": "1.11.3",
     "express": "^4.21.2",
     "graphql": "^16.10.0",
