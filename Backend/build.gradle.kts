@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.10" apply true
+    kotlin("jvm") version "2.1.21" apply true
     kotlin("plugin.spring") version "2.1.10" apply true
     kotlin("plugin.jpa") version "2.1.10" apply true
     id("org.springframework.boot") version "3.4.3"
