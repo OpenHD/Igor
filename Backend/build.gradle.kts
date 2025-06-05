@@ -4,7 +4,7 @@ plugins {
     kotlin("plugin.jpa") version "2.1.10" apply true
     id("org.springframework.boot") version "3.4.3"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.netflix.dgs.codegen") version "7.0.3"
+    id("com.netflix.dgs.codegen") version "8.1.0"
     id("org.graalvm.buildtools.native") version "0.10.4"
 }
 
