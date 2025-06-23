@@ -47,7 +47,7 @@ dependencies {
     implementation("com.graphql-java:graphql-java-extended-scalars")
 
     // Web & UI
-    implementation("org.webjars.npm:htmx.org:1.9.10")
+    implementation("org.webjars.npm:htmx.org:2.0.5")
     implementation("org.webjars.npm:alpinejs:3.13.5")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 
