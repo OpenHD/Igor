@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -15,7 +15,7 @@ import { catchError, of } from 'rxjs';
 @Component({
   selector: 'app-os-category-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag],
+  imports: [FormsModule, RouterModule, CdkDropList, CdkDrag],
   templateUrl: './os-category-management.component.html',
   styleUrls: ['./os-category-management.component.scss']
 })

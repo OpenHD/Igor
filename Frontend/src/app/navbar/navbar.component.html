@@ -4,33 +4,38 @@
   <div class="container">
     <a class="navbar-brand fw-bold" routerLink="/">OpenHD Management</a>
     <button class="navbar-toggler"
-            type="button"
-            (click)="toggleNavbar()"
-            [attr.aria-expanded]="!isCollapsed"
-            aria-label="Toggle navigation"
-            aria-controls="navbarNav">
+      type="button"
+      (click)="toggleNavbar()"
+      [attr.aria-expanded]="!isCollapsed"
+      aria-label="Toggle navigation"
+      aria-controls="navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse" [ngClass]="{ 'collapse': isCollapsed, 'show': !isCollapsed }" id="navbarNav">
-      <ul class="navbar-nav me-auto" *ngIf="authService.isAuthenticated()">
-        <li class="nav-item" *ngFor="let link of navLinks">
-          <a class="nav-link"
-             [routerLink]="link.path"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: true }">
-            {{ link.label }}
-          </a>
-        </li>
-      </ul>
+      @if (authService.isAuthenticated()) {
+        <ul class="navbar-nav me-auto">
+          @for (link of navLinks; track link) {
+            <li class="nav-item">
+              <a class="nav-link"
+                [routerLink]="link.path"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }">
+                {{ link.label }}
+              </a>
+            </li>
+          }
+        </ul>
+      }
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item" *ngIf="authService.isAuthenticated(); else loginLink">
-          <a class="nav-link" href="#" (click)="logout()">Logout</a>
-        </li>
-        <ng-template #loginLink>
+        @if (authService.isAuthenticated()) {
+          <li class="nav-item">
+            <a class="nav-link" href="#" (click)="logout()">Logout</a>
+          </li>
+        } @else {
           <li class="nav-item">
             <a class="nav-link" routerLink="/login">Login</a>
           </li>
-        </ng-template>
+        }
       </ul>
     </div>
   </div>

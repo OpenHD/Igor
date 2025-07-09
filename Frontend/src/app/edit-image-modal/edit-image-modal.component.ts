@@ -2,13 +2,13 @@
 import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import {Image, ImageFragment, ImageListFragment, OsCategoryFragment} from '../graphql/generated';
 import { GraphqlService } from '../services/graphql.service';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './edit-image-modal.component.html',
   styleUrls: ['./edit-image-modal.component.scss']
 })

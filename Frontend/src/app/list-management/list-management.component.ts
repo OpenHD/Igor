@@ -7,7 +7,7 @@ import {
   GetAllImagesListsWithCategoriesQuery
 } from '../graphql/generated';
 import { FormsModule } from '@angular/forms';
-import { NgForOf, NgIf } from '@angular/common';
+
 import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 declare var bootstrap: any;
@@ -18,10 +18,8 @@ declare var bootstrap: any;
   styleUrls: ['./list-management.component.scss'],
   imports: [
     FormsModule,
-    NgIf,
-    NgForOf,
     NgbModule
-  ],
+],
   standalone: true
 })
 export class ListManagementComponent implements OnInit {

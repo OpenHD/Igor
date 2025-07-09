@@ -17,7 +17,7 @@
                 [(ngModel)]="credentials.username"
                 required
                 autofocus
-              >
+                >
             </div>
 
             <div class="mb-4">
@@ -29,16 +29,20 @@
                 name="password"
                 [(ngModel)]="credentials.password"
                 required
-              >
+                >
             </div>
 
             <button
               type="submit"
               class="btn btn-primary w-100 mb-3"
               [disabled]="loading"
-            >
-              <span *ngIf="!loading">Login</span>
-              <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+              >
+              @if (!loading) {
+                <span>Login</span>
+              }
+              @if (loading) {
+                <span class="spinner-border spinner-border-sm"></span>
+              }
             </button>
 
           </form>

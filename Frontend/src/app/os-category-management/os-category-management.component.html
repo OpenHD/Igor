@@ -13,110 +13,125 @@
 
     <div class="card-body">
       <!-- Loading & Error States -->
-      <div *ngIf="loading" class="alert alert-info">
-        <i class="bi bi-arrow-repeat me-2"></i> Loading categories...
-      </div>
-      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
-        {{ error }}
-        <button type="button" class="btn-close" (click)="error = null"></button>
-      </div>
+      @if (loading) {
+        <div class="alert alert-info">
+          <i class="bi bi-arrow-repeat me-2"></i> Loading categories...
+        </div>
+      }
+      @if (error) {
+        <div class="alert alert-danger alert-dismissible fade show">
+          {{ error }}
+          <button type="button" class="btn-close" (click)="error = null"></button>
+        </div>
+      }
 
       <!-- Neuer Kategorie-Eintrag -->
-      <div class="mb-3" *ngIf="!loading && !error">
-        <form (ngSubmit)="createCategory()">
-          <div class="row g-2 align-items-center">
-            <div class="col-md-3">
-              <input #newCategoryInput type="text"
-                     class="form-control"
-                     placeholder="Category name"
-                     [(ngModel)]="newCategory.name" name="name" required>
+      @if (!loading && !error) {
+        <div class="mb-3">
+          <form (ngSubmit)="createCategory()">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-3">
+                <input #newCategoryInput type="text"
+                  class="form-control"
+                  placeholder="Category name"
+                  [(ngModel)]="newCategory.name" name="name" required>
+              </div>
+              <div class="col-md-3">
+                <input type="text"
+                  class="form-control"
+                  placeholder="Icon URL"
+                  [(ngModel)]="newCategory.icon" name="icon">
+              </div>
+              <div class="col-md-4">
+                <input type="text"
+                  class="form-control"
+                  placeholder="Description"
+                  [(ngModel)]="newCategory.description" name="description">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-success w-100"
+                  type="submit"
+                  [disabled]="!newCategory.name.trim()">
+                  <i class="bi bi-plus-circle me-2"></i> Add New
+                </button>
+              </div>
             </div>
-            <div class="col-md-3">
-              <input type="text"
-                     class="form-control"
-                     placeholder="Icon URL"
-                     [(ngModel)]="newCategory.icon" name="icon">
-            </div>
-            <div class="col-md-4">
-              <input type="text"
-                     class="form-control"
-                     placeholder="Description"
-                     [(ngModel)]="newCategory.description" name="description">
-            </div>
-            <div class="col-md-2">
-              <button class="btn btn-success w-100"
-                      type="submit"
-                      [disabled]="!newCategory.name.trim()">
-                <i class="bi bi-plus-circle me-2"></i> Add New
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      }
 
       <!-- Kategorienliste als List Group mit Drag & Drop -->
       <div cdkDropList (cdkDropListDropped)="onDrop($event)">
         <ul class="list-group">
-          <li class="list-group-item d-flex align-items-start" *ngFor="let category of categories; trackBy: trackByCategoryId" cdkDrag>
-            <!-- Drag-Handle -->
-            <span class="me-3 cdk-drag-handle" style="cursor: move;">
-              <i class="bi bi-arrows-move text-secondary"></i>
-            </span>
-
-            <!-- Anzeige vs. Bearbeitung -->
-            <div class="flex-grow-1" *ngIf="!category.isEditing; else editTemplate" (click)="startEditing(category)" style="cursor: pointer;">
-              <div class="d-flex align-items-center">
-                <img *ngIf="category.icon" [src]="category.icon" alt="{{ category.name }} icon" class="category-icon me-3">
-                <span *ngIf="!category.icon" class="text-muted me-3">No Icon</span>
-                <div>
-                  <h5 class="mb-1">{{ category.name }}</h5>
-                  <p class="mb-0 small text-muted">{{ category.description || 'No description provided' }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bearbeitungs-Template -->
-            <ng-template #editTemplate>
-              <div class="w-100">
-                <div class="mb-2">
-                  <label class="form-label small">Category Name</label>
-                  <input type="text" class="form-control" [(ngModel)]="category.editedName">
-                </div>
-                <div class="mb-2">
-                  <label class="form-label small">Icon URL</label>
-                  <input type="text" class="form-control" [(ngModel)]="category.editedIcon" placeholder="https://...">
-                  <div class="mt-1">
-                    <small class="text-muted">Preview:</small>
+          @for (category of categories; track trackByCategoryId($index, category)) {
+            <li class="list-group-item d-flex align-items-start" cdkDrag>
+              <!-- Drag-Handle -->
+              <span class="me-3 cdk-drag-handle" style="cursor: move;">
+                <i class="bi bi-arrows-move text-secondary"></i>
+              </span>
+              <!-- Anzeige vs. Bearbeitung -->
+              @if (!category.isEditing) {
+                <div class="flex-grow-1" (click)="startEditing(category)" style="cursor: pointer;">
+                  <div class="d-flex align-items-center">
+                    @if (category.icon) {
+                      <img [src]="category.icon" alt="{{ category.name }} icon" class="category-icon me-3">
+                    }
+                    @if (!category.icon) {
+                      <span class="text-muted me-3">No Icon</span>
+                    }
                     <div>
-                      <img *ngIf="category.editedIcon" [src]="category.editedIcon" alt="Icon preview" class="category-icon">
+                      <h5 class="mb-1">{{ category.name }}</h5>
+                      <p class="mb-0 small text-muted">{{ category.description || 'No description provided' }}</p>
                     </div>
                   </div>
                 </div>
-                <div class="mb-2">
-                  <label class="form-label small">Description</label>
-                  <input type="text" class="form-control" [(ngModel)]="category.editedDescription">
+              } @else {
+                <div class="w-100">
+                  <div class="mb-2">
+                    <label class="form-label small">Category Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="category.editedName">
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Icon URL</label>
+                    <input type="text" class="form-control" [(ngModel)]="category.editedIcon" placeholder="https://...">
+                    <div class="mt-1">
+                      <small class="text-muted">Preview:</small>
+                      <div>
+                        @if (category.editedIcon) {
+                          <img [src]="category.editedIcon" alt="Icon preview" class="category-icon">
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Description</label>
+                    <input type="text" class="form-control" [(ngModel)]="category.editedDescription">
+                  </div>
                 </div>
+              }
+              <!-- Bearbeitungs-Template -->
+              <!-- Positionsanzeige -->
+              <div class="mx-3 d-flex align-items-center">
+                <span class="badge bg-primary">{{ category.position + 1 }}</span>
               </div>
-            </ng-template>
-
-            <!-- Positionsanzeige -->
-            <div class="mx-3 d-flex align-items-center">
-              <span class="badge bg-primary">{{ category.position + 1 }}</span>
-            </div>
-
-            <!-- Aktion-Buttons -->
-            <div class="btn-group">
-              <button *ngIf="category.isEditing" class="btn btn-sm btn-outline-success" (click)="saveCategory(category)">
-                <i class="bi bi-check-lg"></i>
-              </button>
-              <button *ngIf="category.isEditing" class="btn btn-sm btn-outline-secondary" (click)="cancelEditing(category)">
-                <i class="bi bi-x-lg"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category.id)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
-          </li>
+              <!-- Aktion-Buttons -->
+              <div class="btn-group">
+                @if (category.isEditing) {
+                  <button class="btn btn-sm btn-outline-success" (click)="saveCategory(category)">
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                }
+                @if (category.isEditing) {
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelEditing(category)">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                }
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </li>
+          }
         </ul>
       </div>
     </div>
