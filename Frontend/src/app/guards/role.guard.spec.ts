@@ -11,7 +11,7 @@ describe('RoleGuard', () => {
   let mockState: RouterStateSnapshot;
 
   beforeEach(() => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['hasRole']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['hasRole', 'isAuthenticated']);
     const routerSpy = jasmine.createSpyObj('Router', ['parseUrl']);
 
     TestBed.configureTestingModule({
@@ -52,21 +52,37 @@ describe('RoleGuard', () => {
   });
 
   it('should allow access when user has required role', () => {
+    mockAuthService.isAuthenticated.and.returnValue(true);
     mockAuthService.hasRole.and.returnValue(true);
     
     const result = guard.canActivate(mockRoute, mockState);
     
     expect(result).toBe(true);
+    expect(mockAuthService.isAuthenticated).toHaveBeenCalled();
     expect(mockAuthService.hasRole).toHaveBeenCalledWith(['admin']);
   });
 
   it('should redirect to login when user does not have required role', () => {
     const mockUrlTree = {} as any;
+    mockAuthService.isAuthenticated.and.returnValue(true);
     mockAuthService.hasRole.and.returnValue(false);
     mockRouter.parseUrl.and.returnValue(mockUrlTree);
     
     const result = guard.canActivate(mockRoute, mockState);
     
+    expect(mockRouter.parseUrl).toHaveBeenCalledWith('/login');
+    expect(result).toBe(mockUrlTree);
+  });
+
+  it('should redirect to login when user is not authenticated', () => {
+    const mockUrlTree = {} as any;
+    mockAuthService.isAuthenticated.and.returnValue(false);
+    mockRouter.parseUrl.and.returnValue(mockUrlTree);
+    
+    const result = guard.canActivate(mockRoute, mockState);
+    
+    expect(mockAuthService.isAuthenticated).toHaveBeenCalled();
+    expect(mockAuthService.hasRole).not.toHaveBeenCalled();
     expect(mockRouter.parseUrl).toHaveBeenCalledWith('/login');
     expect(result).toBe(mockUrlTree);
   });

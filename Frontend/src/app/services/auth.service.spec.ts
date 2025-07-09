@@ -29,6 +29,41 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should return current user', () => {
+    const testUser = { username: 'test', roles: ['USER'] };
+    service['currentUserSubject'].next(testUser);
+    
+    expect(service.getCurrentUser()).toEqual(testUser);
+  });
+
+  it('should check authentication with valid token', () => {
+    spyOn(Storage.prototype, 'getItem').and.returnValue('valid-token');
+    
+    expect(service.isAuthenticated()).toBe(true);
+  });
+
+  it('should check authentication with no token', () => {
+    spyOn(Storage.prototype, 'getItem').and.returnValue(null);
+    
+    expect(service.isAuthenticated()).toBe(false);
+  });
+
+  it('should logout and clear user', () => {
+    const removeItemSpy = spyOn(Storage.prototype, 'removeItem');
+    service['currentUserSubject'].next({ username: 'test', roles: ['USER'] });
+    
+    service.logout();
+    
+    expect(removeItemSpy).toHaveBeenCalledWith('auth_token');
+    expect(service.getCurrentUser()).toBeNull();
+  });
+
+  it('should get auth token from localStorage', () => {
+    spyOn(Storage.prototype, 'getItem').and.returnValue('test-token');
+    
+    expect(service.getAuthToken()).toBe('test-token');
+  });
+
   it('should initialize with no current user', () => {
     service.currentUser$.subscribe(user => {
       expect(user).toBeNull();

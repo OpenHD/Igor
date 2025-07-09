@@ -32,7 +32,10 @@ export class AuthService {
   fetchCurrentUser(): void {
     this.http.get<User>(this.config.userEndpoint).subscribe({
       next: (user) => this.currentUserSubject.next(user),
-      error: () => this.logout()
+      error: (error) => {
+        console.warn('Failed to fetch current user, logging out:', error);
+        this.logout();
+      }
     });
   }
 
@@ -42,13 +45,41 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getAuthToken();
+    const token = this.getAuthToken();
+    if (!token) {
+      return false;
+    }
+
+    // Prüfe ob Token abgelaufen ist (optional - falls JWT verwendet wird)
+    try {
+      const payload = this.parseJwtPayload(token);
+      if (payload && payload.exp) {
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp < now) {
+          console.warn('Token is expired, logging out');
+          this.logout();
+          return false;
+        }
+      }
+    } catch (error) {
+      // Falls Token-Parsing fehlschlägt, ignorieren wir es
+      console.debug('Could not parse JWT token:', error);
+    }
+
+    return true;
   }
 
-  private getAuthToken(): string | null {
-    return isPlatformBrowser(this.platformId)
-      ? localStorage.getItem('auth_token')
-      : null;
+  private parseJwtPayload(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (error) {
+      return null;
+    }
   }
 
   logout(): void {
@@ -56,5 +87,15 @@ export class AuthService {
       localStorage.removeItem('auth_token');
     }
     this.currentUserSubject.next(null);
+  }
+
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  getAuthToken(): string | null {
+    return isPlatformBrowser(this.platformId)
+      ? localStorage.getItem('auth_token')
+      : null;
   }
 }
