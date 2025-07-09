@@ -65,6 +65,10 @@ jobs:
         # e.g., build:prod, generate, compile, etc.
         run: pnpm run build # ADJUST 'build' IF YOUR SCRIPT IS NAMED DIFFERENTLY
 
+      - name: Run Tests
+        # Run unit tests to ensure the Angular 20 upgrade didn't break anything
+        run: pnpm run test --watch=false --browsers=ChromeHeadless
+
       # Optional: Add a step to upload build artifacts if needed for deployment etc.
       # - name: Upload Build Artifacts
       #   uses: actions/upload-artifact@v4

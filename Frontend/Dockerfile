@@ -1,24 +1,34 @@
 # ===== Stage 1: Build des Angular SSR Projekts =====
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Kopiere package-Dateien (relativer Pfad, da Dockerfile im Frontend-Ordner liegt)
-COPY package*.json ./
-RUN npm install
+# Installiere pnpm global
+RUN npm install -g pnpm
+
+# Kopiere package-Dateien (pnpm verwendet pnpm-lock.yaml)
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Kopiere den restlichen Quellcode
 COPY . .
 
-# Installiere Angular CLI global und erstelle den SSR Build
-RUN npm install -g @angular/cli
-RUN ng build --configuration production
+# Erstelle den Angular Build mit SSR
+RUN pnpm run build
 
 # ===== Stage 2: Runtime =====
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 
+# Installiere pnpm für das Runtime Image
+RUN npm install -g pnpm
+
+# Kopiere package.json und pnpm-lock.yaml für Produktions-Dependencies
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
+
+# Installiere nur Produktions-Dependencies
+RUN pnpm install --frozen-lockfile --prod
+
 # Kopiere die gebauten Dateien aus dem Build-Stage
-# Hier wird davon ausgegangen, dass der Build-Output im Unterordner "dist/open-hd-management-frontend" liegt
 COPY --from=builder /app/dist/open-hd-management-frontend ./dist
 
 # Exponiere den für den SSR Server genutzten Port (anpassen, falls nötig)
