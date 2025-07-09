@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { ApolloTestingModule } from 'apollo-angular/testing';
 
 import { GraphqlService } from './graphql.service';
 
@@ -6,7 +7,10 @@ describe('GraphqlService', () => {
   let service: GraphqlService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [ApolloTestingModule],
+      providers: [GraphqlService]
+    });
     service = TestBed.inject(GraphqlService);
   });
 
