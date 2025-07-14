@@ -1,42 +1,91 @@
-<!-- navbar.component.html -->
-
-<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #00a2ec;">
-  <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">OpenHD Management</a>
-    <button class="navbar-toggler"
-      type="button"
-      (click)="toggleNavbar()"
-      [attr.aria-expanded]="!isCollapsed"
-      aria-label="Toggle navigation"
-      aria-controls="navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="navbar-collapse" [ngClass]="{ 'collapse': isCollapsed, 'show': !isCollapsed }" id="navbarNav">
-      @if (authService.isAuthenticated()) {
-        <ul class="navbar-nav me-auto">
-          @for (link of navLinks; track link) {
-            <li class="nav-item">
-              <a class="nav-link"
-                [routerLink]="link.path"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }">
-                {{ link.label }}
-              </a>
-            </li>
-          }
-        </ul>
-      }
-      <ul class="navbar-nav ms-auto">
-        @if (authService.isAuthenticated()) {
-          <li class="nav-item">
-            <a class="nav-link" href="#" (click)="logout()">Logout</a>
-          </li>
-        } @else {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/login">Login</a>
-          </li>
-        }
-      </ul>
+<!-- Modern OpenHD Navbar -->
+<nav class="modern-navbar">
+  <div class="navbar-container">
+    <!-- Brand Section -->
+    <div class="navbar-brand">
+      <div class="brand-icon">
+        <i class="bi bi-cpu"></i>
+      </div>
+      <span class="brand-text" routerLink="/">OpenHD</span>
+      <span class="brand-subtitle">Management</span>
     </div>
+
+    <!-- Desktop Navigation -->
+    <div class="navbar-nav desktop-nav">
+      @if (authService.isAuthenticated()) {
+        @for (link of navLinks; track link.path) {
+          <a class="nav-item"
+             [routerLink]="link.path"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }">
+            <i [class]="link.icon"></i>
+            <span>{{ link.label }}</span>
+          </a>
+        }
+      }
+    </div>
+
+    <!-- User Actions -->
+    <div class="navbar-actions">
+      @if (authService.isAuthenticated()) {
+        <div class="user-menu">
+          <button class="user-avatar" (click)="toggleUserMenu()">
+            <i class="bi bi-person-circle"></i>
+          </button>
+          <div class="user-dropdown" [class.show]="showUserMenu">
+            <div class="user-info">
+              <i class="bi bi-person"></i>
+              <span>Admin User</span>
+            </div>
+            <hr>
+            <button class="dropdown-item" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      } @else {
+        <a class="login-btn" routerLink="/login">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Login</span>
+        </a>
+      }
+
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-toggle"
+              (click)="toggleMobileMenu()"
+              [class.active]="showMobileMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" [class.show]="showMobileMenu">
+    @if (authService.isAuthenticated()) {
+      @for (link of navLinks; track link.path) {
+        <a class="mobile-nav-item"
+           [routerLink]="link.path"
+           routerLinkActive="active"
+           (click)="closeMobileMenu()">
+          <i [class]="link.icon"></i>
+          <span>{{ link.label }}</span>
+        </a>
+      }
+      <div class="mobile-divider"></div>
+      <button class="mobile-nav-item logout" (click)="logout(); closeMobileMenu()">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Logout</span>
+      </button>
+    } @else {
+      <a class="mobile-nav-item"
+         routerLink="/login"
+         (click)="closeMobileMenu()">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+      </a>
+    }
   </div>
 </nav>
