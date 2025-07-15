@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { FormsModule } from '@angular/forms';
+import { isDevMode } from '@angular/core';
 
 
 @Component({
@@ -19,6 +20,7 @@ export class LoginComponent {
 
   loading = false;
   errorMessage = '';
+  isDevMode = isDevMode();
 
   constructor(
     private authService: AuthService,

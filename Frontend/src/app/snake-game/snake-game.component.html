@@ -1,0 +1,69 @@
+<!-- OpenHD Snake Game 404 Page -->
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="bi bi-exclamation-triangle me-3"></i>404 - Page Not Found</h1>
+    <p class="error-message">The page you're looking for doesn't exist, but here's a game to pass the time!</p>
+  </div>
+
+  <div class="snake-wrapper">
+    <div class="game-details">
+      <div class="score-info">
+        <span class="score">Score: {{ score }}</span>
+        <span class="high-score">High Score: {{ highScore }}</span>
+      </div>
+      <div class="game-title">
+        <i class="bi bi-joystick"></i>
+        <span>OpenHD Snake</span>
+      </div>
+    </div>
+
+    <div class="play-board" #playBoard></div>
+
+    @if (gameOver) {
+      <div class="game-over-overlay">
+        <div class="game-over-content">
+          <h2><i class="bi bi-emoji-frown"></i> Game Over!</h2>
+          <p>Final Score: {{ score }}</p>
+          @if (score === highScore && score > 0) {
+            <p class="new-record"><i class="bi bi-trophy"></i> New High Score!</p>
+          }
+          <button class="btn-primary-modern" (click)="restartGame()">
+            <i class="bi bi-arrow-repeat"></i>
+            Play Again
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="controls">
+      <button class="control-btn" (click)="onControlClick('ArrowLeft')">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <button class="control-btn" (click)="onControlClick('ArrowUp')">
+        <i class="bi bi-arrow-up"></i>
+      </button>
+      <button class="control-btn" (click)="onControlClick('ArrowDown')">
+        <i class="bi bi-arrow-down"></i>
+      </button>
+      <button class="control-btn" (click)="onControlClick('ArrowRight')">
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+
+    <div class="game-instructions">
+      <h3><i class="bi bi-info-circle"></i> How to Play</h3>
+      <ul>
+        <li>Use arrow keys or buttons to move the snake</li>
+        <li>Eat the red food to grow and score points</li>
+        <li>Don't hit the walls or yourself!</li>
+        <li>Try to beat your high score</li>
+      </ul>
+      <div class="back-home">
+        <a routerLink="/" class="btn-secondary-modern">
+          <i class="bi bi-house"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

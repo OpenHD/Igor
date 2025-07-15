@@ -1,14 +1,14 @@
 // src/app/edit-image-modal/edit-image-modal.component.ts
 import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 
 import {Image, ImageFragment, ImageListFragment, OsCategoryFragment} from '../graphql/generated';
 import { GraphqlService } from '../services/graphql.service';
 
 @Component({
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './edit-image-modal.component.html',
   styleUrls: ['./edit-image-modal.component.scss']
 })
@@ -21,9 +21,79 @@ export class EditImageModalComponent {
   iconPreview?: string;
   graphql = inject(GraphqlService);
   imagesLists: ImageListFragment[] = [];
+  
+  // New properties for the redesigned modal
+  currentIcon?: string;
+  newUrlInput = '';
+  imageUrls: Array<{url: string, isAvailable: boolean | null, isDefault: boolean}> = [];
+  availableLists: ImageListFragment[] = [];
+  iconLoaded = false;
+  iconLoading = false;
 
   updateIconPreview() {
     this.iconPreview = this.imageForm.get('icon')?.value;
+    this.currentIcon = this.imageForm.get('icon')?.value;
+  }
+
+  onIconChange(event: any) {
+    const value = event.target.value;
+    this.currentIcon = value;
+    this.iconPreview = value;
+    this.iconLoaded = false;
+    this.iconLoading = !!value;
+  }
+
+  onIconLoad() {
+    this.iconLoaded = true;
+    this.iconLoading = false;
+  }
+
+  onIconError() {
+    this.iconLoaded = false;
+    this.iconLoading = false;
+  }
+
+  addUrl() {
+    if (this.newUrlInput.trim()) {
+      this.imageUrls.push({
+        url: this.newUrlInput.trim(),
+        isAvailable: null, // Will be checked later
+        isDefault: this.imageUrls.length === 0 // First URL is default
+      });
+      this.newUrlInput = '';
+    }
+  }
+
+  toggleFavorite(index: number) {
+    // Remove default from all URLs
+    this.imageUrls.forEach(url => url.isDefault = false);
+    // Set clicked URL as default
+    this.imageUrls[index].isDefault = true;
+  }
+
+  removeUrl(index: number) {
+    this.imageUrls.splice(index, 1);
+  }
+
+  isListSelected(listId: string): boolean {
+    const numericId = Number(listId);
+    const currentLists = this.imageForm.get('imagesLists')?.value || [];
+    return currentLists.includes(numericId);
+  }
+
+  toggleList(listId: string, event: any) {
+    const numericId = Number(listId);
+    const currentLists = this.imageForm.get('imagesLists')?.value || [];
+    
+    if (event.target.checked) {
+      if (!currentLists.includes(numericId)) {
+        this.imageForm.get('imagesLists')?.setValue([...currentLists, numericId]);
+      }
+    } else {
+      const newValue = currentLists.filter(id => id !== numericId);
+      this.imageForm.get('imagesLists')?.setValue(newValue);
+    }
+    this.imageForm.get('imagesLists')?.markAsTouched();
   }
 
 
@@ -40,6 +110,7 @@ export class EditImageModalComponent {
     imageDownloadSize: new FormControl<number>(0, {nonNullable: true}),
     isEnabled: new FormControl<boolean>(true, {nonNullable: true}),
     categoryId: new FormControl<string>(''),
+    redirectsCount: new FormControl<number>(0, {nonNullable: true}),
     imagesLists: new FormControl<number[]>([], {
       nonNullable: true,
       validators: [Validators.required]
@@ -52,6 +123,9 @@ export class EditImageModalComponent {
 
 
   ngOnInit() {
+    // Initialize available lists
+    this.availableLists = this.imagesLists;
+    
     if (this.image?.id) {
       this.imageForm.patchValue({
         name: this.image.name,
@@ -61,13 +135,20 @@ export class EditImageModalComponent {
         extractSha256: this.image.extractSha256 || '',
         imageDownloadSize: this.image.imageDownloadSize,
         isEnabled: this.image.isEnabled,
-        categoryId: this.image.category?.id || ''
+        categoryId: this.image.category?.id || '',
+        redirectsCount: this.image.redirectsCount || 0
       });
-      this.image.urls.forEach(url => {
-        this.addUrl(url.url, url.isDefault);
-      });
+      
+      // Load URLs into new format
+      this.imageUrls = this.image.urls.map(url => ({
+        url: url.url,
+        isAvailable: url.isAvailable,
+        isDefault: url.isDefault || false
+      }));
+      
       if (this.image?.icon) {
         this.iconPreview = this.image.icon;
+        this.currentIcon = this.image.icon;
       }
     }
     if (this.image?.imagesLists) {
@@ -93,17 +174,6 @@ export class EditImageModalComponent {
   }
 
 
-  addUrl(url = '', isDefault = false) {
-    this.urls.push(new FormGroup({
-      url: new FormControl<string>(url, {nonNullable: true}),
-      isDefault: new FormControl<boolean>(isDefault, {nonNullable: true})
-    }));
-  }
-
-  removeUrl(index: number) {
-    this.urls.removeAt(index);
-  }
-
   setDefaultUrl(index: number) {
     this.urls.controls.forEach((control, i) =>
       control.get('isDefault')?.setValue(i === index)
@@ -117,8 +187,9 @@ export class EditImageModalComponent {
 
     const input = {
       ...formValue,
+      isEnabled: String(formValue.isEnabled) === 'true', // Convert to boolean properly
       imagesLists: formValue.imagesLists,
-      urls: formValue.urls.map(u => ({
+      urls: this.imageUrls.map(u => ({
         url: u.url,
         isDefault: u.isDefault
       })),

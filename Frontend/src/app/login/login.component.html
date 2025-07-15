@@ -1,53 +1,98 @@
-<!-- src/app/login/login.component.html -->
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card shadow">
-        <div class="card-body">
-          <h2 class="card-title text-center mb-4">Login</h2>
-
-          <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
-              <input
-                type="text"
-                class="form-control"
-                id="username"
-                name="username"
-                [(ngModel)]="credentials.username"
-                required
-                autofocus
-                >
-            </div>
-
-            <div class="mb-4">
-              <label for="password" class="form-label">Password</label>
-              <input
-                type="password"
-                class="form-control"
-                id="password"
-                name="password"
-                [(ngModel)]="credentials.password"
-                required
-                >
-            </div>
-
-            <button
-              type="submit"
-              class="btn btn-primary w-100 mb-3"
-              [disabled]="loading"
-              >
-              @if (!loading) {
-                <span>Login</span>
-              }
-              @if (loading) {
-                <span class="spinner-border spinner-border-sm"></span>
-              }
-            </button>
-
-          </form>
-        </div>
+<!-- Modern OpenHD Login -->
+<div class="login-container">
+  <div class="login-content">
+    <!-- Brand Section -->
+    <div class="login-brand">
+      <div class="brand-icon">
+        <i class="bi bi-cpu"></i>
       </div>
+      <h1 class="brand-title text-gradient">OpenHD</h1>
+      <p class="brand-subtitle">Management Portal</p>
     </div>
+
+    <!-- Login Card -->
+    <div class="login-card modern-card">
+      <div class="card-header">
+        <h2>Welcome Back</h2>
+        <p class="login-subtitle">Sign in to your account</p>
+      </div>
+
+      <form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="username" class="form-label-modern">
+            <i class="bi bi-person"></i>
+            Username
+          </label>
+          <input
+            type="text"
+            class="form-control-modern"
+            id="username"
+            name="username"
+            [(ngModel)]="credentials.username"
+            placeholder="Enter your username"
+            required
+            autofocus
+            >
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label-modern">
+            <i class="bi bi-lock"></i>
+            Password
+          </label>
+          <input
+            type="password"
+            class="form-control-modern"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            placeholder="Enter your password"
+            required
+            >
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-message">
+            <i class="bi bi-exclamation-triangle"></i>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="btn-primary-modern login-button"
+          [disabled]="loading"
+          >
+          @if (!loading) {
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Sign In</span>
+          }
+          @if (loading) {
+            <div class="spinner"></div>
+            <span>Signing In...</span>
+          }
+        </button>
+      </form>
+
+      <!-- Development Info -->
+      @if (isDevMode) {
+        <div class="dev-info">
+          <i class="bi bi-info-circle"></i>
+          <span>Development: Use <strong>devadmin</strong> / <strong>devsecret</strong></span>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>&copy; 2025 OpenHD Management Portal</p>
+    </div>
+  </div>
+
+  <!-- Background Animation -->
+  <div class="login-background">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
   </div>
 </div>

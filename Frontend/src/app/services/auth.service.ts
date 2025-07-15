@@ -1,6 +1,7 @@
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { ConfigService } from './config.service';
 
@@ -17,6 +18,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private config: ConfigService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -87,6 +89,7 @@ export class AuthService {
       localStorage.removeItem('auth_token');
     }
     this.currentUserSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
   getCurrentUser(): User | null {

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Favicon</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .sizes { display: flex; gap: 10px; }
+        .size-info { text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>CPU Icon Favicon Generator</h1>
+    
+    <div class="sizes">
+        <div class="size-info">
+            <div>16x16</div>
+            <canvas id="canvas16" width="16" height="16"></canvas>
+            <br><a id="download16" download="favicon-16.png">Download 16x16</a>
+        </div>
+        <div class="size-info">
+            <div>32x32</div>
+            <canvas id="canvas32" width="32" height="32"></canvas>
+            <br><a id="download32" download="favicon-32.png">Download 32x32</a>
+        </div>
+        <div class="size-info">
+            <div>48x48</div>
+            <canvas id="canvas48" width="48" height="48"></canvas>
+            <br><a id="download48" download="favicon-48.png">Download 48x48</a>
+        </div>
+    </div>
+
+    <script>
+        const cpuSvg = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path fill="#00A2EC" d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0zm-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3h-7zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+            </svg>
+        `;
+
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            const svgBlob = new Blob([cpuSvg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+                URL.revokeObjectURL(url);
+                
+                // Create download link
+                canvas.toBlob(function(blob) {
+                    const downloadLink = document.getElementById('download' + size);
+                    downloadLink.href = URL.createObjectURL(blob);
+                });
+            };
+            
+            img.src = url;
+        }
+
+        // Generate all sizes
+        drawIcon(document.getElementById('canvas16'), 16);
+        drawIcon(document.getElementById('canvas32'), 32);
+        drawIcon(document.getElementById('canvas48'), 48);
+    </script>
+</body>
+</html>

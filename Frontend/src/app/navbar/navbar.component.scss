@@ -10,13 +10,13 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .navbar-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 70px;
+    height: 60px;
   }
 
   // Brand Section
@@ -33,27 +33,27 @@
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
+      width: 32px;
+      height: 32px;
       background: linear-gradient(135deg, #00a2ec, #0066b3);
-      border-radius: 12px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 20px;
-      box-shadow: 0 4px 16px rgba(0, 162, 236, 0.3);
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(0, 162, 236, 0.3);
     }
 
     .brand-text {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.25rem;
+      font-weight: 600;
       color: #1a1a1a;
       letter-spacing: -0.5px;
     }
 
     .brand-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       color: #666;
       font-weight: 500;
       margin-left: -0.5rem;
@@ -72,13 +72,13 @@
       display: inline-flex;
       flex-direction: row;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
+      gap: 0.25rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
       color: #555;
       text-decoration: none;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.8rem;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
@@ -416,6 +416,54 @@
           color: #00a2ec;
         }
       }
+    }
+  }
+}
+
+// Widescreen navbar optimizations
+@media (min-width: 1600px) {
+  .modern-navbar .navbar-container {
+    max-width: 1600px;
+    padding: 0 1.5rem;
+  }
+
+  .modern-navbar .navbar-brand {
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+    }
+
+    .brand-text {
+      font-size: 1.4rem;
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+    }
+  }
+
+  .modern-navbar .desktop-nav .nav-item {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 2000px) {
+  .modern-navbar .navbar-container {
+    max-width: 1800px;
+    padding: 0 2rem;
+  }
+
+  .modern-navbar .navbar-brand {
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+    }
+
+    .brand-text {
+      font-size: 1.5rem;
     }
   }
 }

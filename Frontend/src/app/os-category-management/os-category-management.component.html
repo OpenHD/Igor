@@ -1,139 +1,181 @@
-<!-- os-category-management.component.html -->
-
-<div class="container mt-4">
-  <div class="card shadow">
-    <!-- Header -->
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h4 class="mb-0">Operating System Categories</h4>
-      <!-- Hier wird per @ViewChild auf das Input-Element referenziert -->
-      <button class="btn btn-light btn-sm" (click)="focusNewCategoryInput()">
-        <i class="bi bi-plus-lg"></i> New Category
+<!-- Modern OpenHD OS Category Management -->
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="bi bi-folder-symlink me-3"></i>OS Categories</h1>
+    <div class="page-actions">
+      <button class="btn-primary-modern" (click)="focusNewCategoryInput()">
+        <i class="bi bi-plus-lg"></i>
+        <span>New Category</span>
       </button>
     </div>
+  </div>
 
-    <div class="card-body">
-      <!-- Loading & Error States -->
-      @if (loading) {
-        <div class="alert alert-info">
-          <i class="bi bi-arrow-repeat me-2"></i> Loading categories...
-        </div>
-      }
-      @if (error) {
-        <div class="alert alert-danger alert-dismissible fade show">
-          {{ error }}
-          <button type="button" class="btn-close" (click)="error = null"></button>
-        </div>
-      }
+  <!-- Loading & Error States -->
+  @if (isLoading$ | async) {
+    <div class="modern-card">
+      <div class="loading-state">
+        <i class="bi bi-arrow-repeat spinning me-2"></i>
+        <span>Loading categories...</span>
+      </div>
+    </div>
+  }
+  @if (error) {
+    <div class="modern-card error-card">
+      <div class="error-message">
+        <i class="bi bi-exclamation-triangle"></i>
+        {{ error }}
+        <button class="btn-secondary-modern btn-sm" (click)="error = null">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    </div>
+  }
 
-      <!-- Neuer Kategorie-Eintrag -->
-      @if (!loading && !error) {
-        <div class="mb-3">
-          <form (ngSubmit)="createCategory()">
-            <div class="row g-2 align-items-center">
-              <div class="col-md-3">
-                <input #newCategoryInput type="text"
-                  class="form-control"
-                  placeholder="Category name"
-                  [(ngModel)]="newCategory.name" name="name" required>
-              </div>
-              <div class="col-md-3">
-                <input type="text"
-                  class="form-control"
-                  placeholder="Icon URL"
-                  [(ngModel)]="newCategory.icon" name="icon">
-              </div>
-              <div class="col-md-4">
-                <input type="text"
-                  class="form-control"
-                  placeholder="Description"
-                  [(ngModel)]="newCategory.description" name="description">
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-success w-100"
-                  type="submit"
-                  [disabled]="!newCategory.name.trim()">
-                  <i class="bi bi-plus-circle me-2"></i> Add New
-                </button>
+  <!-- New Category Form -->
+  @if (!loading && !error) {
+    <div class="modern-card mb-4">
+      <div class="card-header">
+        <h3><i class="bi bi-plus-circle me-2"></i>Add New Category</h3>
+      </div>
+      <form (ngSubmit)="createCategory()" class="category-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label-modern">
+              <i class="bi bi-tag me-2"></i>Category Name
+            </label>
+            <input #newCategoryInput type="text"
+              class="form-control-modern"
+              placeholder="Enter category name"
+              [(ngModel)]="newCategory.name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label-modern">
+              <i class="bi bi-image me-2"></i>Icon URL
+            </label>
+            <input type="text"
+              class="form-control-modern"
+              placeholder="https://example.com/icon.png"
+              [(ngModel)]="newCategory.icon" name="icon">
+          </div>
+          <div class="form-group">
+            <label class="form-label-modern">
+              <i class="bi bi-text-paragraph me-2"></i>Description
+            </label>
+            <input type="text"
+              class="form-control-modern"
+              placeholder="Brief description"
+              [(ngModel)]="newCategory.description" name="description">
+          </div>
+          <div class="form-group form-actions">
+            <button class="btn-primary-modern"
+              type="submit"
+              [disabled]="!newCategory.name.trim()">
+              <i class="bi bi-plus-circle me-2"></i>
+              <span>Add Category</span>
+            </button>
+          </div>
+        </div>
+        @if (newCategory.icon) {
+          <div class="icon-preview">
+            <span class="preview-label">Icon Preview:</span>
+            <div class="preview-icon">
+              <img [src]="newCategory.icon" alt="Icon preview" width="32" height="32">
+            </div>
+          </div>
+        }
+      </form>
+    </div>
+  }
+
+  <!-- Categories List with Drag & Drop -->
+  <div class="modern-card">
+    <div class="card-header">
+      <h3><i class="bi bi-list-ul me-2"></i>Categories</h3>
+      <span class="status-badge status-active">
+        <i class="bi bi-folder me-1"></i>{{ categories.length }} Categories
+      </span>
+    </div>
+    
+    <div class="categories-container" cdkDropList (cdkDropListDropped)="onDrop($event)">
+      @for (category of categories; track trackByCategoryId($index, category)) {
+        <div class="category-item hover-lift" cdkDrag [class.editing]="category.isEditing">
+          <!-- Drag Handle -->
+          <div class="drag-handle cdk-drag-handle">
+            <i class="bi bi-grip-vertical"></i>
+          </div>
+          
+          <!-- Display Mode -->
+          @if (!category.isEditing) {
+            <div class="category-content" (click)="startEditing(category)">
+              <div class="category-info">
+                <div class="category-icon-wrapper">
+                  @if (category.icon) {
+                    <img [src]="category.icon" alt="{{ category.name }} icon" class="category-icon-display">
+                  } @else {
+                    <div class="no-icon-placeholder">
+                      <i class="bi bi-image"></i>
+                    </div>
+                  }
+                </div>
+                <div class="category-details">
+                  <h4 class="category-name">{{ category.name }}</h4>
+                  <p class="category-description">{{ category.description || 'No description provided' }}</p>
+                </div>
               </div>
             </div>
-          </form>
-        </div>
-      }
-
-      <!-- Kategorienliste als List Group mit Drag & Drop -->
-      <div cdkDropList (cdkDropListDropped)="onDrop($event)">
-        <ul class="list-group">
-          @for (category of categories; track trackByCategoryId($index, category)) {
-            <li class="list-group-item d-flex align-items-start" cdkDrag>
-              <!-- Drag-Handle -->
-              <span class="me-3 cdk-drag-handle" style="cursor: move;">
-                <i class="bi bi-arrows-move text-secondary"></i>
-              </span>
-              <!-- Anzeige vs. Bearbeitung -->
-              @if (!category.isEditing) {
-                <div class="flex-grow-1" (click)="startEditing(category)" style="cursor: pointer;">
-                  <div class="d-flex align-items-center">
-                    @if (category.icon) {
-                      <img [src]="category.icon" alt="{{ category.name }} icon" class="category-icon me-3">
-                    }
-                    @if (!category.icon) {
-                      <span class="text-muted me-3">No Icon</span>
-                    }
-                    <div>
-                      <h5 class="mb-1">{{ category.name }}</h5>
-                      <p class="mb-0 small text-muted">{{ category.description || 'No description provided' }}</p>
-                    </div>
-                  </div>
+          } @else {
+            <!-- Edit Mode -->
+            <div class="category-edit-form">
+              <div class="edit-form-grid">
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="bi bi-tag me-2"></i>Name
+                  </label>
+                  <input type="text" class="form-control-modern" [(ngModel)]="category.editedName">
                 </div>
-              } @else {
-                <div class="w-100">
-                  <div class="mb-2">
-                    <label class="form-label small">Category Name</label>
-                    <input type="text" class="form-control" [(ngModel)]="category.editedName">
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label small">Icon URL</label>
-                    <input type="text" class="form-control" [(ngModel)]="category.editedIcon" placeholder="https://...">
-                    <div class="mt-1">
-                      <small class="text-muted">Preview:</small>
-                      <div>
-                        @if (category.editedIcon) {
-                          <img [src]="category.editedIcon" alt="Icon preview" class="category-icon">
-                        }
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mb-2">
-                    <label class="form-label small">Description</label>
-                    <input type="text" class="form-control" [(ngModel)]="category.editedDescription">
-                  </div>
+                <div class="form-group">
+                  <label class="form-label-modern">
+                    <i class="bi bi-image me-2"></i>Icon URL
+                  </label>
+                  <input type="text" class="form-control-modern" [(ngModel)]="category.editedIcon" placeholder="https://...">
+                </div>
+                <div class="form-group full-width">
+                  <label class="form-label-modern">
+                    <i class="bi bi-text-paragraph me-2"></i>Description
+                  </label>
+                  <input type="text" class="form-control-modern" [(ngModel)]="category.editedDescription">
+                </div>
+              </div>
+              @if (category.editedIcon) {
+                <div class="edit-icon-preview">
+                  <span class="preview-label">Preview:</span>
+                  <img [src]="category.editedIcon" alt="Icon preview" class="preview-icon">
                 </div>
               }
-              <!-- Bearbeitungs-Template -->
-              <!-- Positionsanzeige -->
-              <div class="mx-3 d-flex align-items-center">
-                <span class="badge bg-primary">{{ category.position + 1 }}</span>
-              </div>
-              <!-- Aktion-Buttons -->
-              <div class="btn-group">
-                @if (category.isEditing) {
-                  <button class="btn btn-sm btn-outline-success" (click)="saveCategory(category)">
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                }
-                @if (category.isEditing) {
-                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelEditing(category)">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                }
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteCategory(category.id)">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
-            </li>
+            </div>
           }
-        </ul>
-      </div>
+          
+          <!-- Position Badge -->
+          <div class="position-badge">
+            <span class="status-badge status-active">{{ category.position + 1 }}</span>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="category-actions">
+            @if (category.isEditing) {
+              <button class="btn-primary-modern btn-sm" (click)="saveCategory(category)">
+                <i class="bi bi-check-lg"></i>
+              </button>
+              <button class="btn-secondary-modern btn-sm" (click)="cancelEditing(category)">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            }
+            <button class="btn-danger-modern btn-sm" (click)="deleteCategory(category.id)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>

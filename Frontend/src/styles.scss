@@ -1,19 +1,508 @@
-// styles.scss
-
-/* You can add global styles to this file, and also import other style files */
+// Global Modern OpenHD Styles
 
 /* Importing Bootstrap SCSS file. */
 @use 'bootstrap' as *;
 @use 'bootstrap-icons' as *;
 
-$important-color: #00a2ec;
+// OpenHD Design System
+:root {
+  // Colors
+  --openhd-primary: #00a2ec;
+  --openhd-primary-dark: #0066b3;
+  --openhd-primary-light: #33b7f0;
+  --openhd-secondary: #6c757d;
+  --openhd-success: #28a745;
+  --openhd-danger: #dc3545;
+  --openhd-warning: #ffc107;
+  --openhd-info: #17a2b8;
 
-body {
-  background: rgb(255, 255, 255);
-  background: radial-gradient(circle, rgba(255, 255, 255, 1) 36%, $important-color 75%, rgba(1, 107, 153, 1) 100%);
-  background-attachment: fixed;
+  // Surfaces
+  --surface-primary: rgba(255, 255, 255, 0.98); // More opaque for better contrast
+  --surface-secondary: rgba(248, 249, 250, 0.95); // More opaque
+  --surface-tertiary: rgba(233, 236, 239, 0.9); // More opaque
+  --surface-glass: rgba(255, 255, 255, 0.1);
+  
+  // Text
+  --text-primary: #2d3748; // Beautiful dark slate instead of harsh black
+  --text-secondary: #718096; // Softer secondary
+  --text-muted: #a0aec0; // Elegant muted
+  --text-white: #ffffff;
+
+  // Shadows
+  --shadow-sm: 0 2px 8px rgba(0, 162, 236, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 162, 236, 0.12);
+  --shadow-lg: 0 16px 48px rgba(0, 162, 236, 0.16);
+  --shadow-glass: 0 8px 32px rgba(0, 162, 236, 0.08);
+
+  // Border radius
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  // Transitions
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+// Dark mode variables
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-primary: rgba(26, 26, 26, 0.95);
+    --surface-secondary: rgba(33, 37, 41, 0.9);
+    --surface-tertiary: rgba(52, 58, 64, 0.8);
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: #a0a0a0;
+  }
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// Global Styles
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body { 
+  height: 100%; 
+  margin: 0;
+}
+
+body { 
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); // Elegant soft background
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+// Modern Card Component
+.modern-card {
+  background: var(--surface-primary);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 162, 236, 0.1);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass);
+  padding: 0.75rem;
+  transition: all var(--transition-smooth);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 162, 236, 0.1);
+
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 700; // Increased from 600
+      
+      &:not(h1) {
+        font-size: 1.25rem; // Better size for h3 in cards
+      }
+    }
+    
+    i {
+      color: var(--openhd-primary);
+      font-weight: 600;
+    }
+  }
+}
+
+// Modern Button System
+.btn-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.btn-primary-modern {
+  @extend .btn-modern;
+  background: linear-gradient(135deg, var(--openhd-primary), var(--openhd-primary-dark));
+  color: var(--text-white);
+  box-shadow: var(--shadow-sm);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.btn-secondary-modern {
+  @extend .btn-modern;
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  border: 1px solid rgba(0, 162, 236, 0.2);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-tertiary);
+    border-color: var(--openhd-primary);
+  }
+}
+
+.btn-danger-modern {
+  @extend .btn-modern;
+  background: linear-gradient(135deg, var(--openhd-danger), #c82333);
+  color: var(--text-white);
+  box-shadow: var(--shadow-sm);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(220, 53, 69, 0.3);
+  }
+}
+
+// Modern Form Controls
+.form-control-modern {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0, 162, 236, 0.1);
+  border-radius: var(--radius-sm);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+
+  &:focus {
+    outline: none;
+    border-color: var(--openhd-primary);
+    box-shadow: 0 0 0 3px rgba(0, 162, 236, 0.1);
+    background: var(--surface-primary);
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.form-label-modern {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+}
+
+// Modern Table
+.table-modern {
+  background: var(--surface-primary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-glass);
+  border: 1px solid rgba(0, 162, 236, 0.1);
+
+  th {
+    background: rgba(0, 162, 236, 0.05);
+    font-weight: 600;
+    color: var(--text-primary);
+    border: none;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  td {
+    border: none;
+    padding: 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 162, 236, 0.05);
+    font-size: 0.85rem;
+  }
+
+  tbody tr:hover {
+    background: rgba(0, 162, 236, 0.02);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+// Modern Page Container
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.75rem 0.5rem;
+  min-height: calc(100vh - 60px); // Account for navbar height
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 162, 236, 0.1);
+
+  h1 {
+    margin: 0;
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    font-size: 1.75rem;
+    letter-spacing: -0.025em;
+    
+    i {
+      background: linear-gradient(135deg, var(--openhd-primary), var(--openhd-primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+}
+
+// Loading States
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Status Badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+
+  &.status-active {
+    background: rgba(40, 167, 69, 0.1);
+    color: var(--openhd-success);
+  }
+
+  &.status-inactive {
+    background: rgba(108, 117, 125, 0.1);
+    color: var(--openhd-secondary);
+  }
+
+  &.status-error {
+    background: rgba(220, 53, 69, 0.1);
+    color: var(--openhd-danger);
+  }
+}
+
+// Widescreen optimizations
+@media (min-width: 1600px) {
+  .page-container {
+    max-width: 1600px;
+    padding: 1rem 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .modern-card {
+    padding: 1rem;
+  }
+
+  .btn-modern {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .form-control-modern {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 2000px) {
+  .page-container {
+    max-width: 1800px;
+    padding: 1.25rem 2rem;
+  }
+
+  .page-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+  }
+
+  .modern-card {
+    padding: 1.25rem;
+  }
+}
+
+// Mobile/Tablet optimizations for maximum information density
+@media (max-width: 768px) {
+  .page-container {
+    padding: 0.25rem;
+    max-width: 100%;
+  }
+
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 0.125rem;
+    }
+  }
+
+  .modern-card {
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.25rem;
+  }
+
+  .card-header {
+    margin-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
+
+    h3, h4, h5 {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  }
+
+  // Compact buttons for mobile
+  .btn-modern {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    gap: 0.125rem;
+    border-radius: 4px;
+  }
+
+  .btn-sm {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.65rem;
+  }
+
+  // Ultra compact form controls
+  .form-control-modern {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+  }
+
+  .form-label-modern {
+    font-size: 0.7rem;
+    margin-bottom: 0.125rem;
+  }
+
+  // Status badges smaller
+  .status-badge {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.65rem;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 0.125rem;
+  }
+
+  .page-header h1 {
+    font-size: 0.9rem;
+  }
+
+  .modern-card {
+    padding: 0.125rem;
+  }
+
+  .btn-modern {
+    padding: 0.125rem 0.375rem;
+    font-size: 0.65rem;
+  }
+
+  .form-control-modern {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.7rem;
+  }
+}
+
+// Utility Classes
+.text-gradient {
+  background: linear-gradient(135deg, var(--openhd-primary), var(--openhd-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hover-lift {
+  transition: transform var(--transition-fast);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}

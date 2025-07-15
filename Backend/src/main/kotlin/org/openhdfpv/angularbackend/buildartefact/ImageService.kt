@@ -6,7 +6,10 @@ import org.openhdfpv.angularbackend.special.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
+import org.slf4j.LoggerFactory
 
 @Service
 class ImageService(
@@ -14,6 +17,8 @@ class ImageService(
     private val imageListService: ImageListService, // Instead of ImagesListRepository
     private val osCategoryService: OsCategoryService
 ) {
+
+    private val logger = LoggerFactory.getLogger(ImageService::class.java)
 
     fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
         imageEntity?.let { entity ->
@@ -154,6 +159,9 @@ class ImageService(
             }
         }
 
+        // Check URLs immediately after saving
+        checkUrlsImmediately(savedImage)
+        
         return savedImage
     }
 
@@ -193,7 +201,48 @@ class ImageService(
                 imageListService.addImageToImagesList(listId, updatedImage)
             }
         }
+        // Check URLs immediately after update if URLs were modified
+        input.urls?.let { 
+            checkUrlsImmediately(updatedImage)
+        }
+        
         return updatedImage
+    }
+
+    /**
+     * Immediately check URL availability for newly added/updated URLs
+     */
+    private fun checkUrlsImmediately(imageEntity: ImageEntity) {
+        var requiresUpdate = false
+        
+        imageEntity.urls.forEach { imageUrl ->
+            val available = isUrlReachable(imageUrl.url)
+            if (imageUrl.isAvailable != available) {
+                logger.info("Immediately updating URL ${imageUrl.url} availability to $available")
+                imageUrl.isAvailable = available
+                requiresUpdate = true
+            }
+        }
+        
+        if (requiresUpdate) {
+            save(imageEntity)
+        }
+    }
+
+    /**
+     * Check if a URL is reachable
+     */
+    private fun isUrlReachable(url: String): Boolean {
+        return try {
+            val connection = URL(url).openConnection() as HttpURLConnection
+            connection.connectTimeout = 5000
+            connection.readTimeout = 5000
+            connection.requestMethod = "HEAD"
+            connection.responseCode in 200..399
+        } catch (e: Exception) {
+            logger.debug("URL $url is not reachable: ${e.message}")
+            false
+        }
     }
 }
 

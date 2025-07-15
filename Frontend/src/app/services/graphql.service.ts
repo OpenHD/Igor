@@ -22,17 +22,38 @@ import {
   UpdateImagesListPartialDocument,
   DeleteImagesListDocument
 } from '../graphql/generated';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
+import { ErrorBannerService } from './error-banner.service';
 
 @Injectable({ providedIn: 'root' })
 export class GraphqlService {
   private apollo = inject(Apollo);
+  private errorBannerService = inject(ErrorBannerService);
+
+  private handleError = (error: any) => {
+    console.error('GraphQL Error:', error);
+    
+    if (error.networkError) {
+      this.errorBannerService.setBackendConnectivity(false);
+    }
+    
+    return throwError(() => error);
+  };
 
   getImagesWithCategories() {
-    return this.apollo.watchQuery<GetAllImagesWithCategoriesQuery>({
+    const query = this.apollo.watchQuery<GetAllImagesWithCategoriesQuery>({
       query: GetAllImagesWithCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
+    
+    query.valueChanges.pipe(
+      catchError(this.handleError)
+    ).subscribe({
+      next: () => this.errorBannerService.setBackendConnectivity(true),
+      error: () => {} // Already handled in handleError
+    });
+    
+    return query;
   }
 
   createImage(input: ImageInput) {
@@ -42,28 +63,43 @@ export class GraphqlService {
       update: (cache, { data }) => {
         // Cache-Update-Logik (ggf. implementieren)
       }
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   updateImagePartial(id: string, input: ImagePartialInput) {
     return this.apollo.mutate({
       mutation: UpdateImagePartialDocument,
       variables: { id, input }
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   deleteImage(id: string) {
     return this.apollo.mutate({
       mutation: DeleteImageDocument,
       variables: { id }
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   getOsCategories() {
-    return this.apollo.watchQuery({
+    const query = this.apollo.watchQuery({
       query: GetOsCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
+    
+    query.valueChanges.pipe(
+      catchError(this.handleError)
+    ).subscribe({
+      next: () => this.errorBannerService.setBackendConnectivity(true),
+      error: () => {}
+    });
+    
+    return query;
   }
 
   createOsCategory(input: OsCategoryInput): Observable<any> {
@@ -71,21 +107,19 @@ export class GraphqlService {
       mutation: CreateOsCategoryDocument,
       variables: { input },
       refetchQueries: [GetOsCategoriesDocument]
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   updateOsCategoryPartial(input: OsCategoryInputUpdate): Observable<any> {
     return this.apollo.mutate({
       mutation: UpdateOsCategoryPartialDocument,
       variables: { input },
-      optimisticResponse: (vars) => ({
-        __typename: 'Mutation',
-        updateOsCategoryPartial: {
-          ...vars.input,
-          __typename: 'OsCategory'
-        }
-      })
-    });
+      refetchQueries: [GetOsCategoriesDocument]
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   deleteOsCategory(id: string): Observable<any> {
@@ -93,14 +127,25 @@ export class GraphqlService {
       mutation: DeleteOsCategoryDocument,
       variables: { id },
       refetchQueries: [GetOsCategoriesDocument]
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   getImagesListsWithCategories() {
-    return this.apollo.watchQuery<GetAllImagesListsWithCategoriesQuery>({
+    const query = this.apollo.watchQuery<GetAllImagesListsWithCategoriesQuery>({
       query: GetAllImagesListsWithCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
+    
+    query.valueChanges.pipe(
+      catchError(this.handleError)
+    ).subscribe({
+      next: () => this.errorBannerService.setBackendConnectivity(true),
+      error: () => {}
+    });
+    
+    return query;
   }
 
   createImagesList(input: ImagesListInput): Observable<any> {
@@ -108,14 +153,18 @@ export class GraphqlService {
       mutation: CreateImagesListDocument,
       variables: { input },
       refetchQueries: [GetAllImagesListsWithCategoriesDocument]
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   updateImagesListPartial(id: string, input: ImagesListPartialInput): Observable<any> {
     return this.apollo.mutate({
       mutation: UpdateImagesListPartialDocument,
       variables: { id, input }
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   deleteImagesList(id: string): Observable<any> {
@@ -123,6 +172,8 @@ export class GraphqlService {
       mutation: DeleteImagesListDocument,
       variables: { id },
       refetchQueries: [GetAllImagesListsWithCategoriesDocument]
-    });
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 }

@@ -1,0 +1,365 @@
+// OpenHD Snake Game 404 Page Styles
+
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--surface-primary), var(--surface-secondary));
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  
+  h1 {
+    color: var(--openhd-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    
+    i {
+      color: var(--openhd-warning);
+    }
+  }
+  
+  .error-message {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.snake-wrapper {
+  width: min(90vw, 600px);
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  border: 2px solid var(--openhd-primary);
+}
+
+.game-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, var(--openhd-primary), var(--openhd-secondary));
+  color: white;
+  
+  .score-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    .score, .high-score {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .high-score {
+      opacity: 0.9;
+    }
+  }
+  
+  .game-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    
+    i {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.play-board {
+  width: 100%;
+  height: 400px;
+  display: grid;
+  grid-template: repeat(30, 1fr) / repeat(30, 1fr);
+  background: var(--surface-dark);
+  position: relative;
+  border-top: 2px solid var(--openhd-primary);
+  border-bottom: 2px solid var(--openhd-primary);
+  
+  .food {
+    background: var(--openhd-danger);
+    border-radius: 50%;
+    animation: pulse-food 1s ease-in-out infinite alternate;
+  }
+  
+  .head {
+    background: var(--openhd-success);
+    border-radius: 2px;
+    box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  
+  .game-over-content {
+    background: var(--surface-primary);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    border: 2px solid var(--openhd-primary);
+    
+    h2 {
+      color: var(--openhd-danger);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+    
+    p {
+      color: var(--text-primary);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .new-record {
+      color: var(--openhd-warning);
+      font-weight: 700;
+      animation: glow 1s ease-in-out infinite alternate;
+      
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+    
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.controls {
+  display: none;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--surface-secondary);
+  
+  .control-btn {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--openhd-primary);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    
+    &:hover {
+      background: var(--openhd-secondary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    &:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+.game-instructions {
+  padding: 2rem;
+  background: var(--surface-secondary);
+  
+  h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    
+    i {
+      color: var(--openhd-primary);
+      margin-right: 0.5rem;
+    }
+  }
+  
+  ul {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+  }
+  
+  .back-home {
+    text-align: center;
+    
+    a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Animations
+@keyframes pulse-food {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px var(--openhd-warning);
+  }
+  100% {
+    text-shadow: 0 0 20px var(--openhd-warning), 0 0 30px var(--openhd-warning);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+  
+  .page-header {
+    h1 {
+      font-size: 2rem;
+    }
+    
+    .error-message {
+      font-size: 1rem;
+    }
+  }
+  
+  .snake-wrapper {
+    width: 95vw;
+  }
+  
+  .game-details {
+    padding: 1rem;
+    
+    .score-info {
+      .score, .high-score {
+        font-size: 1rem;
+      }
+    }
+    
+    .game-title {
+      font-size: 1.1rem;
+    }
+  }
+  
+  .play-board {
+    height: 300px;
+  }
+  
+  .controls {
+    display: flex;
+    
+    .control-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+    }
+  }
+  
+  .game-instructions {
+    padding: 1rem;
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+    
+    ul {
+      font-size: 0.9rem;
+    }
+  }
+  
+  .game-over-overlay {
+    .game-over-content {
+      padding: 1.5rem;
+      margin: 1rem;
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+      
+      p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .play-board {
+    height: 250px;
+  }
+  
+  .controls {
+    gap: 0.5rem;
+    
+    .control-btn {
+      width: 45px;
+      height: 45px;
+      font-size: 1rem;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .snake-wrapper {
+    background: rgba(26, 26, 26, 0.95);
+  }
+  
+  .play-board {
+    background: rgba(15, 15, 15, 0.95);
+  }
+  
+  .game-over-overlay {
+    .game-over-content {
+      background: rgba(26, 26, 26, 0.95);
+    }
+  }
+  
+  .game-instructions {
+    background: rgba(20, 20, 20, 0.95);
+  }
+}

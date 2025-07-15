@@ -41,9 +41,29 @@ class UrlAvailabilityService(
     }
 
     /**
+     * Immediately check availability for newly added URLs
+     */
+    fun checkUrlsImmediately(imageEntity: ImageEntity) {
+        var requiresUpdate = false
+        
+        imageEntity.urls.forEach { imageUrl ->
+            val available = isUrlReachable(imageUrl.url)
+            if (imageUrl.isAvailable != available) {
+                logger.info("Immediately updating URL ${imageUrl.url} availability to $available")
+                imageUrl.isAvailable = available
+                requiresUpdate = true
+            }
+        }
+        
+        if (requiresUpdate) {
+            imageService.save(imageEntity)
+        }
+    }
+
+    /**
      * Checks if a URL is reachable.
      */
-    private fun isUrlReachable(url: String): Boolean {
+    fun isUrlReachable(url: String): Boolean {
         return try {
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.connectTimeout = 5000 // Connection timeout in milliseconds

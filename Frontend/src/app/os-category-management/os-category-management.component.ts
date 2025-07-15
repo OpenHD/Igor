@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
@@ -11,17 +12,19 @@ import {
   UpdateOsCategoryPartialDocument
 } from '../graphql/generated';
 import { catchError, of } from 'rxjs';
+import { LoadingStateService } from '../services/loading-state.service';
 
 @Component({
   selector: 'app-os-category-management',
   standalone: true,
-  imports: [FormsModule, RouterModule, CdkDropList, CdkDrag],
+  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag],
   templateUrl: './os-category-management.component.html',
   styleUrls: ['./os-category-management.component.scss']
 })
 export class OsCategoryManagementComponent implements AfterViewInit {
   private graphql = inject(GraphqlService);
   private apollo = inject(Apollo);
+  private loadingStateService = inject(LoadingStateService);
 
   @ViewChild('newCategoryInput') newCategoryInput!: ElementRef;
 
@@ -34,6 +37,12 @@ export class OsCategoryManagementComponent implements AfterViewInit {
   newCategory = { name: '', description: '', icon: '' };
   loading = true;
   error: string | null = null;
+  
+  isLoading$;
+
+  constructor() {
+    this.isLoading$ = this.loadingStateService.getLoadingState('category-management');
+  }
 
   ngOnInit() {
     this.loadCategories();
@@ -51,7 +60,9 @@ export class OsCategoryManagementComponent implements AfterViewInit {
 
   loadCategories() {
     this.loading = true;
+    this.loadingStateService.setLoading('category-management', true);
     this.error = null;
+    
     this.apollo.watchQuery({
       query: GetOsCategoriesDocument,
       fetchPolicy: 'cache-and-network'
@@ -68,10 +79,12 @@ export class OsCategoryManagementComponent implements AfterViewInit {
             editedIcon: c.icon
           }));
         this.loading = false;
+        this.loadingStateService.setLoading('category-management', false);
       },
       error: (err) => {
         this.handleError('Failed to load categories', err);
         this.loading = false;
+        this.loadingStateService.setLoading('category-management', false);
       }
     });
   }
@@ -138,36 +151,36 @@ export class OsCategoryManagementComponent implements AfterViewInit {
   }
 
   onDrop(event: CdkDragDrop<any>) {
-    const previousIndex = event.previousIndex;
-    const newIndex = event.currentIndex;
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
 
-    // Originalzustand sichern
+    // Originalzustand für Rollback sichern
     const originalCategories = [...this.categories];
 
-    // Array-Referenz brechen und neu zuweisen
-    const reorderedCategories = [...this.categories];
-    moveItemInArray(reorderedCategories, previousIndex, newIndex);
+    // Update UI sofort
+    moveItemInArray(this.categories, event.previousIndex, event.currentIndex);
 
-    // Positionen aller Kategorien neu berechnen
-    this.categories = reorderedCategories.map((category, index) => ({
-      ...category,
-      position: index // Backend-kompatible 0-basierte Position
-    }));
-
-    // Update für die verschobene Kategorie
-    const movedCategory = this.categories[newIndex];
-
+    // Die verschobene Kategorie
+    const movedCategory = this.categories[event.currentIndex];
+    
+    // Update nur die verschobene Kategorie mit der neuen Position
     this.graphql.updateOsCategoryPartial({
       id: movedCategory.id,
-      position: newIndex
+      position: event.currentIndex
     }).pipe(
       catchError((err) => {
-        // Rollback mit Originalpositionen
-        this.categories = originalCategories.map((c, i) => ({ ...c, position: i }));
-        this.handleError('Neuanordnung fehlgeschlagen', err);
+        this.handleError('Position update failed', err);
+        // Rollback bei Fehler
+        this.categories = originalCategories;
         return of(null);
       })
-    ).subscribe();
+    ).subscribe((result) => {
+      if (result) {
+        // Erfolgreich - lade neu um korrekte Positionen zu bekommen
+        this.loadCategories();
+      }
+    });
   }
 
   private handleError(context: string, error: any) {

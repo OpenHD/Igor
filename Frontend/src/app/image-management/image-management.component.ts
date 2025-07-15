@@ -7,6 +7,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditImageModalComponent } from '../edit-image-modal/edit-image-modal.component';
 import {GraphqlService} from '../services/graphql.service';
 import {Image, ImageFragment, OsCategoryFragment, ImageListFragment} from '../graphql/generated';
+import { LoadingStateService } from '../services/loading-state.service';
 
 @Component({
   selector: 'app-image-management',
@@ -18,14 +19,23 @@ import {Image, ImageFragment, OsCategoryFragment, ImageListFragment} from '../gr
 export class ImageManagementComponent {
   private modalService = inject(NgbModal);
   private graphql = inject(GraphqlService);
+  private loadingStateService = inject(LoadingStateService);
 
   images: ImageFragment[] = [];
   categories: OsCategoryFragment[] = [];
   currentView: 'grid' | 'list' = 'grid';
   imagesLists: ImageListFragment[] = [];
   selectedListId: string | null = null;
+  
+  isLoading$;
+
+  constructor() {
+    this.isLoading$ = this.loadingStateService.getLoadingState('image-management');
+  }
 
   ngOnInit() {
+    this.loadingStateService.setLoading('image-management', true);
+    
     this.graphql.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
         const previousSelectedId = this.selectedListId; // Vorherige ID speichern
@@ -39,8 +49,13 @@ export class ImageManagementComponent {
         } else {
           this.selectedListId = null;
         }
+        
+        this.loadingStateService.setLoading('image-management', false);
       },
-      error: (err) => console.error('Error loading data', err)
+      error: (err) => {
+        console.error('Error loading data', err);
+        this.loadingStateService.setLoading('image-management', false);
+      }
     });
   }
 

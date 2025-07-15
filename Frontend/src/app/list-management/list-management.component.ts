@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { GraphqlService } from '../services/graphql.service';
 import {
   ImagesList,
@@ -7,6 +8,7 @@ import {
   GetAllImagesListsWithCategoriesQuery
 } from '../graphql/generated';
 import { FormsModule } from '@angular/forms';
+import { LoadingStateService } from '../services/loading-state.service';
 
 import {NgbModal, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -17,6 +19,7 @@ declare var bootstrap: any;
   templateUrl: './list-management.component.html',
   styleUrls: ['./list-management.component.scss'],
   imports: [
+    CommonModule,
     FormsModule,
     NgbModule
 ],
@@ -30,7 +33,6 @@ export class ListManagementComponent implements OnInit {
   error: string | null = null;
   imageLists: any[] = [];
   selectedList: any = null;
-  selectedListId: string | null = null;
   isCreatingNewList = false;
   newList: Partial<ImagesList> = {
     name: '',
@@ -44,8 +46,13 @@ export class ListManagementComponent implements OnInit {
 
   constructor(
     private graphqlService: GraphqlService,
-    private modalService: NgbModal
-  ) { }
+    private modalService: NgbModal,
+    private loadingStateService: LoadingStateService
+  ) { 
+    this.isLoading$ = this.loadingStateService.getLoadingState('list-management');
+  }
+  
+  isLoading$;
 
   ngOnInit(): void {
     this.loadImageLists();
@@ -54,9 +61,13 @@ export class ListManagementComponent implements OnInit {
 
   loadImageLists() {
     this.loading = true;
+    this.loadingStateService.setLoading('list-management', true);
+    
     this.graphqlService.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }: { data: GetAllImagesListsWithCategoriesQuery }) => {
         this.loading = false;
+        this.loadingStateService.setLoading('list-management', false);
+        
         if (data?.imagesLists) {
           this.imageLists = data.imagesLists.map(list => ({
             ...list,
@@ -68,22 +79,15 @@ export class ListManagementComponent implements OnInit {
             editedUrl: list.url
           }));
 
-          if (this.imageLists.length > 0) {
-            this.setActiveList(this.imageLists[0].id);
-          }
+          // Listen sind jetzt alle sichtbar - keine Auswahl nötig
         }
       },
       error: err => {
         this.loading = false;
+        this.loadingStateService.setLoading('list-management', false);
         this.error = err.message || 'Error loading image lists';
       }
     });
-  }
-
-  setActiveList(id: string, event?: Event) {
-    event?.stopPropagation();
-    this.selectedListId = id;
-    this.selectedList = this.imageLists.find(list => list.id === id);
   }
 
   startEditing(list: any) {
@@ -121,7 +125,7 @@ export class ListManagementComponent implements OnInit {
           isEditing: false
         });
 
-        if (this.selectedListId === list.id) {
+        if (this.selectedList?.id === list.id) {
           this.selectedList = list;
         }
       },
@@ -145,13 +149,7 @@ export class ListManagementComponent implements OnInit {
     this.graphqlService.deleteImagesList(id).subscribe({
       next: () => {
         this.imageLists = this.imageLists.filter(list => list.id !== id);
-        if (this.selectedListId === id) {
-          this.selectedList = null;
-          this.selectedListId = null;
-          if (this.imageLists.length > 0) {
-            this.setActiveList(this.imageLists[0].id);
-          }
-        }
+        this.selectedList = null;
         this.deleteModal.hide();
         this.modalService.dismissAll();
       },
@@ -196,7 +194,6 @@ export class ListManagementComponent implements OnInit {
           editedUrl: newList.url
         });
 
-        this.setActiveList(newList.id);
         this.isCreatingNewList = false;
         this.newList = { name: '', endpoint: '', description: '', latestVersion: '', url: '' };
       },

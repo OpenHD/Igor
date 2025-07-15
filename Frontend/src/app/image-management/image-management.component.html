@@ -1,206 +1,227 @@
-<!-- image-management.component.html -->
-
-<div class="container mt-4">
-  <div class="card shadow">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-      <h4 class="card-title mb-0">OS Image Management</h4>
-      <div class="d-flex gap-2">
-        <div class="btn-group">
-          <button class="btn btn-light btn-sm"
-            [class.active]="currentView === 'grid'"
-            (click)="currentView = 'grid'; $event.stopPropagation()">
-            <i class="bi bi-grid"></i>
-          </button>
-          <button class="btn btn-light btn-sm"
-            [class.active]="currentView === 'list'"
-            (click)="currentView = 'list'; $event.stopPropagation()">
-            <i class="bi bi-list"></i>
-          </button>
-        </div>
-        <button class="btn btn-light btn-sm" (click)="openEditModal(); $event.stopPropagation()">
-          <i class="bi bi-plus-lg"></i> New OS Image
+<!-- Modern OpenHD Image Management -->
+<div class="page-container">
+  <div class="page-header">
+    <h1><i class="bi bi-hdd-stack me-3"></i>OS Image Management</h1>
+    <div class="page-actions">
+      <div class="btn-group">
+        <button class="btn-secondary-modern btn-sm"
+          [class.btn-primary-modern]="currentView === 'grid'"
+          (click)="currentView = 'grid'; $event.stopPropagation()">
+          <i class="bi bi-grid"></i>
+        </button>
+        <button class="btn-secondary-modern btn-sm"
+          [class.btn-primary-modern]="currentView === 'list'"
+          (click)="currentView = 'list'; $event.stopPropagation()">
+          <i class="bi bi-list"></i>
         </button>
       </div>
+      <button class="btn-primary-modern" (click)="openEditModal(); $event.stopPropagation()">
+        <i class="bi bi-plus-lg"></i>
+        <span>New OS Image</span>
+      </button>
     </div>
+  </div>
 
-    <div class="card-body">
-      <!-- Tabs für ImagesLists -->
-      <ul class="nav nav-tabs mb-4 custom-tabs">
+  <!-- Loading state -->
+  @if (isLoading$ | async) {
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="loading-text">Loading images...</p>
+    </div>
+  } @else {
+    <!-- Tabs for Images Lists -->
+    <div class="modern-card mb-4">
+      <div class="modern-tabs">
         @for (list of imagesLists; track trackListById($index, list)) {
-          <li class="nav-item">
-            <a class="nav-link"
-              [class.active]="selectedListId === list.id"
-              (click)="setActiveList(list.id, $event)"
-              role="button">
-              {{ list.name }}
-              @if (selectedListId === list.id) {
-                <span class="active-indicator"></span>
-              }
-            </a>
-          </li>
+          <button class="modern-tab"
+            [class.active]="selectedListId === list.id"
+            (click)="setActiveList(list.id, $event)">
+            <i class="bi bi-collection me-2"></i>
+            {{ list.name }}
+            @if (selectedListId === list.id) {
+              <span class="active-indicator"></span>
+            }
+          </button>
         }
-      </ul>
+      </div>
+    </div>
+  }
 
-      <!-- Inhalt der ausgewählten ImagesList -->
-      @if (selectedList) {
-        <div>
-          <!-- Kategorien und Images -->
-          @for (category of getCategoriesForList(selectedList); track category) {
-            <div class="category-section mb-4">
-              <div class="d-flex align-items-center mb-3 p-2 category-header">
+  <!-- Content of selected ImagesList -->
+  @if (selectedList) {
+    <div>
+      <!-- Categories and Images -->
+      @for (category of getCategoriesForList(selectedList); track category) {
+        <div class="modern-card mb-4">
+          <div class="card-header">
+            <div class="d-flex align-items-center">
+              <div class="category-icon me-3">
                 <img [src]="category.icon.startsWith('http') ? category.icon : '/images/icons/' + category.icon"
                   alt="category icon"
-                  class="me-2"
                   width="32"
                   height="32"
                   style="object-fit: contain;">
-                  <h5 class="mb-0 me-2">{{ category.name }}</h5>
-                  <span class="badge bg-secondary ms-auto">
-                    <i class="bi bi-images me-1"></i>{{ getImagesForCategoryInList(selectedList, category.id).length }}
-                  </span>
-                </div>
-                <!-- Grid View -->
-                @if (currentView === 'grid') {
-                  <div class="row g-4">
-                    @for (image of getImagesForCategoryInList(selectedList, category.id); track image) {
-                      <div
-                        class="col-12 col-md-6 col-lg-4 col-xl-3">
-                        <div class="card h-100 shadow-sm image-card"
-                          (click)="openEditModal(image)"
-                          [class.border-primary]="image.isEnabled">
-                          <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                              <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
-                                alt="icon"
-                                class="me-3"
-                                width="48"
-                                height="48"
-                                style="object-fit: contain;">
-                                <h6 class="card-title mb-0">{{ image.name }}</h6>
-                              </div>
-                              <p class="card-text small text-muted">{{ image.description }}</p>
-                              <div class="d-flex justify-content-between align-items-center mb-3">
-                                <select class="form-select form-select-sm"
-                                  [ngModel]="image.category?.id"
-                                  (ngModelChange)="updateCategory(image, $event)"
-                                  (click)="$event.stopPropagation()">
-                                  @for (cat of categories; track cat) {
-                                    <option [value]="cat.id">
-                                      {{ cat.name }}
-                                    </option>
-                                  }
-                                </select>
-                              </div>
-                              <div class="d-flex justify-content-between small">
-                                <span class="badge d-flex align-items-center"
-                                  [class.bg-warning]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length"
-                                  [class.bg-success]="getAvailableCount(image) === image.urls.length"
-                                  [class.bg-danger]="getAvailableCount(image) === 0">
-                                  {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
-                                </span>
-                                <span class="text-muted">
-                                  <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
-                                </span>
-                              </div>
-                            </div>
-                            <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
-                              <div class="form-check form-switch">
-                                <input class="form-check-input"
-                                  type="checkbox"
-                                  [checked]="image.isEnabled"
-                                  (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
-                                </div>
-                                <button class="btn btn-sm btn-outline-danger"
-                                  (click)="deleteImage(image, $event)">
-                                  <i class="bi bi-trash"></i>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        }
-                      </div>
-                    }
-                    <!-- List View -->
-                    @if (currentView === 'list') {
-                      <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                          <thead>
-                            <tr>
-                              <th>Icon</th>
-                              <th>Name</th>
-                              <th>Description</th>
-                              <th>Category</th>
-                              <th>Availability</th>
-                              <th>Redirects</th>
-                              <th>Status</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            @for (image of getImagesForCategoryInList(selectedList, category.id); track image) {
-                              <tr
-                                (click)="openEditModal(image)"
-                                style="cursor: pointer">
-                                <td>
-                                  <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
-                                    alt="icon"
-                                    width="32"
-                                    height="32"
-                                    style="object-fit: contain">
-                                  </td>
-                                  <td>{{ image.name }}</td>
-                                  <td class="small text-muted">{{ image.description }}</td>
-                                  <td>
-                                    <select class="form-select form-select-sm"
-                                      [ngModel]="image.category?.id"
-                                      (ngModelChange)="updateCategory(image, $event)"
-                                      (click)="$event.stopPropagation()">
-                                      @for (cat of categories; track cat) {
-                                        <option [value]="cat.id">
-                                          {{ cat.name }}
-                                        </option>
-                                      }
-                                    </select>
-                                  </td>
-                                  <td>
-                                    <span class="badge d-flex align-items-center"
-                          [ngClass]="{
-                            'bg-warning': getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length,
-                            'bg-success': getAvailableCount(image) === image.urls.length,
-                            'bg-danger': getAvailableCount(image) === 0
-                          }">
-                                      {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <span class="text-muted">
-                                      <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <div class="form-check form-switch">
-                                      <input class="form-check-input"
-                                        type="checkbox"
-                                        [checked]="image.isEnabled"
-                                        (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <button class="btn btn-sm btn-outline-danger"
-                                        (click)="$event.stopPropagation(); deleteImage(image, $event)">
-                                        <i class="bi bi-trash"></i>
-                                      </button>
-                                    </td>
-                                  </tr>
-                                }
-                              </tbody>
-                            </table>
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-                }
               </div>
+              <h3>{{ category.name }}</h3>
             </div>
+            <span class="status-badge status-active">
+              <i class="bi bi-images me-1"></i>{{ getImagesForCategoryInList(selectedList, category.id).length }}
+            </span>
           </div>
+          <!-- Grid View -->
+          @if (currentView === 'grid') {
+            <div class="image-grid">
+              @for (image of getImagesForCategoryInList(selectedList, category.id); track image.id) {
+                <div class="image-card-modern hover-lift"
+                  (click)="openEditModal(image)"
+                  [class.enabled]="image.isEnabled">
+                  <div class="image-card-header">
+                    <div class="image-icon">
+                      <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
+                        alt="icon"
+                        width="48"
+                        height="48"
+                        style="object-fit: contain;">
+                    </div>
+                    <h6 class="image-title">{{ image.name }}</h6>
+                  </div>
+                  
+                  <div class="image-content">
+                    <p class="image-description">{{ image.description }}</p>
+                    
+                    <div class="image-category mb-3">
+                      <select class="form-control-modern"
+                        [ngModel]="image.category?.id"
+                        (ngModelChange)="updateCategory(image, $event)"
+                        (click)="$event.stopPropagation()">
+                        @for (cat of categories; track cat) {
+                          <option [value]="cat.id">
+                            {{ cat.name }}
+                          </option>
+                        }
+                      </select>
+                    </div>
+                    
+                    <div class="image-stats">
+                      <span class="status-badge"
+                        [class.status-error]="getAvailableCount(image) === 0"
+                        [class.status-active]="getAvailableCount(image) === image.urls.length"
+                        [class.status-inactive]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length">
+                        {{ getAvailableCount(image) }}/{{ image.urls.length }} Available
+                      </span>
+                      <span class="download-count">
+                        <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
+                      </span>
+                    </div>
+                    
+                    <!-- Mobile quick stats row -->
+                    <div class="image-quick-stats">
+                      <span class="category-name">{{ image.category?.name || 'No Category' }}</span>
+                      <div class="availability-dot"
+                        [class.available]="getAvailableCount(image) === image.urls.length"
+                        [class.partial]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length"
+                        [class.unavailable]="getAvailableCount(image) === 0"></div>
+                      <span class="download-count">
+                        <i class="bi bi-download"></i>{{ image.redirectsCount || 0 }}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="image-actions">
+                    <div class="modern-switch">
+                      <input type="checkbox"
+                        [checked]="image.isEnabled"
+                        (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
+                      <span class="switch-label">{{ image.isEnabled ? 'Enabled' : 'Disabled' }}</span>
+                    </div>
+                    <button class="btn-danger-modern btn-sm"
+                      (click)="deleteImage(image, $event)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          <!-- List View -->
+          @if (currentView === 'list') {
+            <div class="table-responsive">
+              <table class="table-modern">
+                <thead>
+                  <tr>
+                    <th><i class="bi bi-image me-2"></i>Icon</th>
+                    <th><i class="bi bi-tag me-2"></i>Name</th>
+                    <th class="hide-mobile"><i class="bi bi-text-paragraph me-2"></i>Description</th>
+                    <th><i class="bi bi-folder me-2"></i>Category</th>
+                    <th><i class="bi bi-check-circle me-2"></i>Status</th>
+                    <th class="hide-mobile"><i class="bi bi-download me-2"></i>Downloads</th>
+                    <th><i class="bi bi-toggle-on me-2"></i>Enabled</th>
+                    <th><i class="bi bi-gear me-2"></i>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (image of getImagesForCategoryInList(selectedList, category.id); track image.id) {
+                    <tr (click)="openEditModal(image)" style="cursor: pointer">
+                      <td>
+                        <div class="table-icon">
+                          <img [src]="image.icon.startsWith('http') ? image.icon : '/images/icons/' + image.icon"
+                            alt="icon"
+                            width="32"
+                            height="32"
+                            style="object-fit: contain">
+                        </div>
+                      </td>
+                      <td><strong>{{ image.name }}</strong></td>
+                      <td class="text-muted hide-mobile">{{ image.description }}</td>
+                      <td>
+                        <select class="form-control-modern"
+                          [ngModel]="image.category?.id"
+                          (ngModelChange)="updateCategory(image, $event)"
+                          (click)="$event.stopPropagation()">
+                          @for (cat of categories; track cat) {
+                            <option [value]="cat.id">
+                              {{ cat.name }}
+                            </option>
+                          }
+                        </select>
+                      </td>
+                      <td>
+                        <span class="status-badge"
+                          [class.status-error]="getAvailableCount(image) === 0"
+                          [class.status-active]="getAvailableCount(image) === image.urls.length"
+                          [class.status-inactive]="getAvailableCount(image) > 0 && getAvailableCount(image) < image.urls.length">
+                          {{ getAvailableCount(image) }}/{{ image.urls.length }}
+                        </span>
+                      </td>
+                      <td class="hide-mobile">
+                        <span class="download-count">
+                          <i class="bi bi-download me-1"></i>{{ image.redirectsCount || 0 }}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="modern-switch">
+                          <input type="checkbox"
+                            [checked]="image.isEnabled"
+                            (click)="$event.stopPropagation(); updateStatus(image, !image.isEnabled)">
+                          <span class="switch-label">{{ image.isEnabled ? 'On' : 'Off' }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <button class="btn-danger-modern btn-sm"
+                          (click)="$event.stopPropagation(); deleteImage(image, $event)">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
