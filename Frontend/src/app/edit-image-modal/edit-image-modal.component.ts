@@ -96,6 +96,21 @@ export class EditImageModalComponent {
     this.imageForm.get('imagesLists')?.markAsTouched();
   }
 
+  toggleListById(listId: string) {
+    const numericId = Number(listId);
+    const currentLists = this.imageForm.get('imagesLists')?.value || [];
+    
+    if (currentLists.includes(numericId)) {
+      // Remove from list
+      const newValue = currentLists.filter(id => id !== numericId);
+      this.imageForm.get('imagesLists')?.setValue(newValue);
+    } else {
+      // Add to list
+      this.imageForm.get('imagesLists')?.setValue([...currentLists, numericId]);
+    }
+    this.imageForm.get('imagesLists')?.markAsTouched();
+  }
+
 
   imageForm = new FormGroup({
     name: new FormControl('', {nonNullable: true, validators: [Validators.required]}),

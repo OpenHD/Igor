@@ -14,7 +14,7 @@ export class NavbarComponent {
   showUserMenu = false;
 
   navLinks = [
-    { path: '/images', label: 'Images', icon: 'bi bi-hdd-stack' },
+    { path: '/images', label: 'OS Images', icon: 'bi bi-hdd-stack' },
     { path: '/categories', label: 'Categories', icon: 'bi bi-tags' },
     { path: '/lists', label: 'Lists', icon: 'bi bi-list-ul' }
   ];

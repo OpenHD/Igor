@@ -3,7 +3,7 @@
   <div class="modal-header">
     <h4 class="modal-title">
       <i class="bi bi-card-image me-2"></i>
-      {{ image?.id ? 'Edit Image' : 'New Image' }}
+      {{ image?.id ? 'Edit OS Image' : 'New OS Image' }}
     </h4>
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
@@ -26,7 +26,7 @@
                 </label>
                 <input type="text" 
                   formControlName="name" 
-                  placeholder="Enter image name">
+                  placeholder="Enter OS image name">
                 @if (imageForm.get('name')?.invalid && imageForm.get('name')?.touched) {
                   <div class="field-error">
                     <i class="bi bi-exclamation-triangle"></i>Name is required
@@ -190,27 +190,31 @@
                   <input type="url" 
                     class="url-input"
                     [(ngModel)]="url.url"
-                    placeholder="https://example.com/download/image.img"
+                    placeholder="https://example.com/download/os-image.img"
                     [ngModelOptions]="{standalone: true}">
-                  <div class="url-status" 
-                    [class.available]="url.isAvailable === true"
-                    [class.unavailable]="url.isAvailable === false"
-                    [class.checking]="url.isAvailable === null"
-                    [title]="url.isAvailable === true ? 'Available' : url.isAvailable === false ? 'Unavailable' : 'Checking...'">
+                  <div class="url-controls">
+                    <div class="url-status" 
+                      [class.available]="url.isAvailable === true"
+                      [class.unavailable]="url.isAvailable === false"
+                      [class.checking]="url.isAvailable === null"
+                      [title]="url.isAvailable === true ? 'Available' : url.isAvailable === false ? 'Unavailable' : 'Checking...'">
+                    </div>
+                    <div class="url-actions">
+                      <button type="button" 
+                        class="favorite-url"
+                        (click)="toggleFavorite($index)"
+                        [class.active]="url.isDefault"
+                        [title]="url.isDefault ? 'Remove from favorites' : 'Set as favorite (default)'">
+                        <i class="bi" [class.bi-star]="!url.isDefault" [class.bi-star-fill]="url.isDefault"></i>
+                      </button>
+                      <button type="button" 
+                        class="remove-url"
+                        (click)="removeUrl($index)"
+                        [title]="'Remove URL'">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </div>
                   </div>
-                  <button type="button" 
-                    class="favorite-url"
-                    (click)="toggleFavorite($index)"
-                    [class.active]="url.isDefault"
-                    [title]="url.isDefault ? 'Remove from favorites' : 'Set as favorite (default)'">
-                    <i class="bi" [class.bi-star]="!url.isDefault" [class.bi-star-fill]="url.isDefault"></i>
-                  </button>
-                  <button type="button" 
-                    class="remove-url"
-                    (click)="removeUrl($index)"
-                    [title]="'Remove URL'">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
                 </div>
               }
               
@@ -238,7 +242,9 @@
             
             <div class="lists-assignment">
               @for (list of availableLists; track list.id) {
-                <div class="list-item" [class.selected]="isListSelected(list.id)">
+                <div class="list-item" 
+                     [class.selected]="isListSelected(list.id)"
+                     (click)="toggleListById(list.id)">
                   <div class="list-info">
                     <div class="list-icon"></div>
                     <span class="list-name">{{ list.name }}</span>
@@ -246,7 +252,8 @@
                   <div class="list-checkbox">
                     <input type="checkbox" 
                       [checked]="isListSelected(list.id)"
-                      (change)="toggleList(list.id, $event)">
+                      (change)="toggleList(list.id, $event)"
+                      (click)="$event.stopPropagation()">
                   </div>
                 </div>
               }

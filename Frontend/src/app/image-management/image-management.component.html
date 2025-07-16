@@ -3,17 +3,26 @@
   <div class="page-header">
     <h1><i class="bi bi-hdd-stack me-3"></i>OS Image Management</h1>
     <div class="page-actions">
-      <div class="btn-group">
-        <button class="btn-secondary-modern btn-sm"
-          [class.btn-primary-modern]="currentView === 'grid'"
-          (click)="currentView = 'grid'; $event.stopPropagation()">
+      <div class="view-toggle-switch">
+        <input type="radio" 
+               id="grid-view" 
+               name="view-toggle" 
+               [checked]="currentView === 'grid'"
+               (change)="currentView = 'grid'; $event.stopPropagation()">
+        <label for="grid-view" class="toggle-option">
           <i class="bi bi-grid"></i>
-        </button>
-        <button class="btn-secondary-modern btn-sm"
-          [class.btn-primary-modern]="currentView === 'list'"
-          (click)="currentView = 'list'; $event.stopPropagation()">
+          <span>Kacheln</span>
+        </label>
+        
+        <input type="radio" 
+               id="list-view" 
+               name="view-toggle" 
+               [checked]="currentView === 'list'"
+               (change)="currentView = 'list'; $event.stopPropagation()">
+        <label for="list-view" class="toggle-option">
           <i class="bi bi-list"></i>
-        </button>
+          <span>Liste</span>
+        </label>
       </div>
       <button class="btn-primary-modern" (click)="openEditModal(); $event.stopPropagation()">
         <i class="bi bi-plus-lg"></i>
@@ -28,10 +37,10 @@
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="loading-text">Loading images...</p>
+      <p class="loading-text">Loading OS images...</p>
     </div>
   } @else {
-    <!-- Tabs for Images Lists -->
+    <!-- Tabs for OS Images Lists -->
     <div class="modern-card mb-4">
       <div class="modern-tabs">
         @for (list of imagesLists; track trackListById($index, list)) {
@@ -49,10 +58,10 @@
     </div>
   }
 
-  <!-- Content of selected ImagesList -->
+  <!-- Content of selected OS Images List -->
   @if (selectedList) {
     <div>
-      <!-- Categories and Images -->
+      <!-- Categories and OS Images -->
       @for (category of getCategoriesForList(selectedList); track category) {
         <div class="modern-card mb-4">
           <div class="card-header">
@@ -67,7 +76,7 @@
               <h3>{{ category.name }}</h3>
             </div>
             <span class="status-badge status-active">
-              <i class="bi bi-images me-1"></i>{{ getImagesForCategoryInList(selectedList, category.id).length }}
+              <i class="bi bi-hdd-stack me-1"></i>{{ getImagesForCategoryInList(selectedList, category.id).length }} OS Images
             </span>
           </div>
           <!-- Grid View -->

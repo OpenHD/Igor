@@ -24,17 +24,39 @@ import {
 } from '../graphql/generated';
 import { Observable, catchError, throwError } from 'rxjs';
 import { ErrorBannerService } from './error-banner.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class GraphqlService {
   private apollo = inject(Apollo);
   private errorBannerService = inject(ErrorBannerService);
+  private authService = inject(AuthService);
 
   private handleError = (error: any) => {
     console.error('GraphQL Error:', error);
     
     if (error.networkError) {
       this.errorBannerService.setBackendConnectivity(false);
+      
+      if (error.networkError.status === 401) {
+        console.warn('Authentication failed in GraphQL request, logging out user');
+        this.authService.logout();
+        return throwError(() => error);
+      }
+    }
+    
+    if (error.graphQLErrors) {
+      for (const graphQLError of error.graphQLErrors) {
+        if (graphQLError.extensions?.code === 'UNAUTHENTICATED' || 
+            graphQLError.message?.toLowerCase().includes('unauthorized') ||
+            graphQLError.message?.toLowerCase().includes('authentication') ||
+            graphQLError.message?.toLowerCase().includes('invalid token') ||
+            graphQLError.message?.toLowerCase().includes('jwt')) {
+          console.warn('Authentication failed in GraphQL response, logging out user');
+          this.authService.logout();
+          return throwError(() => error);
+        }
+      }
     }
     
     return throwError(() => error);
