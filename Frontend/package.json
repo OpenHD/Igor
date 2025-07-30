@@ -48,7 +48,7 @@
     "@graphql-codegen/typescript-apollo-angular": "^4.0.0",
     "@graphql-codegen/typescript-operations": "^4.5.1",
     "@types/express": "^5.0.1",
-    "@types/jasmine": "~5.1.7",
+    "@types/jasmine": "~5.1.8",
     "@types/node": "^22.13.11",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.4",
