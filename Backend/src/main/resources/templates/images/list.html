@@ -305,6 +305,21 @@
         }
 
         // Aktualisiert die entsprechende Tabellenzeile
+        // Helper function to escape HTML special characters
+        function escapeHtml(str) {
+            if (typeof str !== 'string') {
+                if (str === undefined || str === null) return '';
+                str = String(str);
+            }
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/`/g, '&#96;');
+        }
+
         function updateTableRow(image) {
             let row = document.querySelector(`tr[data-id="${image.id}"]`);
             if (row) {
@@ -342,24 +357,24 @@
                 // Erstelle die Zellen – hier ein Beispiel
                 row.innerHTML = `
             <td>
-                <img src="${ image.icon.startsWith('http') ? image.icon : `/images/icons/${image.icon}` }" alt="icon" width="40" height="40" loading="lazy">
+                <img src="${ image.icon.startsWith('http') ? escapeHtml(image.icon) : `/images/icons/${escapeHtml(image.icon)}` }" alt="icon" width="40" height="40" loading="lazy">
             </td>
-            <td>${image.name}</td>
-            <td>${image.description}</td>
-            <td>${image.category?.name || 'No Category'}</td>
+            <td>${escapeHtml(image.name)}</td>
+            <td>${escapeHtml(image.description)}</td>
+            <td>${image.category && image.category.name ? escapeHtml(image.category.name) : 'No Category'}</td>
             <td class="text-center">
                 <div class="form-check form-switch">
-                    <input class="form-check-input status-toggle" type="checkbox" role="switch" ${ image.isEnabled ? 'checked' : '' } data-id="${image.id}" onclick="event.stopPropagation(); updateStatus(this);">
+                    <input class="form-check-input status-toggle" type="checkbox" role="switch" ${ image.isEnabled ? 'checked' : '' } data-id="${escapeHtml(image.id)}" onclick="event.stopPropagation(); updateStatus(this);">
                 </div>
             </td>
             <td class="text-center">
                 <span class="badge ${ image.isAvailable ? 'bg-success' : 'bg-secondary' }">${ image.isAvailable ? 'Yes' : 'No' }</span>
             </td>
-            <td class="text-center">${image.redirectsCount}</td>
+            <td class="text-center">${escapeHtml(image.redirectsCount)}</td>
             <td class="text-center">
                 <form action="/admin/images/delete" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete?');">
-                    <input type="hidden" name="id" value="${image.id}">
-                    <input type="hidden" name="_csrf" value="${document.querySelector('input[name="_csrf"]').value}">
+                    <input type="hidden" name="id" value="${escapeHtml(image.id)}">
+                    <input type="hidden" name="_csrf" value="${escapeHtml(document.querySelector('input[name="_csrf"]').value)}">
                     <button type="submit" class="btn btn-sm btn-danger">
                         <i class="bi bi-trash"></i>
                     </button>
