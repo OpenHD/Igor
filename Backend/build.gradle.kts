@@ -58,7 +58,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
-    implementation("nl.basjes.parse.useragent:yauaa:7.30.0")
+    implementation("nl.basjes.parse.useragent:yauaa:7.31.0")
     implementation("com.bucket4j:bucket4j-core:8.10.1")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
     implementation("org.springframework.boot:spring-boot-starter-cache")
