@@ -109,6 +109,12 @@ graalvmNative {
     binaries {
         named("main") {
             buildArgs.add("--initialize-at-build-time=org.openhdfpv")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.requeststats.CacheConfig\$SpringCGLIB\$0")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.security.SecurityConfig\$SpringCGLIB\$0")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.special.DummyDataLoader\$SpringCGLIB\$0")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.special.GraphQLConfig\$SpringCGLIB\$0")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.special.RestTemplateConfig\$SpringCGLIB\$0")
+            buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.special.UserAgentConfig\$SpringCGLIB\$0")
         }
     }
 }

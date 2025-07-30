@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { ImageManagementComponent } from './image-management/image-management.component';
 import { OsCategoryManagementComponent } from './os-category-management/os-category-management.component';
 import { ListManagementComponent } from './list-management/list-management.component';
+import { UserManagementComponent } from './user-management/user-management.component';
 import { LoginComponent } from './login/login.component';
 import { SnakeGameComponent } from './snake-game/snake-game.component';
 import { GraphqlGuard } from './guards/graphql.guard';
@@ -17,6 +18,7 @@ export const routes: Routes = [
       { path: 'images', component: ImageManagementComponent },
       { path: 'categories', component: OsCategoryManagementComponent },
       { path: 'lists', component: ListManagementComponent },
+      { path: 'users', component: UserManagementComponent },
       // Weitere geschützte Routen hier …
     ]
   },

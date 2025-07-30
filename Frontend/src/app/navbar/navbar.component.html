@@ -14,13 +14,15 @@
     <div class="navbar-nav desktop-nav">
       @if (authService.isAuthenticated()) {
         @for (link of navLinks; track link.path) {
-          <a class="nav-item"
-             [routerLink]="link.path"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: true }">
-            <i [class]="link.icon"></i>
-            <span>{{ link.label }}</span>
-          </a>
+          @if (shouldShowLink(link)) {
+            <a class="nav-item"
+               [routerLink]="link.path"
+               routerLinkActive="active"
+               [routerLinkActiveOptions]="{ exact: true }">
+              <i [class]="link.icon"></i>
+              <span>{{ link.label }}</span>
+            </a>
+          }
         }
       }
     </div>
@@ -66,13 +68,15 @@
   <div class="mobile-nav" [class.show]="showMobileMenu">
     @if (authService.isAuthenticated()) {
       @for (link of navLinks; track link.path) {
-        <a class="mobile-nav-item"
-           [routerLink]="link.path"
-           routerLinkActive="active"
-           (click)="closeMobileMenu()">
-          <i [class]="link.icon"></i>
-          <span>{{ link.label }}</span>
-        </a>
+        @if (shouldShowLink(link)) {
+          <a class="mobile-nav-item"
+             [routerLink]="link.path"
+             routerLinkActive="active"
+             (click)="closeMobileMenu()">
+            <i [class]="link.icon"></i>
+            <span>{{ link.label }}</span>
+          </a>
+        }
       }
       <div class="mobile-divider"></div>
       <button class="mobile-nav-item logout" (click)="logout(); closeMobileMenu()">

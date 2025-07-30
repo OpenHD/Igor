@@ -44,6 +44,12 @@ fragment ImageList on ImagesList {
   }
 }
 
+fragment User on User {
+  id
+  username
+  roles
+}
+
 # ----------------------------
 # Queries
 # ----------------------------
@@ -77,6 +83,18 @@ query GetAllImagesListsWithCategories {
   }
   osCategories {
     ...OsCategory
+  }
+}
+
+query GetUsers {
+  users {
+    ...User
+  }
+}
+
+query GetUser($id: ID!) {
+  user(id: $id) {
+    ...User
   }
 }
 
@@ -130,4 +148,26 @@ mutation UpdateImagesListPartial($id: ID!, $input: ImagesListPartialInput!) {
 
 mutation DeleteImagesList($id: ID!) {
   deleteImagesList(id: $id)
+}
+
+mutation CreateUser($input: UserInput!) {
+  createUser(input: $input) {
+    ...User
+  }
+}
+
+mutation UpdateUser($id: ID!, $input: UserUpdateInput!) {
+  updateUser(id: $id, input: $input) {
+    ...User
+  }
+}
+
+mutation UpdateUserPassword($id: ID!, $newPassword: String!) {
+  updateUserPassword(id: $id, newPassword: $newPassword) {
+    ...User
+  }
+}
+
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
 }

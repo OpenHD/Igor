@@ -26,17 +26,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 class SecurityConfig(
     private val userService: UserService,
     private val jwtUtil: JwtUtil,
-    private val rateLimitFilter: RateLimitFilter
+    private val rateLimitFilter: RateLimitFilter,
+    private val passwordEncoder: PasswordEncoder
 ) {
-
-    @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
     fun authenticationProvider(): AuthenticationProvider =
         DaoAuthenticationProvider().apply {
             setUserDetailsService(userService)
-            setPasswordEncoder(passwordEncoder())
+            setPasswordEncoder(passwordEncoder)
         }
 
     @Bean
@@ -54,26 +52,24 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers(
-                        "/api/**",
+                        "/api/auth/**",
                         "/image_list/**",
                         "/image_lists/**",
                         "/download/**",
                         "/graphiql",
-                        "/graphql",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/api-docs/**",
                         "/actuator/health",
                         "/error",
                     ).permitAll()
-                    .requestMatchers("/graphql").hasRole("USER")
-                    .requestMatchers("/actuator/**").hasRole("ADMIN")
+                    .requestMatchers("/graphql").authenticated()
+                    .requestMatchers("/actuator/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter::class.java)
             .addFilterBefore(rateLimitFilter, JwtFilter::class.java)
-            .addFilterBefore(JwtFilter(jwtUtil, userService), UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
 

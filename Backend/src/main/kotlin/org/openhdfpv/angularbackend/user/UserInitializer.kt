@@ -23,7 +23,7 @@ class UserInitializer(
                 User(
                     username = userProperties.username,
                     password = passwordEncoder.encode(userProperties.password),
-                    roles = userProperties.roles.map { Role.valueOf(it) }.toSet()
+                    roles = userProperties.roles.map { Role.valueOf(it) }.toMutableSet()
                 )
             )
         }

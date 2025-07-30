@@ -11,4 +11,4 @@ echo "- Debug logging enabled"
 echo ""
 
 echo "Starting application..."
-./gradlew bootRun --args="--spring.profiles.active=dev" --continuous
+./gradlew bootRun --args="--spring.profiles.active=dev"

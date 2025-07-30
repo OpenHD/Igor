@@ -10,13 +10,14 @@ import java.util.*
 @Table(name = "users")
 class User(
     @Column(unique = true)
-    private val username: String,
-    private val password: String,
+    private var username: String,
+    private var password: String,
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = Role::class)
     @CollectionTable(name = "user_roles", joinColumns = [JoinColumn(name = "user_id")])
+    @Column(name = "roles")
     @Enumerated(EnumType.STRING)
-    val roles: Set<Role>,
+    var roles: MutableSet<Role>,
 ) : UserDetails {
 
     @Id
@@ -31,4 +32,18 @@ class User(
     override fun isAccountNonLocked(): Boolean = true
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isEnabled(): Boolean = true
+    
+    // Methods for updating user properties
+    fun updateUsername(newUsername: String) {
+        this.username = newUsername
+    }
+    
+    fun updatePassword(newPassword: String) {
+        this.password = newPassword
+    }
+    
+    fun updateRoles(newRoles: Set<Role>) {
+        this.roles.clear()
+        this.roles.addAll(newRoles)
+    }
 }

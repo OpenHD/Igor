@@ -16,10 +16,21 @@ export class NavbarComponent {
   navLinks = [
     { path: '/images', label: 'OS Images', icon: 'bi bi-hdd-stack' },
     { path: '/categories', label: 'Categories', icon: 'bi bi-tags' },
-    { path: '/lists', label: 'Lists', icon: 'bi bi-list-ul' }
+    { path: '/lists', label: 'Lists', icon: 'bi bi-list-ul' },
+    { path: '/users', label: 'Users', icon: 'bi bi-people' }
   ];
 
   constructor(public authService: AuthService) {}
+
+  shouldShowLink(link: any): boolean {
+    // Users link requires ADMIN or OWNER role
+    if (link.path === '/users') {
+      return this.authService.hasRole(['ADMIN', 'OWNER']);
+    }
+    
+    // All other links are visible to authenticated users
+    return true;
+  }
 
   toggleMobileMenu(): void {
     this.showMobileMenu = !this.showMobileMenu;

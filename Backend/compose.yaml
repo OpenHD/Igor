@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: postgres
+    container_name: openhd-postgres-dev
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
@@ -15,7 +15,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.44.0
-    container_name: prometheus
+    container_name: openhd-prometheus-dev
     ports:
       - "9090:9090"
     volumes:

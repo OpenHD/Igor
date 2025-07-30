@@ -112,15 +112,19 @@ export type Mutation = {
   createImage: Image;
   createImagesList: ImagesList;
   createOsCategory: OsCategory;
+  createUser: User;
   deleteImage?: Maybe<Scalars['Boolean']['output']>;
   deleteImagesList?: Maybe<Scalars['Boolean']['output']>;
   deleteOsCategory?: Maybe<Scalars['Boolean']['output']>;
+  deleteUser?: Maybe<Scalars['Boolean']['output']>;
   updateImage: Image;
   updateImagePartial: Image;
   updateImagesList: ImagesList;
   updateImagesListPartial: ImagesList;
   updateOsCategory: OsCategory;
   updateOsCategoryPartial: OsCategory;
+  updateUser: User;
+  updateUserPassword: User;
 };
 
 
@@ -139,6 +143,11 @@ export type MutationCreateOsCategoryArgs = {
 };
 
 
+export type MutationCreateUserArgs = {
+  input: UserInput;
+};
+
+
 export type MutationDeleteImageArgs = {
   id: Scalars['ID']['input'];
 };
@@ -150,6 +159,11 @@ export type MutationDeleteImagesListArgs = {
 
 
 export type MutationDeleteOsCategoryArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteUserArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -188,6 +202,18 @@ export type MutationUpdateOsCategoryPartialArgs = {
   input: OsCategoryInputUpdate;
 };
 
+
+export type MutationUpdateUserArgs = {
+  id: Scalars['ID']['input'];
+  input: UserUpdateInput;
+};
+
+
+export type MutationUpdateUserPasswordArgs = {
+  id: Scalars['ID']['input'];
+  newPassword: Scalars['String']['input'];
+};
+
 export type OsCategory = {
   __typename?: 'OsCategory';
   description: Scalars['String']['output'];
@@ -219,6 +245,8 @@ export type Query = {
   imagesListByEndpoint?: Maybe<ImagesList>;
   imagesLists: Array<ImagesList>;
   osCategories: Array<OsCategory>;
+  user?: Maybe<User>;
+  users: Array<User>;
 };
 
 
@@ -236,11 +264,41 @@ export type QueryImagesListByEndpointArgs = {
   endpoint: Scalars['String']['input'];
 };
 
+
+export type QueryUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type Role =
+  | 'ADMIN'
+  | 'OWNER'
+  | 'USER';
+
+export type User = {
+  __typename?: 'User';
+  id: Scalars['ID']['output'];
+  roles: Array<Role>;
+  username: Scalars['String']['output'];
+};
+
+export type UserInput = {
+  password: Scalars['String']['input'];
+  roles: Array<Role>;
+  username: Scalars['String']['input'];
+};
+
+export type UserUpdateInput = {
+  roles?: InputMaybe<Array<Role>>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ImageFragment = { __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null };
 
 export type OsCategoryFragment = { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number };
 
 export type ImageListFragment = { __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> };
+
+export type UserFragment = { __typename?: 'User', id: string, username: string, roles: Array<Role> };
 
 export type GetAllImagesWithCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -256,6 +314,18 @@ export type GetAllImagesListsWithCategoriesQueryVariables = Exact<{ [key: string
 
 
 export type GetAllImagesListsWithCategoriesQuery = { __typename?: 'Query', imagesLists: Array<{ __typename?: 'ImagesList', id: string, name: string, endpoint: string, description: string, url: string, latestVersion: string, images: Array<{ __typename?: 'Image', id: string, name: string, description: string, icon: string, extractSize: number, extractSha256?: string | null, imageDownloadSize: number, isEnabled: boolean, releaseDate: string, redirectsCount?: number | null, imagesLists?: Array<string | null> | null, urls: Array<{ __typename?: 'ImageUrl', url: string, isAvailable: boolean, isDefault: boolean }>, category?: { __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number } | null }> }>, osCategories: Array<{ __typename?: 'OsCategory', id: string, name: string, description: string, icon: string, position: number }> };
+
+export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, username: string, roles: Array<Role> }> };
+
+export type GetUserQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, username: string, roles: Array<Role> } | null };
 
 export type CreateImageMutationVariables = Exact<{
   input: ImageInput;
@@ -322,6 +392,36 @@ export type DeleteImagesListMutationVariables = Exact<{
 
 export type DeleteImagesListMutation = { __typename?: 'Mutation', deleteImagesList?: boolean | null };
 
+export type CreateUserMutationVariables = Exact<{
+  input: UserInput;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, username: string, roles: Array<Role> } };
+
+export type UpdateUserMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UserUpdateInput;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, username: string, roles: Array<Role> } };
+
+export type UpdateUserPasswordMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type UpdateUserPasswordMutation = { __typename?: 'Mutation', updateUserPassword: { __typename?: 'User', id: string, username: string, roles: Array<Role> } };
+
+export type DeleteUserMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser?: boolean | null };
+
 export const OsCategoryFragmentDoc = gql`
     fragment OsCategory on OsCategory {
   id
@@ -367,6 +467,13 @@ export const ImageListFragmentDoc = gql`
   }
 }
     ${ImageFragmentDoc}`;
+export const UserFragmentDoc = gql`
+    fragment User on User {
+  id
+  username
+  roles
+}
+    `;
 export const GetAllImagesWithCategoriesDocument = gql`
     query GetAllImagesWithCategories {
   images {
@@ -432,6 +539,42 @@ ${OsCategoryFragmentDoc}`;
   })
   export class GetAllImagesListsWithCategoriesGQL extends Apollo.Query<GetAllImagesListsWithCategoriesQuery, GetAllImagesListsWithCategoriesQueryVariables> {
     document = GetAllImagesListsWithCategoriesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetUsersDocument = gql`
+    query GetUsers {
+  users {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetUsersGQL extends Apollo.Query<GetUsersQuery, GetUsersQueryVariables> {
+    document = GetUsersDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetUserDocument = gql`
+    query GetUser($id: ID!) {
+  user(id: $id) {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetUserGQL extends Apollo.Query<GetUserQuery, GetUserQueryVariables> {
+    document = GetUserDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
@@ -588,6 +731,76 @@ export const DeleteImagesListDocument = gql`
   })
   export class DeleteImagesListGQL extends Apollo.Mutation<DeleteImagesListMutation, DeleteImagesListMutationVariables> {
     document = DeleteImagesListDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const CreateUserDocument = gql`
+    mutation CreateUser($input: UserInput!) {
+  createUser(input: $input) {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class CreateUserGQL extends Apollo.Mutation<CreateUserMutation, CreateUserMutationVariables> {
+    document = CreateUserDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($id: ID!, $input: UserUpdateInput!) {
+  updateUser(id: $id, input: $input) {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UpdateUserGQL extends Apollo.Mutation<UpdateUserMutation, UpdateUserMutationVariables> {
+    document = UpdateUserDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const UpdateUserPasswordDocument = gql`
+    mutation UpdateUserPassword($id: ID!, $newPassword: String!) {
+  updateUserPassword(id: $id, newPassword: $newPassword) {
+    ...User
+  }
+}
+    ${UserFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UpdateUserPasswordGQL extends Apollo.Mutation<UpdateUserPasswordMutation, UpdateUserPasswordMutationVariables> {
+    document = UpdateUserPasswordDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeleteUserDocument = gql`
+    mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DeleteUserGQL extends Apollo.Mutation<DeleteUserMutation, DeleteUserMutationVariables> {
+    document = DeleteUserDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

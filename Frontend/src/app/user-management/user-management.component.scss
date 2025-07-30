@@ -1,0 +1,205 @@
+// User Management Styles - following existing app style
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: #333;
+    font-size: 2rem;
+    font-weight: 300;
+
+    .title-icon {
+      margin-right: 12px;
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  .add-button {
+    min-width: 120px;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.users-card {
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-card-header {
+    padding-bottom: 16px;
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  mat-card-subtitle {
+    color: #666;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.users-table {
+  width: 100%;
+  
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .mat-mdc-cell {
+    padding: 12px 8px;
+  }
+}
+
+.username-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .user-icon {
+    color: #666;
+    font-size: 20px;
+  }
+
+  .username {
+    font-weight: 500;
+  }
+
+  .self-indicator {
+    color: #ff9800;
+    font-size: 18px;
+  }
+}
+
+.roles-cell {
+  .mat-mdc-chip-set {
+    margin: 0;
+  }
+
+  .mat-mdc-chip {
+    margin-right: 4px;
+    font-size: 0.8rem;
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 4px;
+
+  .mat-mdc-icon-button[disabled] {
+    opacity: 0.3;
+  }
+}
+
+.loading-container, .empty-container {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+.info-section {
+  margin-top: 20px;
+}
+
+.info-card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  mat-card-title {
+    font-size: 1.25rem;
+    font-weight: 400;
+  }
+
+  .role-info {
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      span {
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .table-container {
+    font-size: 0.9rem;
+  }
+
+  .username-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .actions-cell {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+// Dark mode support (if implemented)
+@media (prefers-color-scheme: dark) {
+  .page-title {
+    color: #fff;
+  }
+
+  .username-cell .user-icon {
+    color: #ccc;
+  }
+
+  .loading-container, .empty-container {
+    color: #ccc;
+  }
+}

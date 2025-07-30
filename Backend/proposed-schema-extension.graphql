@@ -1,0 +1,270 @@
+# Erweiterte Schema-Struktur für Multi-Product Downloads
+
+# Haupt-Produkt-Kategorien
+enum ProductType {
+  OS_IMAGE
+  IMAGE_WRITER
+  MOBILE_APP
+  DESKTOP_APP
+  TOOL
+  FIRMWARE
+}
+
+# Erweiterte Platform-Unterstützung
+enum Platform {
+  WINDOWS
+  MACOS
+  LINUX_UBUNTU_JAMMY
+  LINUX_UBUNTU_LUNAR  
+  LINUX_UBUNTU_NOBLE
+  ANDROID_ARMV7
+  ANDROID_ARMV8
+  IOS
+  RASPBERRY_PI
+  RADXA_ZERO_3
+  RADXA_CM3
+  RADXA_ROCK5A
+  RADXA_ROCK5B
+  X86_FULL
+  X86_MINIMAL
+  OPENHD_X20_VTX
+}
+
+# Haupt-Entität: Product (ersetzt/erweitert Image)
+type Product {
+  id: ID!
+  name: String!
+  description: String!
+  productType: ProductType!
+  category: ProductCategory
+  
+  # Platform-spezifische Varianten
+  variants: [ProductVariant!]!
+  
+  # Release Information
+  version: String!
+  releaseDate: String!
+  releaseNotes: String
+  isStable: Boolean!
+  isEnabled: Boolean!
+  
+  # Statistiken
+  totalDownloads: Long!
+  downloads30Days: Long!
+  
+  # CI/CD Integration
+  buildInfo: BuildInfo
+  
+  # Legacy compatibility
+  icon: String!
+  extractSize: Long
+  extractSha256: String
+}
+
+# Platform-spezifische Varianten
+type ProductVariant {
+  id: ID!
+  platform: Platform!
+  architecture: String # arm64, x64, armv7, etc.
+  
+  # Download URLs mit Fallbacks
+  downloadUrls: [DownloadUrl!]!
+  
+  # Spezifische Metadaten
+  fileSize: Long!
+  checksum: String
+  fileName: String!
+  
+  # Verfügbarkeit
+  isAvailable: Boolean!
+  availabilityCheckedAt: String
+  
+  # Statistiken pro Variante
+  downloadCount: Long!
+}
+
+# Erweiterte Download-URL Struktur
+type DownloadUrl {
+  id: ID!
+  url: String!
+  priority: Int! # 1 = primary, 2 = secondary, etc.
+  mirrorLocation: String # "GitHub", "CDN", "Direct"
+  isAvailable: Boolean!
+  responseTime: Int # ms
+  lastChecked: String
+  
+  # CI Integration
+  isFromCI: Boolean!
+  buildNumber: String
+  commitHash: String
+}
+
+# CI/CD Build Information
+type BuildInfo {
+  buildNumber: String
+  commitHash: String
+  branch: String
+  buildDate: String
+  artifactUrl: String
+  
+  # GitHub Actions / CI specific
+  workflowName: String
+  runId: String
+  triggeredBy: String
+}
+
+# Erweiterte Kategorien
+type ProductCategory {
+  id: ID!
+  name: String!
+  description: String!
+  productType: ProductType!
+  icon: String!
+  position: Int!
+  
+  # Hierarchie Support
+  parentCategory: ProductCategory
+  subCategories: [ProductCategory!]!
+}
+
+# Download-Statistiken
+type DownloadStats {
+  id: ID!
+  product: Product!
+  variant: ProductVariant!
+  
+  # Zeitstempel
+  downloadedAt: String!
+  
+  # Geo & User Data
+  country: String
+  city: String
+  ipAddress: String
+  userAgent: String
+  referer: String
+  
+  # Download Context
+  downloadSource: String # "website", "api", "imagewriter"
+  downloadedVia: String # "direct", "redirect", "torrent"
+}
+
+# Release Management
+type Release {
+  id: ID!
+  version: String!
+  name: String!
+  releaseDate: String!
+  releaseNotes: String
+  isPrerelease: Boolean!
+  
+  # Enthaltene Produkte
+  products: [Product!]!
+  
+  # GitHub Release Integration
+  githubReleaseId: String
+  githubTagName: String
+}
+
+# Queries
+extend type Query {
+  # Produkt-Management
+  products(type: ProductType, platform: Platform): [Product!]!
+  product(id: ID!): Product
+  productBySlug(slug: String!): Product
+  
+  # Kategorien
+  productCategories(type: ProductType): [ProductCategory!]!
+  
+  # Releases
+  releases(includePrerelease: Boolean): [Release!]!
+  latestRelease(type: ProductType): Release
+  
+  # Statistiken
+  downloadStats(
+    productId: ID
+    dateFrom: String
+    dateTo: String
+    groupBy: String # "day", "week", "month", "country", "platform"
+  ): [DownloadStats!]!
+  
+  popularProducts(limit: Int = 10): [Product!]!
+}
+
+# Mutations
+extend type Mutation {
+  # Produkt-Management
+  createProduct(input: ProductInput!): Product!
+  updateProduct(id: ID!, input: ProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+  
+  # Varianten-Management
+  addProductVariant(productId: ID!, input: ProductVariantInput!): ProductVariant!
+  updateProductVariant(id: ID!, input: ProductVariantInput!): ProductVariant!
+  removeProductVariant(id: ID!): Boolean!
+  
+  # URL-Management
+  addDownloadUrl(variantId: ID!, input: DownloadUrlInput!): DownloadUrl!
+  updateDownloadUrl(id: ID!, input: DownloadUrlInput!): DownloadUrl!
+  removeDownloadUrl(id: ID!): Boolean!
+  
+  # CI Integration
+  updateProductFromCI(input: CIProductUpdateInput!): Product!
+  triggerAvailabilityCheck(productId: ID): Boolean!
+  
+  # Release Management
+  createRelease(input: ReleaseInput!): Release!
+  addProductToRelease(releaseId: ID!, productId: ID!): Release!
+}
+
+# Input Types
+input ProductInput {
+  name: String!
+  description: String!
+  productType: ProductType!
+  categoryId: ID
+  version: String!
+  releaseNotes: String
+  isStable: Boolean!
+  isEnabled: Boolean!
+}
+
+input ProductVariantInput {
+  platform: Platform!
+  architecture: String
+  fileName: String!
+  fileSize: Long!
+  checksum: String
+}
+
+input DownloadUrlInput {
+  url: String!
+  priority: Int!
+  mirrorLocation: String
+  isFromCI: Boolean
+  buildNumber: String
+  commitHash: String
+}
+
+input CIProductUpdateInput {
+  productId: ID!
+  version: String
+  buildInfo: BuildInfoInput
+  variants: [CIVariantUpdateInput!]!
+}
+
+input BuildInfoInput {
+  buildNumber: String!
+  commitHash: String!
+  branch: String!
+  artifactUrl: String
+  workflowName: String
+  runId: String
+}
+
+input CIVariantUpdateInput {
+  platform: Platform!
+  downloadUrl: String!
+  fileSize: Long!
+  checksum: String!
+  fileName: String!
+}

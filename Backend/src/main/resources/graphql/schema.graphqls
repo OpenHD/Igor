@@ -19,6 +19,10 @@ type Query {
     imagesList(id: ID!): ImagesList
     # Returns an ImagesList by a unique endpoint
     imagesListByEndpoint(endpoint: String!): ImagesList
+    
+    # User Management
+    users: [User!]!
+    user(id: ID!): User
 }
 
 # ----------------------------
@@ -43,6 +47,12 @@ type Mutation {
     updateOsCategory(id: ID!, input: OsCategoryInput!): OsCategory!
     updateOsCategoryPartial(input: OsCategoryInputUpdate!): OsCategory!
     deleteOsCategory(id: ID!): Boolean
+    
+    # User Management mutations
+    createUser(input: UserInput!): User!
+    updateUser(id: ID!, input: UserUpdateInput!): User!
+    updateUserPassword(id: ID!, newPassword: String!): User!
+    deleteUser(id: ID!): Boolean
 }
 
 # ----------------------------
@@ -91,6 +101,18 @@ type OsCategory {
     position: Int!
 }
 
+type User {
+    id: ID!
+    username: String!
+    roles: [Role!]!
+}
+
+enum Role {
+    USER
+    ADMIN
+    OWNER
+}
+
 # ----------------------------
 # Input Types for Creation and Full Updates
 # ----------------------------
@@ -125,6 +147,17 @@ input OsCategoryInput {
     name: String!
     description: String!
     icon: String!
+}
+
+input UserInput {
+    username: String!
+    password: String!
+    roles: [Role!]!
+}
+
+input UserUpdateInput {
+    username: String
+    roles: [Role!]
 }
 
 # ----------------------------
