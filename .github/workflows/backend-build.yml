@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Setup Java (GraalVM as specified in original, potentially for build performance/features)
       # Enables Gradle caching for faster subsequent builds
@@ -65,7 +65,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # Setup Java (Temurin is sufficient and common for this task)
       # Re-enable Gradle caching for this job as well
