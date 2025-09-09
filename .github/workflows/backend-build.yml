@@ -78,7 +78,7 @@ jobs:
 
       # Use the dedicated Gradle action to generate and submit the dependency graph
       - name: Generate and Submit Dependency Graph
-        uses: gradle/actions/dependency-submission@v4.4.1 # Use the specific action version
+        uses: gradle/actions/dependency-submission@v4.4.3 # Use the specific action version
         with:
           # Specify the root of the Gradle project to scan
           build-root-directory: ./Backend
