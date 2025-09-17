@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "^20.0.6",
     "@angular/platform-server": "^20.0.6",
     "@angular/router": "^20.0.6",
-    "@angular/ssr": "^20.0.5",
+    "@angular/ssr": "^20.3.2",
     "@apollo/client": "^3.13.9",
     "@nestjs/graphql": "13.0.3",
     "@ng-bootstrap/ng-bootstrap": "19.0.1",
