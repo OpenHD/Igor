@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "2.2.0" apply true
     kotlin("plugin.spring") version "2.2.0" apply true
     kotlin("plugin.jpa") version "2.1.10" apply true
-    id("org.springframework.boot") version "3.5.4"
+    id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.netflix.dgs.codegen") version "8.1.1"
     id("org.graalvm.buildtools.native") version "0.11.0"
@@ -47,8 +47,8 @@ dependencies {
     implementation("com.graphql-java:graphql-java-extended-scalars")
 
     // Web & UI
-    implementation("org.webjars.npm:htmx.org:2.0.6")
-    implementation("org.webjars.npm:alpinejs:3.14.9")
+    implementation("org.webjars.npm:htmx.org:2.0.7")
+    implementation("org.webjars.npm:alpinejs:3.15.0")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 
     // Utilities
