@@ -48,7 +48,7 @@ dependencies {
 
     // Web & UI
     implementation("org.webjars.npm:htmx.org:2.0.7")
-    implementation("org.webjars.npm:alpinejs:3.14.9")
+    implementation("org.webjars.npm:alpinejs:3.15.0")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 
     // Utilities
