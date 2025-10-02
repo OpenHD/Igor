@@ -6,6 +6,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.netflix.dgs.codegen") version "8.1.1"
     id("org.graalvm.buildtools.native") version "0.11.0"
+    id("org.cyclonedx.bom") version "1.10.0"
 }
 
 group = "org.openhdfpv"
@@ -57,7 +58,7 @@ dependencies {
     implementation("org.apache.httpcomponents.core5:httpcore5")
     implementation("org.springframework.retry:spring-retry")
     implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
     implementation("nl.basjes.parse.useragent:yauaa:7.31.0")
     implementation("com.bucket4j:bucket4j-core:8.10.1")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
@@ -117,4 +118,16 @@ graalvmNative {
             buildArgs.add("--initialize-at-run-time=org.openhdfpv.angularbackend.special.UserAgentConfig\$SpringCGLIB\$0")
         }
     }
+}
+
+// SBOM generation (CycloneDX): ./gradlew cyclonedxBom
+tasks.named("cyclonedxBom") {
+    // Configure via extra properties if supported version
+    extensions.extraProperties.set("schemaVersion", "1.5")
+    extensions.extraProperties.set("projectType", "application")
+    extensions.extraProperties.set("includeConfigs", listOf("runtimeClasspath", "compileClasspath"))
+    extensions.extraProperties.set("skipConfigs", listOf("testRuntimeClasspath", "testCompileClasspath"))
+    extensions.extraProperties.set("destination", layout.buildDirectory.dir("sbom").get().asFile.absolutePath)
+    extensions.extraProperties.set("outputName", "backend-sbom")
+    extensions.extraProperties.set("outputFormat", "json")
 }

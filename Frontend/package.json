@@ -4,11 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:port": "node -e \"const fs=require('fs'); const port=process.argv[2]||'8080'; fs.writeFileSync('src/assets/env.js', '(function(window){window.env=window.env||{};window.env.BACKEND_PORT=\"'+port+'\"})(this);'); console.log('Backend port set to:', port);\" && ng serve",
+  "start:port": "node -e 'const fs=require(\"fs\"); const port=process.argv[2]||\"8080\"; fs.writeFileSync(\"src/assets/env.js\", `(function(w){w.env=w.env||{};w.env.BACKEND_PORT=\"${port}\"})(this);`); console.log(\"Backend port set to:\", port);' && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:OpenHD-Management-Frontend": "node dist/open-hd-management-frontend/server/server.mjs"
+    "serve:ssr:OpenHD-Management-Frontend": "node dist/open-hd-management-frontend/server/server.mjs",
+  "sbom": "npx @cyclonedx/cyclonedx-npm --ignore-npm-errors --omit dev --spec-version 1.5 --output-format json --output-file sbom-frontend.json || true",
+  "sbom:xml": "npx @cyclonedx/cyclonedx-npm --ignore-npm-errors --omit dev --spec-version 1.5 --output-format xml --output-file sbom-frontend.xml || true"
   },
   "private": true,
   "dependencies": {
@@ -17,7 +19,6 @@
     "@angular/common": "^20.0.6",
     "@angular/compiler": "^20.0.6",
     "@angular/core": "^20.0.6",
-    "@angular/flex-layout": "15.0.0-beta.42",
     "@angular/forms": "^20.0.6",
     "@angular/material": "20.0.5",
     "@angular/platform-browser": "^20.0.6",
@@ -56,6 +57,7 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+  "@cyclonedx/cyclonedx-npm": "^1.18.0"
   }
 }
