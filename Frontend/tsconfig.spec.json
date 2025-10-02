@@ -5,6 +5,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "types": [
+      // Node Typen nötig für process.* Zugriffe in Tests/Services
+      "node",
       "jasmine",
       "@angular/localize"
     ]
