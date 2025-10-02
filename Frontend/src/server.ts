@@ -5,6 +5,9 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import compression from 'compression';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +15,24 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
+
+// Security & performance middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Angular inline styles/scripts; consider CSP nonce setup later
+  crossOriginEmbedderPolicy: false,
+}));
+app.use(compression());
+app.use(express.json({ limit: '200kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+// Basic rate limiting (tuned for SSR endpoints; adjust windowMs and max as needed)
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(limiter);
 const angularApp = new AngularNodeAppEngine();
 
 /**
@@ -48,6 +69,15 @@ app.use('/**', (req, res, next) => {
       response ? writeResponseToNodeResponse(response, res) : next(),
     )
     .catch(next);
+});
+
+// Centralized error handler (no stack traces leaked in production)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('[SSR Error]', err);
+  }
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 /**
