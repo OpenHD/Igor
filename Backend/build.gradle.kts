@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.0" apply true
     kotlin("plugin.spring") version "2.2.0" apply true
-    kotlin("plugin.jpa") version "2.1.10" apply true
+    kotlin("plugin.jpa") version "2.2.20" apply true
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.netflix.dgs.codegen") version "8.1.1"
