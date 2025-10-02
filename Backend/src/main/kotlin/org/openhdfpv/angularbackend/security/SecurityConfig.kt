@@ -84,6 +84,8 @@ class SecurityConfig(
                         "/error",
                     ).permitAll()
                     .requestMatchers("/graphql").authenticated()
+                    .requestMatchers("/actuator/prometheus").permitAll()
+                    .requestMatchers("/actuator/health/**").permitAll()
                     .requestMatchers("/actuator/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
             }
