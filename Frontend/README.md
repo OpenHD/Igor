@@ -62,3 +62,19 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## SBOM & Security
+
+Production dependency SBOMs (CycloneDX) can be generated via:
+
+```
+pnpm run sbom      # JSON -> sbom-frontend.json
+pnpm run sbom:xml  # XML  -> sbom-frontend.xml
+```
+
+Notes:
+- Tool: `@cyclonedx/cyclonedx-npm` with pnpm; warnings about missing packages are expected (npm tree emulation) and suppressed from failing CI.
+- Only production deps are included (`--omit dev`).
+
+Backend SBOM generation and holistic security measures (headers, rate limiting, GraphQL depth/complexity, persisted queries, JWT secret policy) are documented in the top-level `SECURITY.md`.
+
