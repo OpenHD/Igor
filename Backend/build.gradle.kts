@@ -103,6 +103,8 @@ tasks.withType<com.netflix.graphql.dgs.codegen.gradle.GenerateJavaTask> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // Für vereinfachte lokale Ausführung Tests ohne AOT
+    systemProperty("spring.aot.enabled", "false")
 }
 
 graalvmNative {
