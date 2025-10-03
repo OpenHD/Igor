@@ -1,5 +1,5 @@
 # ===== Stage 1: Build des Angular SSR Projekts =====
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 # Installiere pnpm global
@@ -16,7 +16,7 @@ COPY . .
 RUN pnpm run build
 
 # ===== Stage 2: Runtime =====
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 
 # Installiere pnpm für das Runtime Image
