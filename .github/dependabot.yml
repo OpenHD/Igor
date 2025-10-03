@@ -31,6 +31,23 @@ updates:
       interval: "daily"
     # Limit the number of open PRs for frontend updates
     open-pull-requests-limit: 10
+    groups:
+      angular:
+        patterns:
+          - "^@angular/"
+      angular-tooling:
+        patterns:
+          - "^@angular-devkit/"
+          - "^@schematics/angular$"
+      testing:
+        patterns:
+          - "^@?vitest"
+          - "^@?testing-library/"
+      linting-and-formatting:
+        patterns:
+          - "^eslint"
+          - "^@typescript-eslint/"
+          - "^prettier"
     # Optional: Customize commit messages
     commit-message:
       prefix: "chore(deps)"
@@ -58,3 +75,31 @@ updates:
     labels:
       - "dependencies"
       - "github_actions"
+
+  # Enable version updates for Dockerfiles in the Backend project
+  - package-ecosystem: "docker"
+    directory: "/Backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "docker"
+
+  # Enable version updates for Dockerfiles in the Frontend project
+  - package-ecosystem: "docker"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "docker"
