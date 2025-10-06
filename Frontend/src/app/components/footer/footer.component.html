@@ -1,0 +1,28 @@
+<footer class="app-footer">
+  <div class="footer-content">
+    <div class="footer-meta" *ngIf="frontendEntry">
+      <span class="footer-label">{{ frontendEntry.label }}:</span>
+      <span class="footer-value">{{ frontendEntry.timestampText }}</span>
+      <span class="footer-relative" *ngIf="frontendEntry.relativeText">({{ frontendEntry.relativeText }})</span>
+      <span class="footer-commit" *ngIf="frontendEntry.commitText">{{ frontendEntry.commitText }}</span>
+    </div>
+
+    <div class="footer-meta" *ngIf="backendEntry">
+      <span class="footer-label">{{ backendEntry.label }}:</span>
+      <span class="footer-value">{{ backendEntry.timestampText }}</span>
+      <span class="footer-relative" *ngIf="backendEntry.relativeText">({{ backendEntry.relativeText }})</span>
+      <span class="footer-commit" *ngIf="backendEntry.commitText">{{ backendEntry.commitText }}</span>
+    </div>
+
+    <div class="footer-meta" *ngIf="latestEntry">
+      <span class="footer-label">{{ latestEntry.label }}:</span>
+      <span class="footer-value">{{ latestEntry.timestampText }}</span>
+      <span class="footer-relative" *ngIf="latestEntry.relativeText">({{ latestEntry.relativeText }})</span>
+    </div>
+
+    <div class="footer-meta" *ngIf="!frontendEntry && !backendEntry">
+      <span class="footer-label">Build-Informationen:</span>
+      <span class="footer-value">Keine Angaben verfügbar</span>
+    </div>
+  </div>
+</footer>

@@ -1,86 +1,123 @@
-# .github/dependabot.yml
-
-# Use version 2 of the Dependabot configuration syntax
 version: 2
+
+# Optimiert: Wöchentliche gebündelte Updates + getrennte Major-Bündel für leichteres Review.
 updates:
-  # Enable version updates for Gradle (Backend: Kotlin/Java)
+  # Backend (Gradle)
   - package-ecosystem: "gradle"
-    # Look for `build.gradle` or `build.gradle.kts` in the Backend directory
     directory: "/Backend"
-    # Check for updates daily
     schedule:
-      interval: "daily"
-    # Limit the number of open PRs for Gradle updates
-    open-pull-requests-limit: 10
-    # Optional: Customize commit messages
+      interval: "weekly"
+      day: "sunday"
+      time: "05:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 8
+    rebase-strategy: auto
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
       include: "scope"
-    # Optional: Add labels to PRs
     labels:
       - "dependencies"
       - "backend"
-
-  # Enable version updates for npm/yarn/pnpm (Frontend: TypeScript/JavaScript)
-  - package-ecosystem: "npm" # This handles npm, yarn, AND pnpm
-    # Look for `package.json` and lockfile (`pnpm-lock.yaml`) in the Frontend directory
-    directory: "/Frontend"
-    # Check for updates daily
-    schedule:
-      interval: "daily"
-    # Limit the number of open PRs for frontend updates
-    open-pull-requests-limit: 10
     groups:
-      angular:
+      gradle-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+      spring-major:
+        applies-to: version-updates
         patterns:
-          - "^@angular/"
-      angular-tooling:
+          - org.springframework.boot:*
+          - org.springframework.cloud:*
+        update-types:
+          - major
+      test-libs:
+        applies-to: version-updates
         patterns:
-          - "^@angular-devkit/"
-          - "^@schematics/angular$"
-      testing:
-        patterns:
-          - "^@?vitest"
-          - "^@?testing-library/"
-      linting-and-formatting:
-        patterns:
-          - "^eslint"
-          - "^@typescript-eslint/"
-          - "^prettier"
-    # Optional: Customize commit messages
+          - org.junit.jupiter:*
+          - org.mockito:*
+          - org.assertj:*
+        update-types:
+          - patch
+          - minor
+
+  # Frontend (pnpm via npm)
+  - package-ecosystem: "npm"
+    directory: "/Frontend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 8
+    rebase-strategy: auto
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
       include: "scope"
-    # Optional: Add labels to PRs
     labels:
       - "dependencies"
       - "frontend"
+    groups:
+      angular-framework:
+        applies-to: version-updates
+        patterns:
+          - "@angular*"
+          - rxjs
+          - zone.js
+        update-types:
+          - patch
+          - minor
+      angular-major:
+        applies-to: version-updates
+        patterns:
+          - "@angular*"
+          - rxjs
+        update-types:
+          - major
+      types-packages:
+        applies-to: version-updates
+        patterns:
+          - "@types/*"
+        update-types:
+          - patch
+          - minor
+      lint-build:
+        applies-to: version-updates
+        patterns:
+          - eslint*
+          - "@typescript-eslint*"
+          - typescript
+        update-types:
+          - patch
+          - minor
 
-  # Enable version updates for GitHub Actions
+  # GitHub Actions
   - package-ecosystem: "github-actions"
-    # Look for workflow files in `.github/workflows`
     directory: "/"
-    # Check for updates daily
     schedule:
-      interval: "daily"
-    # Limit the number of open PRs for Actions updates
+      interval: "weekly"
+      day: "sunday"
+      time: "05:15"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
-    # Optional: Customize commit messages
+    rebase-strategy: auto
     commit-message:
       prefix: "ci(deps)"
       include: "scope"
-    # Optional: Add labels to PRs
     labels:
       - "dependencies"
       - "github_actions"
 
-  # Enable version updates for Dockerfiles in the Backend project
+  # Docker Backend
   - package-ecosystem: "docker"
     directory: "/Backend"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "05:45"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
@@ -90,11 +127,14 @@ updates:
       - "backend"
       - "docker"
 
-  # Enable version updates for Dockerfiles in the Frontend project
+  # Docker Frontend
   - package-ecosystem: "docker"
     directory: "/Frontend"
     schedule:
       interval: "weekly"
+      day: "sunday"
+      time: "05:50"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(deps)"
@@ -103,3 +143,10 @@ updates:
       - "dependencies"
       - "frontend"
       - "docker"
+
+# Hinweise:
+# - Security Alerts werden weiterhin sofort (separate Mechanik) erstellt.
+# - Major Updates separat => klarer Review / Changelog Prüfung.
+# - Patch/Minor zusammen reduziert CI-Läufe & Merge-Konflikte.
+# - Zeitslots früh (Europe/Berlin) minimieren Beeinträchtigung.
+# Optional: reviewers:, assignees:, ignore:, allow: für noch feinere Steuerung.
