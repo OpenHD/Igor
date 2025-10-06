@@ -1,5 +1,16 @@
 // app.component.scss
 
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  padding: 1.5rem 2rem;
+}
+
 .nav-link.active {
   color: white !important;
   font-weight: bold;
