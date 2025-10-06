@@ -1,0 +1,56 @@
+.app-footer {
+  background: #101820;
+  color: #e1e5ee;
+  padding: 1.2rem 2rem;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.footer-label {
+  font-weight: 600;
+  color: #8fbff2;
+}
+
+.footer-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.footer-relative {
+  color: #b0beca;
+}
+
+.footer-commit {
+  color: #d4e3f3;
+}
+
+@media (max-width: 768px) {
+  .app-footer {
+    padding: 1rem;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-meta {
+    justify-content: center;
+  }
+}

@@ -36,6 +36,26 @@ ng build
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
 
+### Build-Metadaten
+
+Vor jedem lokalen Build wird automatisch `scripts/generate-build-info.js` ausgeführt. Das Skript erzeugt die Datei `src/app/build-info.generated.ts`, die die Informationen für die Fußzeile (Build-Zeitpunkte und Commits für Frontend und Backend) enthält. Standardmäßig werden die Daten aus dem Git-Verlauf ermittelt; falls keine Git-Historie vorhanden ist (z. B. beim Docker-Build), können die Werte über Umgebungsvariablen gesetzt werden:
+
+* `FRONTEND_BUILD_TIME` – ISO-Zeitstempel des Frontend-Builds
+* `FRONTEND_COMMIT` – Commit-SHA des Frontends
+* `BACKEND_BUILD_TIME` – ISO-Zeitstempel des Backend-Builds
+* `BACKEND_COMMIT` – Commit-SHA des Backends
+
+Im Docker-Build können diese Werte als Build-Argumente gesetzt werden, z. B.:
+
+```bash
+docker build \
+  --build-arg FRONTEND_BUILD_TIME="$(date -Iseconds)" \
+  --build-arg FRONTEND_COMMIT="$(git rev-parse HEAD)" \
+  --build-arg BACKEND_BUILD_TIME="${BACKEND_BUILD_TIME}" \
+  --build-arg BACKEND_COMMIT="${BACKEND_COMMIT}" \
+  -t openhd-frontend .
+```
+
 ## Running unit tests
 
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:

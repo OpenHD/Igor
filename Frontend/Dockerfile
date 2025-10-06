@@ -5,6 +5,17 @@ WORKDIR /app
 # Installiere pnpm global
 RUN npm install -g pnpm
 
+# Build-Metadaten (können als Build-Args gesetzt werden)
+ARG FRONTEND_BUILD_TIME
+ARG FRONTEND_COMMIT
+ARG BACKEND_BUILD_TIME
+ARG BACKEND_COMMIT
+
+ENV FRONTEND_BUILD_TIME=${FRONTEND_BUILD_TIME}
+ENV FRONTEND_COMMIT=${FRONTEND_COMMIT}
+ENV BACKEND_BUILD_TIME=${BACKEND_BUILD_TIME}
+ENV BACKEND_COMMIT=${BACKEND_COMMIT}
+
 # Kopiere package-Dateien (pnpm verwendet pnpm-lock.yaml)
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
