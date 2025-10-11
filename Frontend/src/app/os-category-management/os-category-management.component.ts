@@ -1,5 +1,5 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +25,7 @@ export class OsCategoryManagementComponent implements AfterViewInit {
   private graphql = inject(GraphqlService);
   private apollo = inject(Apollo);
   private loadingStateService = inject(LoadingStateService);
+  private platformId = inject(PLATFORM_ID);
 
   @ViewChild('newCategoryInput') newCategoryInput!: ElementRef;
 
@@ -45,6 +46,10 @@ export class OsCategoryManagementComponent implements AfterViewInit {
   }
 
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadCategories();
   }
 
@@ -53,7 +58,7 @@ export class OsCategoryManagementComponent implements AfterViewInit {
   }
 
   focusNewCategoryInput() {
-    if (this.newCategoryInput) {
+    if (isPlatformBrowser(this.platformId) && this.newCategoryInput) {
       this.newCategoryInput.nativeElement.focus();
     }
   }

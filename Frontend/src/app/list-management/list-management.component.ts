@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { GraphqlService } from '../services/graphql.service';
 import {
   ImagesList,
@@ -47,14 +47,19 @@ export class ListManagementComponent implements OnInit {
   constructor(
     private graphqlService: GraphqlService,
     private modalService: NgbModal,
-    private loadingStateService: LoadingStateService
-  ) { 
+    private loadingStateService: LoadingStateService,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     this.isLoading$ = this.loadingStateService.getLoadingState('list-management');
   }
   
   isLoading$;
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadImageLists();
   }
 
@@ -162,7 +167,7 @@ export class ListManagementComponent implements OnInit {
 
   toggleNewListForm() {
     this.isCreatingNewList = !this.isCreatingNewList;
-    if (this.isCreatingNewList) {
+    if (this.isCreatingNewList && isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         this.newListInput.nativeElement.focus();
       }, 100);

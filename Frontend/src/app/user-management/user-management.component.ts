@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -27,7 +27,8 @@ import { UserEditModalComponent } from './user-edit-modal.component';
     MatDialogModule,
     MatChipsModule,
     MatCardModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
   ],
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss']
@@ -37,6 +38,7 @@ export class UserManagementComponent implements OnInit {
   private authService = inject(AuthService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private platformId = inject(PLATFORM_ID);
 
   users: User[] = [];
   displayedColumns: string[] = ['username', 'roles', 'actions'];
@@ -51,6 +53,10 @@ export class UserManagementComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadCurrentUser();
     this.loadUsers();
   }

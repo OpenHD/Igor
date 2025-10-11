@@ -1,6 +1,6 @@
 // src/app/image-management/image-management.component.ts
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -20,6 +20,7 @@ export class ImageManagementComponent {
   private modalService = inject(NgbModal);
   private graphql = inject(GraphqlService);
   private loadingStateService = inject(LoadingStateService);
+  private platformId = inject(PLATFORM_ID);
 
   images: ImageFragment[] = [];
   categories: OsCategoryFragment[] = [];
@@ -34,8 +35,12 @@ export class ImageManagementComponent {
   }
 
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     this.loadingStateService.setLoading('image-management', true);
-    
+
     this.graphql.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
         const previousSelectedId = this.selectedListId; // Vorherige ID speichern
