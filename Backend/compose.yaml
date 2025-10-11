@@ -12,6 +12,29 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-myuser}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  postgres-collation-refresh:
+    image: postgres:15
+    container_name: openhd-postgres-collation-refresh
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    restart: "no"
+    volumes:
+      - ./scripts/refresh-collation.sh:/scripts/refresh-collation.sh:ro
+    entrypoint: ["/bin/bash", "/scripts/refresh-collation.sh"]
 
   prometheus:
     image: prom/prometheus:v2.44.0
