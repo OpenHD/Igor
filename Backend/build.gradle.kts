@@ -6,7 +6,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("com.netflix.dgs.codegen") version "8.1.1"
     id("org.graalvm.buildtools.native") version "0.11.1"
-    id("org.cyclonedx.bom") version "1.10.0"
+    id("org.cyclonedx.bom") version "3.0.1"
 }
 
 group = "org.openhdfpv"
