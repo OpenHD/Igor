@@ -41,7 +41,7 @@ jobs:
       # Setup Node.js using the actions/setup-node action
       # Documentation: https://github.com/actions/setup-node
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           # Specify the Node.js version your project uses (e.g., '18.x', '20.x')
           # Ensure this matches the version used in your Dockerfile and local dev if possible
