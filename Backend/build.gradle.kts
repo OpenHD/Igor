@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.2.20" apply true
-    kotlin("plugin.spring") version "2.2.20" apply true
-    kotlin("plugin.jpa") version "2.2.20" apply true
-    id("org.springframework.boot") version "3.5.6"
+    kotlin("jvm") version "2.2.21" apply true
+    kotlin("plugin.spring") version "2.2.21" apply true
+    kotlin("plugin.jpa") version "2.2.21" apply true
+    id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.netflix.dgs.codegen") version "8.1.1"
-    id("org.graalvm.buildtools.native") version "0.11.1"
+    id("org.graalvm.buildtools.native") version "0.11.2"
     id("org.cyclonedx.bom") version "1.10.0"
 }
 
@@ -59,7 +59,7 @@ dependencies {
     implementation("org.springframework.retry:spring-retry")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
-    implementation("nl.basjes.parse.useragent:yauaa:7.31.0")
+    implementation("nl.basjes.parse.useragent:yauaa:7.32.0")
     implementation("com.bucket4j:bucket4j-core:8.10.1")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
     implementation("org.springframework.boot:spring-boot-starter-cache")
