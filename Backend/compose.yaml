@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:18
     container_name: openhd-postgres-dev
     environment:
       POSTGRES_DB: igor
@@ -20,7 +20,7 @@ services:
       start_period: 10s
 
   postgres-collation-refresh:
-    image: postgres:15
+    image: postgres:18
     container_name: openhd-postgres-collation-refresh
     depends_on:
       postgres:
