@@ -3,7 +3,7 @@ set -euo pipefail
 
 HOST="${POSTGRES_HOST:-postgres}"
 PORT="${POSTGRES_PORT:-5432}"
-DB_TO_REFRESH="${POSTGRES_DB:-mydatabase}"
+DB_TO_REFRESH="${POSTGRES_DB:-igor}"
 USER="${POSTGRES_USER:-myuser}"
 PASSWORD="${POSTGRES_PASSWORD:-mypassword}"
 
