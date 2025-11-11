@@ -74,6 +74,7 @@ updates:
         patterns:
           - "@angular*"
           - rxjs
+          - zone.js
         update-types:
           - major
       types-packages:
