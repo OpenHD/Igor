@@ -17,7 +17,7 @@ RUN ./gradlew clean build -x test
 RUN find . -name "*-plain.jar" -type f -delete
 
 # ===== Stage 2: Runtime – Minimaler JRE Container =====
-FROM openjdk:26-slim
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Kopiere das erstellte Jar in den Runtime-Container
