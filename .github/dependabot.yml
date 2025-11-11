@@ -128,6 +128,23 @@ updates:
       - "backend"
       - "docker"
 
+  # Docker Compose Backend
+  - package-ecosystem: "docker-compose"
+    directory: "/Backend"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "05:45"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "backend"
+      - "docker-compose"
+
   # Docker Frontend
   - package-ecosystem: "docker"
     directory: "/Frontend"
