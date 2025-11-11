@@ -37,7 +37,7 @@ services:
     entrypoint: ["/bin/bash", "/scripts/refresh-collation.sh"]
 
   prometheus:
-    image: prom/prometheus:v2.44.0
+    image: prom/prometheus:v3.7.3
     container_name: openhd-prometheus-dev
     ports:
       - "9090:9090"
