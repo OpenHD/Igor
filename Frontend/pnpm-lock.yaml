@@ -42,8 +42,8 @@ importers:
         specifier: ^20.3.3
         version: 20.3.3(@angular/common@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.3(@angular/animations@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       '@angular/ssr':
-        specifier: ^20.3.4
-        version: 20.3.4(03ece6bc7f879ba0f8d239ef9b3ef452)
+        specifier: ^20.3.9
+        version: 20.3.9(03ece6bc7f879ba0f8d239ef9b3ef452)
       '@apollo/client':
         specifier: ^3.13.9
         version: 3.13.9(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.18.0))(graphql@16.11.0)(subscriptions-transport-ws@0.11.0(graphql@16.11.0))
@@ -83,7 +83,7 @@ importers:
     devDependencies:
       '@angular/build':
         specifier: ^20.3.4
-        version: 20.3.4(91ff665dbeba7189bb36087904a029e9)
+        version: 20.3.4(e80fd25a5f0da81b68bf39f17c081261)
       '@angular/cli':
         specifier: ^20.3.4
         version: 20.3.4(@types/node@22.13.11)(chokidar@4.0.3)
@@ -386,8 +386,8 @@ packages:
       '@angular/platform-browser': 20.3.3
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ssr@20.3.4':
-    resolution: {integrity: sha512-0jfFHUz5JkKI4DJ05lkob4AAOt1LPNsQ3A/u0k1Ctej15jR4fOdE+NcHBV+AZ3XV8eNPqlYbOuTa0lGOon9y/A==}
+  '@angular/ssr@20.3.9':
+    resolution: {integrity: sha512-X6m+CRbqwOP0oHkAGNHdySfZUUC0pm+QZ91B742k2pLc07wLlpZzt1hgaaAQHMOd3Ruso67ChuTi8UfvjJC3Pg==}
     peerDependencies:
       '@angular/common': ^20.0.0
       '@angular/core': ^20.0.0
@@ -4159,8 +4159,8 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  sax@1.4.1:
-    resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
+  sax@1.4.3:
+    resolution: {integrity: sha512-yqYn1JhPczigF94DMS+shiDMjDowYO6y9+wB/4WgO0Y19jWYk0lQ4tuG5KI7kj4FTp1wxPj5IFfcrz/s1c3jjQ==}
 
   schemes@1.4.0:
     resolution: {integrity: sha512-ImFy9FbCsQlVgnE3TCWmLPCFnVzx0lHL/l+umHplDqAKd0dzFpnS6lFZIpagBlYhKwzVmlV36ec0Y1XTu8JBAQ==}
@@ -4965,7 +4965,7 @@ snapshots:
       '@angular/core': 20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)
       tslib: 2.8.1
 
-  '@angular/build@20.3.4(91ff665dbeba7189bb36087904a029e9)':
+  '@angular/build@20.3.4(e80fd25a5f0da81b68bf39f17c081261)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular-devkit/architect': 0.2003.4(chokidar@4.0.3)
@@ -5002,7 +5002,7 @@ snapshots:
       '@angular/localize': 20.3.3(@angular/compiler-cli@20.3.3(@angular/compiler@20.3.3)(typescript@5.8.3))(@angular/compiler@20.3.3)
       '@angular/platform-browser': 20.3.3(@angular/animations@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))
       '@angular/platform-server': 20.3.3(@angular/common@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@20.3.3)(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@20.3.3(@angular/animations@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
-      '@angular/ssr': 20.3.4(03ece6bc7f879ba0f8d239ef9b3ef452)
+      '@angular/ssr': 20.3.9(03ece6bc7f879ba0f8d239ef9b3ef452)
       karma: 6.4.4
       less: 4.3.0
       lmdb: 3.4.2
@@ -5150,7 +5150,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ssr@20.3.4(03ece6bc7f879ba0f8d239ef9b3ef452)':
+  '@angular/ssr@20.3.9(03ece6bc7f879ba0f8d239ef9b3ef452)':
     dependencies:
       '@angular/common': 20.3.3(@angular/core@20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
       '@angular/core': 20.3.3(@angular/compiler@20.3.3)(rxjs@7.8.2)(zone.js@0.15.1)
@@ -8837,7 +8837,7 @@ snapshots:
   needle@3.3.1:
     dependencies:
       iconv-lite: 0.6.3
-      sax: 1.4.1
+      sax: 1.4.3
     optional: true
 
   negotiator@0.6.3: {}
@@ -9409,7 +9409,7 @@ snapshots:
     optionalDependencies:
       '@parcel/watcher': 2.5.1
 
-  sax@1.4.1:
+  sax@1.4.3:
     optional: true
 
   schemes@1.4.0:
