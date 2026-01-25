@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.2.21" apply true
-    kotlin("plugin.spring") version "2.2.21" apply true
-    kotlin("plugin.jpa") version "2.2.21" apply true
+    kotlin("jvm") version "2.3.0" apply true
+    kotlin("plugin.spring") version "2.3.0" apply true
+    kotlin("plugin.jpa") version "2.3.0" apply true
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.netflix.dgs.codegen") version "8.1.1"
-    id("org.graalvm.buildtools.native") version "0.11.3"
+    id("com.netflix.dgs.codegen") version "8.3.0"
+    id("org.graalvm.buildtools.native") version "0.11.4"
     id("org.cyclonedx.bom") version "1.10.0"
 }
 
@@ -49,7 +49,7 @@ dependencies {
 
     // Web & UI
     implementation("org.webjars.npm:htmx.org:2.0.8")
-    implementation("org.webjars.npm:alpinejs:3.15.1")
+    implementation("org.webjars.npm:alpinejs:3.15.4")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 
     // Utilities
