@@ -31,7 +31,7 @@
     "@angular/router": "^20.3.3",
     "@angular/ssr": "^20.3.9",
     "@apollo/client": "^3.13.9",
-    "@nestjs/graphql": "13.0.3",
+    "@nestjs/graphql": "13.4.1",
     "@ng-bootstrap/ng-bootstrap": "19.0.1",
     "@popperjs/core": "^2.11.8",
     "apollo-angular": "^11.0.0",
