@@ -94,8 +94,8 @@ importers:
         specifier: ^20.3.3
         version: 20.3.3(@angular/compiler-cli@20.3.3(@angular/compiler@20.3.3)(typescript@5.8.3))(@angular/compiler@20.3.3)
       '@cyclonedx/cyclonedx-npm':
-        specifier: ^4.0.3
-        version: 4.0.3
+        specifier: ^4.1.1
+        version: 4.1.1
       '@graphql-codegen/cli':
         specifier: ^5.0.5
         version: 5.0.5(@parcel/watcher@2.5.1)(@types/node@22.13.11)(encoding@0.1.13)(graphql@16.11.0)(typescript@5.8.3)
@@ -737,15 +737,15 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@cyclonedx/cyclonedx-library@9.0.0':
-    resolution: {integrity: sha512-KO4z803vEpaIXajyd5f8bDYbqapngUm+tKWrLDn1JNkzlh54jiFc80g7Cm0RYgOTKDtdUy1MF1QiEloUX9N5tw==}
+  '@cyclonedx/cyclonedx-library@9.2.0':
+    resolution: {integrity: sha512-ylwMFPjuOVKaRuQtEKFwPiJaygPZhkjvzDcSrtH8oZl2oCUTWwH2dEu692W4MjKLu5QgsnITLSDPc6149inyvg==}
     engines: {node: '>=20.18.0'}
     peerDependencies:
       ajv: ^8.12.0
       ajv-formats: ^3.0.1
       ajv-formats-draft2019: ^1.6.1
       libxmljs2: ^0.35||^0.37
-      xmlbuilder2: ^3.0.2
+      xmlbuilder2: ^3.0.2||^4.0.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -758,8 +758,8 @@ packages:
       xmlbuilder2:
         optional: true
 
-  '@cyclonedx/cyclonedx-npm@4.0.3':
-    resolution: {integrity: sha512-L2DkzikU0zEmp1MfvZ0ki1Wbot+VaQAXgwF6Fqx6DOVnsttVitjYfYnehcK7FB2UveEY4t9XqxqJZZ8z8JF7RQ==}
+  '@cyclonedx/cyclonedx-npm@4.1.1':
+    resolution: {integrity: sha512-Maa1gYAnNw53niNfanc+15MsvXMZ1jW5LewkuLu2vnyiryK9/F7AWRMHaE2q1Lfc2Ak5Sk3jK04tGb6JukaIWA==}
     engines: {node: '>=20.18.0', npm: '>=9'}
     hasBin: true
 
@@ -2476,8 +2476,8 @@ packages:
   colorette@2.0.20:
     resolution: {integrity: sha512-IfEDxwoWIjkeXL1eXcDiow4UbKjhLdq6/EuSVR9GMN7KVH3r9gQ83e73hsz1Nd1T3ijd5xv1wcWRYO+D6kCI2w==}
 
-  commander@14.0.1:
-    resolution: {integrity: sha512-2JkV3gUZUVrbNA+1sjBOYLsMZ5cEEl8GTFP2a4AVz5hvasAMCQ1D2l2le/cX+pV4N6ZU17zjUahLpIXRrnWL8A==}
+  commander@14.0.2:
+    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
     engines: {node: '>=20'}
 
   commander@2.20.3:
@@ -3105,6 +3105,10 @@ packages:
 
   hosted-git-info@9.0.0:
     resolution: {integrity: sha512-gEf705MZLrDPkbbhi8PnoO4ZwYgKoNL+ISZ3AjZMht2r3N5tuTwncyDi6Fv2/qDnMmZxgs0yI8WDOyR8q3G+SQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
+  hosted-git-info@9.0.2:
+    resolution: {integrity: sha512-M422h7o/BR3rmCQ8UHi7cyyMqKltdP9Uo+J2fXK+RSAY+wTcKOIRyhTuKv4qn+DJf3g+PL890AzId5KZpX+CBg==}
     engines: {node: ^20.17.0 || >=22.9.0}
 
   html-escaper@2.0.2:
@@ -4255,6 +4259,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@0.19.0:
     resolution: {integrity: sha512-dW41u5VfLXu8SJh5bwRmyYUbAoSB3c9uQh6L8h/KtsFREPWpbX1lrljJo186Jc4nmci/sGUZ9a0a0J2zgfq2hw==}
     engines: {node: '>= 0.8.0'}
@@ -4405,8 +4414,11 @@ packages:
   spdx-expression-parse@3.0.1:
     resolution: {integrity: sha512-cbqHunsQWnJNE6KhVSMsMeH5H/L9EpymbzqTQ3uLwNCLZ1Q481oWaofqH7nO6V07xlXwY6PhQdQ2IedWx/ZK4Q==}
 
-  spdx-license-ids@3.0.21:
-    resolution: {integrity: sha512-Bvg/8F5XephndSK3JffaRqdT+gyhfqIPwDHpX80tJrF8QQRYMo8sNMeaZ2Dp5+jhwKnUmIOyFFQfHRkjJm5nXg==}
+  spdx-expression-parse@4.0.0:
+    resolution: {integrity: sha512-Clya5JIij/7C6bRR22+tnGXbc4VKlibKSVj2iHvVeX5iMW7s1SIQlqu699JkODJJIhh/pUu8L0/VLh8xflD+LQ==}
+
+  spdx-license-ids@3.0.22:
+    resolution: {integrity: sha512-4PRT4nh1EImPbt2jASOKHX7PB7I+e4IWNLvkKFDxNhJlfjbYlleYQh285Z/3mPTHSAK/AvdMmw5BNNuYH8ShgQ==}
 
   sponge-case@1.0.1:
     resolution: {integrity: sha512-dblb9Et4DAtiZ5YSUZHLl4XhH4uK80GhAZrVXdN4O2P4gQ40Wa5UIOPUHlA/nFd2PLblBZWUioLMMAVrgpoYcA==}
@@ -5688,10 +5700,10 @@ snapshots:
 
   '@colors/colors@1.5.0': {}
 
-  '@cyclonedx/cyclonedx-library@9.0.0(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.37.0)(xmlbuilder2@3.1.1)':
+  '@cyclonedx/cyclonedx-library@9.2.0(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.37.0)(xmlbuilder2@3.1.1)':
     dependencies:
       packageurl-js: 2.0.1
-      spdx-expression-parse: 3.0.1
+      spdx-expression-parse: 4.0.0
     optionalDependencies:
       ajv: 8.17.1
       ajv-formats: 3.0.1(ajv@8.17.1)
@@ -5699,10 +5711,10 @@ snapshots:
       libxmljs2: 0.37.0
       xmlbuilder2: 3.1.1
 
-  '@cyclonedx/cyclonedx-npm@4.0.3':
+  '@cyclonedx/cyclonedx-npm@4.1.1':
     dependencies:
-      '@cyclonedx/cyclonedx-library': 9.0.0(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.37.0)(xmlbuilder2@3.1.1)
-      commander: 14.0.1
+      '@cyclonedx/cyclonedx-library': 9.2.0(ajv-formats-draft2019@1.6.1(ajv@8.17.1))(ajv-formats@3.0.1(ajv@8.17.1))(ajv@8.17.1)(libxmljs2@0.37.0)(xmlbuilder2@3.1.1)
+      commander: 14.0.2
       normalize-package-data: 8.0.0
       xmlbuilder2: 3.1.1
     optionalDependencies:
@@ -6855,7 +6867,7 @@ snapshots:
 
   '@npmcli/fs@4.0.0':
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   '@npmcli/git@6.0.3':
     dependencies:
@@ -7667,7 +7679,7 @@ snapshots:
 
   colorette@2.0.20: {}
 
-  commander@14.0.1: {}
+  commander@14.0.2: {}
 
   commander@2.20.3:
     optional: true
@@ -8356,6 +8368,10 @@ snapshots:
     dependencies:
       lru-cache: 11.2.2
 
+  hosted-git-info@9.0.2:
+    dependencies:
+      lru-cache: 11.2.2
+
   html-escaper@2.0.2: {}
 
   htmlparser2@10.0.0:
@@ -8846,7 +8862,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   make-fetch-happen@14.0.3:
     dependencies:
@@ -9035,7 +9051,7 @@ snapshots:
 
   node-abi@3.77.0:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   node-addon-api@6.1.0:
     optional: true
@@ -9087,8 +9103,8 @@ snapshots:
 
   normalize-package-data@8.0.0:
     dependencies:
-      hosted-git-info: 9.0.0
-      semver: 7.7.2
+      hosted-git-info: 9.0.2
+      semver: 7.7.3
       validate-npm-package-license: 3.0.4
 
   normalize-path@2.1.1:
@@ -9103,7 +9119,7 @@ snapshots:
 
   npm-install-checks@7.1.2:
     dependencies:
-      semver: 7.7.2
+      semver: 7.7.3
 
   npm-normalize-package-bin@4.0.0: {}
 
@@ -9610,6 +9626,8 @@ snapshots:
 
   semver@7.7.2: {}
 
+  semver@7.7.3: {}
+
   send@0.19.0:
     dependencies:
       debug: 2.6.9
@@ -9828,16 +9846,21 @@ snapshots:
   spdx-correct@3.2.0:
     dependencies:
       spdx-expression-parse: 3.0.1
-      spdx-license-ids: 3.0.21
+      spdx-license-ids: 3.0.22
 
   spdx-exceptions@2.5.0: {}
 
   spdx-expression-parse@3.0.1:
     dependencies:
       spdx-exceptions: 2.5.0
-      spdx-license-ids: 3.0.21
+      spdx-license-ids: 3.0.22
 
-  spdx-license-ids@3.0.21: {}
+  spdx-expression-parse@4.0.0:
+    dependencies:
+      spdx-exceptions: 2.5.0
+      spdx-license-ids: 3.0.22
+
+  spdx-license-ids@3.0.22: {}
 
   sponge-case@1.0.1:
     dependencies:

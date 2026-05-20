@@ -62,7 +62,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.8.3",
-    "@cyclonedx/cyclonedx-npm": "^4.0.3",
+    "@cyclonedx/cyclonedx-npm": "^4.1.1",
     "libxmljs2": "0.37.0"
   }
 }
