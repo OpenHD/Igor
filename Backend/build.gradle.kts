@@ -1,12 +1,12 @@
 plugins {
-    kotlin("jvm") version "2.2.21" apply true
-    kotlin("plugin.spring") version "2.2.21" apply true
-    kotlin("plugin.jpa") version "2.2.21" apply true
+    kotlin("jvm") version "2.3.21" apply true
+    kotlin("plugin.spring") version "2.3.21" apply true
+    kotlin("plugin.jpa") version "2.3.21" apply true
     id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.netflix.dgs.codegen") version "8.1.1"
+    id("com.netflix.dgs.codegen") version "8.5.0"
     id("org.graalvm.buildtools.native") version "0.11.3"
-    id("org.cyclonedx.bom") version "3.0.2"
+    id("org.cyclonedx.bom") version "3.2.4"
 }
 
 group = "org.openhdfpv"
@@ -48,8 +48,8 @@ dependencies {
     implementation("com.graphql-java:graphql-java-extended-scalars")
 
     // Web & UI
-    implementation("org.webjars.npm:htmx.org:2.0.8")
-    implementation("org.webjars.npm:alpinejs:3.15.1")
+    implementation("org.webjars.npm:htmx.org:2.0.10")
+    implementation("org.webjars.npm:alpinejs:3.15.12")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
 
     // Utilities
@@ -61,7 +61,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
     implementation("nl.basjes.parse.useragent:yauaa:7.32.0")
     implementation("com.bucket4j:bucket4j-core:8.10.1")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
     // Kotlin
