@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError, map } from 'rxjs';
-import { 
+import {
   GetUsersGQL, GetUsersQuery,
-  CreateUserGQL, CreateUserMutation, 
+  CreateUserGQL, CreateUserMutation,
   UpdateUserGQL, UpdateUserMutation,
   UpdateUserPasswordGQL, UpdateUserPasswordMutation,
   DeleteUserGQL, DeleteUserMutation,
-  User, Role, UserInput, UserUpdateInput 
+  UserFragment, Role, UserInput, UserUpdateInput
 } from '../graphql/generated';
 
 @Injectable({ providedIn: 'root' })
@@ -17,15 +17,15 @@ export class UserManagementService {
   private updateUserPasswordGQL = inject(UpdateUserPasswordGQL);
   private deleteUserGQL = inject(DeleteUserGQL);
 
-  getUsers(): Observable<User[]> {
-    return this.getUsersGQL.watch({}, { fetchPolicy: 'network-only' }).valueChanges.pipe(
-      map(result => result.data.users),
+  getUsers(): Observable<UserFragment[]> {
+    return this.getUsersGQL.watch({ fetchPolicy: 'network-only' }).valueChanges.pipe(
+      map(result => (result.data?.users as UserFragment[]) || []),
       catchError(this.handleError)
     );
   }
 
-  createUser(input: UserInput): Observable<User> {
-    return this.createUserGQL.mutate({ input }, { 
+  createUser(input: UserInput): Observable<UserFragment> {
+    return this.createUserGQL.mutate({ variables: { input },
       refetchQueries: ['GetUsers']
     }).pipe(
       map(result => result.data!.createUser),
@@ -33,8 +33,8 @@ export class UserManagementService {
     );
   }
 
-  updateUser(id: string, input: UserUpdateInput): Observable<User> {
-    return this.updateUserGQL.mutate({ id, input }, {
+  updateUser(id: string, input: UserUpdateInput): Observable<UserFragment> {
+    return this.updateUserGQL.mutate({ variables: { id, input },
       refetchQueries: ['GetUsers']
     }).pipe(
       map(result => result.data!.updateUser),
@@ -42,15 +42,15 @@ export class UserManagementService {
     );
   }
 
-  updateUserPassword(id: string, newPassword: string): Observable<User> {
-    return this.updateUserPasswordGQL.mutate({ id, newPassword }).pipe(
+  updateUserPassword(id: string, newPassword: string): Observable<UserFragment> {
+    return this.updateUserPasswordGQL.mutate({ variables: { id, newPassword } }).pipe(
       map(result => result.data!.updateUserPassword),
       catchError(this.handleError)
     );
   }
 
   deleteUser(id: string): Observable<boolean> {
-    return this.deleteUserGQL.mutate({ id }, {
+    return this.deleteUserGQL.mutate({ variables: { id },
       refetchQueries: ['GetUsers']
     }).pipe(
       map(result => result.data!.deleteUser || false),

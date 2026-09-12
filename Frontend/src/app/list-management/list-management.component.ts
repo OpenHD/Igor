@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, Inject, PLATFO
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { GraphqlService } from '../services/graphql.service';
 import {
-  ImagesList,
+  ImageListFragment,
   ImagesListInput,
   ImagesListPartialInput,
   GetAllImagesListsWithCategoriesQuery
@@ -34,7 +34,7 @@ export class ListManagementComponent implements OnInit {
   imageLists: any[] = [];
   selectedList: any = null;
   isCreatingNewList = false;
-  newList: Partial<ImagesList> = {
+  newList: Partial<ImageListFragment> = {
     name: '',
     endpoint: '',
     description: '',
@@ -52,7 +52,7 @@ export class ListManagementComponent implements OnInit {
   ) {
     this.isLoading$ = this.loadingStateService.getLoadingState('list-management');
   }
-  
+
   isLoading$;
 
   ngOnInit(): void {
@@ -67,12 +67,13 @@ export class ListManagementComponent implements OnInit {
   loadImageLists() {
     this.loading = true;
     this.loadingStateService.setLoading('list-management', true);
-    
+
     this.graphqlService.getImagesListsWithCategories().valueChanges.subscribe({
-      next: ({ data }: { data: GetAllImagesListsWithCategoriesQuery }) => {
+      next: (result: any) => {
+        const data = result.data as GetAllImagesListsWithCategoriesQuery;
         this.loading = false;
         this.loadingStateService.setLoading('list-management', false);
-        
+
         if (data?.imagesLists) {
           this.imageLists = data.imagesLists.map(list => ({
             ...list,

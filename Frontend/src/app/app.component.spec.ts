@@ -7,19 +7,20 @@ import { EMPTY } from 'rxjs';
 import { AppComponent } from './app.component';
 import { AuthService } from './services/auth.service';
 import { ConfigService } from './services/config.service';
+import { createSpyObj } from '../testing/create-spy-obj';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'createUrlTree', 'serializeUrl'], {
+    const routerSpy = createSpyObj<Router>('Router', ['navigate', 'createUrlTree', 'serializeUrl'], {
       events: EMPTY  // Add events as a property
     });
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated', 'getCurrentUser']);
-    const configServiceSpy = jasmine.createSpyObj('ConfigService', ['getConfig']);
-    const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', ['snapshot']);
+    const authServiceSpy = createSpyObj<AuthService>('AuthService', ['isAuthenticated', 'getCurrentUser']);
+    const configServiceSpy = createSpyObj<ConfigService>('ConfigService', ['getConfig']);
+    const activatedRouteSpy = createSpyObj<ActivatedRoute>('ActivatedRoute', ['snapshot']);
 
     // Configure router mocks
-    routerSpy.createUrlTree.and.returnValue({} as any);
-    routerSpy.serializeUrl.and.returnValue('/mock-url');
+    routerSpy.createUrlTree.mockReturnValue({} as any);
+    routerSpy.serializeUrl.mockReturnValue('/mock-url');
 
     await TestBed.configureTestingModule({
       imports: [AppComponent, NoopAnimationsModule, HttpClientTestingModule],

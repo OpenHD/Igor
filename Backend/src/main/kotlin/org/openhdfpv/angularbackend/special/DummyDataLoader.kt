@@ -15,7 +15,6 @@ import org.openhdfpv.angularbackend.imager.ImageListService
 import org.openhdfpv.angularbackend.oscategory.OsCategoryService
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.http.MediaType
-import org.springframework.http.codec.json.Jackson2JsonDecoder
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.bodyToMono
 
@@ -34,14 +33,14 @@ class DummyDataLoader(
     )
 
     @Bean
-    fun dummyDataInitializer(objectMapper: ObjectMapper): CommandLineRunner {
+    fun dummyDataInitializer(): CommandLineRunner {
         return CommandLineRunner { _ ->
             imageListService.deleteAll()
             imageService.deleteAll()
             osCategoryService.deleteAll()
 
             val webClient = WebClient.builder()
-                .exchangeStrategies(customExchangeStrategies(objectMapper))
+                .exchangeStrategies(customExchangeStrategies())
                 .build()
 
             jsonUrls.forEach { url ->
@@ -154,12 +153,16 @@ class DummyDataLoader(
         category = category,
     )
 
-    private fun customExchangeStrategies(objectMapper: ObjectMapper) =
+    private fun customExchangeStrategies() =
         ExchangeStrategies.builder()
             .codecs { configurer ->
-                configurer.defaultCodecs().jackson2JsonDecoder(
-                    Jackson2JsonDecoder(objectMapper, MediaType.TEXT_PLAIN)
+                // Wir nutzen den Jackson2JsonDecoder aus Spring Boot 4 als voll kompatiblen Brücken-Decoder,
+                // da er die Übergabe von MimeTypes ohne Jackson 3 Klassen erlaubt.
+                val decoder = org.springframework.http.codec.json.Jackson2JsonDecoder(
+                    com.fasterxml.jackson.module.kotlin.jacksonObjectMapper(), 
+                    MediaType.TEXT_PLAIN
                 )
+                configurer.customCodecs().register(decoder)
             }
             .build()
 

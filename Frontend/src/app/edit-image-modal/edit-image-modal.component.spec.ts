@@ -5,16 +5,17 @@ import { ApolloTestingModule } from 'apollo-angular/testing';
 
 import { EditImageModalComponent } from './edit-image-modal.component';
 import { GraphqlService } from '../services/graphql.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('EditImageModalComponent', () => {
   let component: EditImageModalComponent;
   let fixture: ComponentFixture<EditImageModalComponent>;
-  let mockGraphqlService: jasmine.SpyObj<GraphqlService>;
-  let mockActiveModal: jasmine.SpyObj<NgbActiveModal>;
+  let mockGraphqlService: SpyObj<GraphqlService>;
+  let mockActiveModal: SpyObj<NgbActiveModal>;
 
   beforeEach(async () => {
-    const graphqlServiceSpy = jasmine.createSpyObj('GraphqlService', ['updateImage']);
-    const activeModalSpy = jasmine.createSpyObj('NgbActiveModal', ['close', 'dismiss']);
+    const graphqlServiceSpy = createSpyObj<GraphqlService>('GraphqlService', ['updateImage']);
+    const activeModalSpy = createSpyObj<NgbActiveModal>('NgbActiveModal', ['close', 'dismiss']);
 
     await TestBed.configureTestingModule({
       imports: [EditImageModalComponent, NoopAnimationsModule, ApolloTestingModule],
@@ -27,8 +28,8 @@ describe('EditImageModalComponent', () => {
 
     fixture = TestBed.createComponent(EditImageModalComponent);
     component = fixture.componentInstance;
-    mockGraphqlService = TestBed.inject(GraphqlService) as jasmine.SpyObj<GraphqlService>;
-    mockActiveModal = TestBed.inject(NgbActiveModal) as jasmine.SpyObj<NgbActiveModal>;
+    mockGraphqlService = TestBed.inject(GraphqlService) as unknown as SpyObj<GraphqlService>;
+    mockActiveModal = TestBed.inject(NgbActiveModal) as unknown as SpyObj<NgbActiveModal>;
     fixture.detectChanges();
   });
 

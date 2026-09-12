@@ -6,18 +6,19 @@ import { PLATFORM_ID } from '@angular/core';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../services/auth.service';
 import { ConfigService } from '../services/config.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockConfigService: jasmine.SpyObj<ConfigService>;
+  let mockAuthService: SpyObj<AuthService>;
+  let mockRouter: SpyObj<Router>;
+  let mockConfigService: SpyObj<ConfigService>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'isAuthenticated']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const configServiceSpy = jasmine.createSpyObj('ConfigService', ['getConfig']);
+    const authServiceSpy = createSpyObj<AuthService>('AuthService', ['login', 'isAuthenticated']);
+    const routerSpy = createSpyObj<Router>('Router', ['navigate']);
+    const configServiceSpy = createSpyObj<ConfigService>('ConfigService', ['getConfig']);
 
     await TestBed.configureTestingModule({
       imports: [LoginComponent, NoopAnimationsModule],
@@ -32,9 +33,9 @@ describe('LoginComponent', () => {
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    mockConfigService = TestBed.inject(ConfigService) as jasmine.SpyObj<ConfigService>;
+    mockAuthService = TestBed.inject(AuthService) as unknown as SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as unknown as SpyObj<Router>;
+    mockConfigService = TestBed.inject(ConfigService) as unknown as SpyObj<ConfigService>;
     fixture.detectChanges();
   });
 

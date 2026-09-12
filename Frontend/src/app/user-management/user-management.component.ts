@@ -11,7 +11,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { UserManagementService } from '../services/user-management.service';
-import { User, Role } from '../graphql/generated';
+import { UserFragment, Role } from '../graphql/generated';
 import { AuthService } from '../services/auth.service';
 import { UserEditModalComponent } from './user-edit-modal.component';
 
@@ -40,11 +40,11 @@ export class UserManagementComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private platformId = inject(PLATFORM_ID);
 
-  users: User[] = [];
+  users: UserFragment[] = [];
   displayedColumns: string[] = ['username', 'roles', 'actions'];
   loading = false;
   currentUser: any = null;
-  
+
   // For template access to Role values
   ROLES = {
     USER: 'USER' as Role,
@@ -70,7 +70,7 @@ export class UserManagementComponent implements OnInit {
   private loadUsers(): void {
     this.loading = true;
     this.userService.getUsers().subscribe({
-      next: (users: User[]) => {
+      next: (users: UserFragment[]) => {
         this.users = users;
         this.loading = false;
       },
@@ -85,7 +85,7 @@ export class UserManagementComponent implements OnInit {
   openCreateUserModal(): void {
     const dialogRef = this.dialog.open(UserEditModalComponent, {
       width: '500px',
-      data: { 
+      data: {
         isEdit: false,
         canEditRoles: this.canCurrentUserManageUsers()
       }
@@ -98,11 +98,11 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  openEditUserModal(user: User): void {
+  openEditUserModal(user: UserFragment): void {
     const dialogRef = this.dialog.open(UserEditModalComponent, {
       width: '500px',
-      data: { 
-        isEdit: true, 
+      data: {
+        isEdit: true,
         user: { ...user },
         canEditRoles: this.canCurrentUserManageUsers()
       }
@@ -117,7 +117,7 @@ export class UserManagementComponent implements OnInit {
 
   private createUser(userData: any): void {
     this.userService.createUser(userData).subscribe({
-      next: (user: User) => {
+      next: (user: UserFragment) => {
         this.showSnackBar('User created successfully');
         this.loadUsers();
       },
@@ -130,7 +130,7 @@ export class UserManagementComponent implements OnInit {
 
   private updateUser(id: string, userData: any): void {
     this.userService.updateUser(id, userData).subscribe({
-      next: (user: User) => {
+      next: (user: UserFragment) => {
         this.showSnackBar('User updated successfully');
         this.loadUsers();
       },
@@ -141,7 +141,7 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  deleteUser(user: User): void {
+  deleteUser(user: UserFragment): void {
     if (confirm(`Are you sure you want to delete user "${user.username}"?`)) {
       this.userService.deleteUser(user.id).subscribe({
         next: (success: boolean) => {
@@ -156,7 +156,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  resetUserPassword(user: User): void {
+  resetUserPassword(user: UserFragment): void {
     const newPassword = prompt(`Enter new password for ${user.username}:`);
     if (newPassword && newPassword.trim()) {
       this.userService.updateUserPassword(user.id, newPassword.trim()).subscribe({
@@ -172,7 +172,7 @@ export class UserManagementComponent implements OnInit {
   }
 
   canCurrentUserManageUsers(): boolean {
-    return this.currentUser?.roles?.some((role: string) => 
+    return this.currentUser?.roles?.some((role: string) =>
       role === 'ADMIN' || role === 'OWNER'
     ) || false;
   }
@@ -181,14 +181,14 @@ export class UserManagementComponent implements OnInit {
     return this.currentUser?.roles?.includes('OWNER') || false;
   }
 
-  canDeleteUser(user: User): boolean {
+  canDeleteUser(user: UserFragment): boolean {
     // Can't delete OWNER users or yourself
     const isOwner = user.roles.includes('OWNER');
     const isSelf = user.username === this.currentUser?.username;
     return this.canCurrentUserDeleteUsers() && !isOwner && !isSelf;
   }
 
-  canEditUser(user: User): boolean {
+  canEditUser(user: UserFragment): boolean {
     return this.canCurrentUserManageUsers();
   }
 

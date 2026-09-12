@@ -2,15 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GraphqlGuard } from './graphql.guard';
 import { AuthService } from '../services/auth.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('GraphqlGuard', () => {
   let guard: GraphqlGuard;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockAuthService: SpyObj<AuthService>;
+  let mockRouter: SpyObj<Router>;
 
   beforeEach(() => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated']);
-    const routerSpy = jasmine.createSpyObj('Router', ['parseUrl']);
+    const authServiceSpy = createSpyObj<AuthService>('AuthService', ['isAuthenticated']);
+    const routerSpy = createSpyObj<Router>('Router', ['parseUrl']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -21,8 +22,8 @@ describe('GraphqlGuard', () => {
     });
 
     guard = TestBed.inject(GraphqlGuard);
-    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockAuthService = TestBed.inject(AuthService) as unknown as SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as unknown as SpyObj<Router>;
   });
 
   it('should be created', () => {
@@ -30,7 +31,7 @@ describe('GraphqlGuard', () => {
   });
 
   it('should allow access when user is authenticated', () => {
-    mockAuthService.isAuthenticated.and.returnValue(true);
+    mockAuthService.isAuthenticated.mockReturnValue(true);
     
     const result = guard.canActivate();
     
@@ -39,8 +40,8 @@ describe('GraphqlGuard', () => {
 
   it('should redirect to login when user is not authenticated', () => {
     const mockUrlTree = {} as any;
-    mockAuthService.isAuthenticated.and.returnValue(false);
-    mockRouter.parseUrl.and.returnValue(mockUrlTree);
+    mockAuthService.isAuthenticated.mockReturnValue(false);
+    mockRouter.parseUrl.mockReturnValue(mockUrlTree);
     
     const result = guard.canActivate();
     

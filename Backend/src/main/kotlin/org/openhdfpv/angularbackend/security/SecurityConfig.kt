@@ -61,12 +61,17 @@ class SecurityConfig(
                         rp.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                     }
                     .contentSecurityPolicy { csp ->
-                        csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'")
+                        // Für GraphiQL im Dev-Env werden 'unsafe-inline' und 'unsafe-eval' benötigt, damit der Editor geladen werden kann
+                        csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; img-src 'self' data:;")
                     }
                     .xssProtection { xss ->
                         xss.headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                     }
                     .addHeaderWriter(XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.DENY))
+            }
+            .securityContext { context ->
+                // Verhindert 403-Fehler bei asynchronen Dispatches (wie GraphQL-Queries & /error Weiterleitungen) unter Spring Security 6/7
+                context.requireExplicitSave(false)
             }
             .authorizeHttpRequests { auth ->
                 auth
@@ -75,14 +80,16 @@ class SecurityConfig(
                         "/image_list/**",
                         "/image_lists/**",
                         "/download/**",
+                        "/graphql",
+                        "/graphql/**",
                         "/graphiql",
+                        "/graphiql/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/api-docs/**",
                         "/actuator/health",
                         "/error",
                     ).permitAll()
-                    .requestMatchers("/graphql").authenticated()
                     .requestMatchers("/actuator/prometheus").permitAll()
                     .requestMatchers("/actuator/health/**").permitAll()
                     .requestMatchers("/actuator/**").hasAuthority("ADMIN")

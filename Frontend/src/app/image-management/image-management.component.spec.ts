@@ -5,14 +5,15 @@ import { of } from 'rxjs';
 
 import { ImageManagementComponent } from './image-management.component';
 import { GraphqlService } from '../services/graphql.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('ImageManagementComponent', () => {
   let component: ImageManagementComponent;
   let fixture: ComponentFixture<ImageManagementComponent>;
-  let mockGraphqlService: jasmine.SpyObj<GraphqlService>;
+  let mockGraphqlService: SpyObj<GraphqlService>;
 
   beforeEach(async () => {
-    const graphqlServiceSpy = jasmine.createSpyObj('GraphqlService', [
+    const graphqlServiceSpy = createSpyObj<GraphqlService>('GraphqlService', [
       'getAllImages', 
       'deleteImage',
       'getImagesListsWithCategories'
@@ -22,7 +23,7 @@ describe('ImageManagementComponent', () => {
     const queryRef = {
       valueChanges: of({ data: { imagesLists: [] } })
     };
-    graphqlServiceSpy.getImagesListsWithCategories.and.returnValue(queryRef);
+    graphqlServiceSpy.getImagesListsWithCategories.mockReturnValue(queryRef as any);
 
     await TestBed.configureTestingModule({
       imports: [ImageManagementComponent, NoopAnimationsModule, ApolloTestingModule],
@@ -34,7 +35,7 @@ describe('ImageManagementComponent', () => {
 
     fixture = TestBed.createComponent(ImageManagementComponent);
     component = fixture.componentInstance;
-    mockGraphqlService = TestBed.inject(GraphqlService) as jasmine.SpyObj<GraphqlService>;
+    mockGraphqlService = TestBed.inject(GraphqlService) as unknown as SpyObj<GraphqlService>;
     fixture.detectChanges();
   });
 

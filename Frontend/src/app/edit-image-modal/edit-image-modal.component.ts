@@ -3,7 +3,7 @@ import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 
-import {Image, ImageFragment, ImageListFragment, OsCategoryFragment} from '../graphql/generated';
+import { ImageFragment, ImageListFragment, OsCategoryFragment } from '../graphql/generated';
 import { GraphqlService } from '../services/graphql.service';
 
 @Component({
@@ -21,7 +21,7 @@ export class EditImageModalComponent {
   iconPreview?: string;
   graphql = inject(GraphqlService);
   imagesLists: ImageListFragment[] = [];
-  
+
   // New properties for the redesigned modal
   currentIcon?: string;
   newUrlInput = '';
@@ -84,7 +84,7 @@ export class EditImageModalComponent {
   toggleList(listId: string, event: any) {
     const numericId = Number(listId);
     const currentLists = this.imageForm.get('imagesLists')?.value || [];
-    
+
     if (event.target.checked) {
       if (!currentLists.includes(numericId)) {
         this.imageForm.get('imagesLists')?.setValue([...currentLists, numericId]);
@@ -99,7 +99,7 @@ export class EditImageModalComponent {
   toggleListById(listId: string) {
     const numericId = Number(listId);
     const currentLists = this.imageForm.get('imagesLists')?.value || [];
-    
+
     if (currentLists.includes(numericId)) {
       // Remove from list
       const newValue = currentLists.filter(id => id !== numericId);
@@ -140,7 +140,7 @@ export class EditImageModalComponent {
   ngOnInit() {
     // Initialize available lists
     this.availableLists = this.imagesLists;
-    
+
     if (this.image?.id) {
       this.imageForm.patchValue({
         name: this.image.name,
@@ -153,14 +153,14 @@ export class EditImageModalComponent {
         categoryId: this.image.category?.id || '',
         redirectsCount: this.image.redirectsCount || 0
       });
-      
+
       // Load URLs into new format
       this.imageUrls = this.image.urls.map(url => ({
         url: url.url,
         isAvailable: url.isAvailable,
         isDefault: url.isDefault || false
       }));
-      
+
       if (this.image?.icon) {
         this.iconPreview = this.image.icon;
         this.currentIcon = this.image.icon;

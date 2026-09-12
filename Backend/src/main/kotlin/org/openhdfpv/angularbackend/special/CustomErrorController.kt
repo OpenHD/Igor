@@ -11,20 +11,18 @@ import org.springframework.web.bind.annotation.RequestMapping
 class CustomErrorController : ErrorController {
 
     @RequestMapping("/error")
-    fun handleError(request: HttpServletRequest): String {
+    @org.springframework.web.bind.annotation.ResponseBody
+    fun handleError(request: HttpServletRequest): org.springframework.http.ResponseEntity<Map<String, Any>> {
         val status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)
-
-        if (status != null) {
-            val statusCode = status.toString().toInt()
-
-            if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                return "error-404"
-            } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                return "error-500"
-            } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-                return "error-403"
-            }
-        }
-        return "error"
+        val statusCode = status?.toString()?.toIntOrNull() ?: 500
+        
+        val errorAttributes = mapOf(
+            "timestamp" to java.util.Date(),
+            "status" to statusCode,
+            "error" to HttpStatus.valueOf(statusCode).reasonPhrase,
+            "message" to (request.getAttribute(RequestDispatcher.ERROR_MESSAGE) ?: "No message available")
+        )
+        
+        return org.springframework.http.ResponseEntity(errorAttributes, HttpStatus.valueOf(statusCode))
     }
 }

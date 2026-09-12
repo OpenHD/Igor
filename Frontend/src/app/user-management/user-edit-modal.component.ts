@@ -9,11 +9,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Role, User } from '../graphql/generated';
+import { Role, UserFragment } from '../graphql/generated';
 
 interface DialogData {
   isEdit: boolean;
-  user?: User;
+  user?: UserFragment;
   canEditRoles?: boolean;
 }
 
@@ -42,7 +42,7 @@ interface DialogData {
 
     <mat-dialog-content class="modal-content">
       <form [formGroup]="userForm" class="user-form">
-        
+
         <!-- Username Field -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
@@ -71,8 +71,8 @@ interface DialogData {
         <div class="roles-section" *ngIf="data.canEditRoles">
           <h3>User Roles</h3>
           <div class="roles-grid">
-            <mat-checkbox 
-              *ngFor="let role of availableRoles" 
+            <mat-checkbox
+              *ngFor="let role of availableRoles"
               [checked]="isRoleSelected(role)"
               (change)="toggleRole(role, $event.checked)"
               [disabled]="!canToggleRole(role)"
@@ -104,9 +104,9 @@ interface DialogData {
 
     <mat-dialog-actions class="modal-actions">
       <button mat-button (click)="onCancel()">Cancel</button>
-      <button 
-        mat-raised-button 
-        color="primary" 
+      <button
+        mat-raised-button
+        color="primary"
         (click)="onSave()"
         [disabled]="!userForm.valid || selectedRoles.length === 0">
         {{ data.isEdit ? 'Update' : 'Create' }}

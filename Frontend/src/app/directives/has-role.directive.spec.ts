@@ -2,17 +2,18 @@ import { TestBed } from '@angular/core/testing';
 import { TemplateRef, ViewContainerRef } from '@angular/core';
 import { HasRoleDirective } from './has-role.directive';
 import { AuthService } from '../services/auth.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('HasRoleDirective', () => {
   let directive: HasRoleDirective;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockTemplateRef: jasmine.SpyObj<TemplateRef<any>>;
-  let mockViewContainerRef: jasmine.SpyObj<ViewContainerRef>;
+  let mockAuthService: SpyObj<AuthService>;
+  let mockTemplateRef: SpyObj<TemplateRef<any>>;
+  let mockViewContainerRef: SpyObj<ViewContainerRef>;
 
   beforeEach(() => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['hasRole']);
-    const templateRefSpy = jasmine.createSpyObj('TemplateRef', ['createEmbeddedView']);
-    const viewContainerRefSpy = jasmine.createSpyObj('ViewContainerRef', ['createEmbeddedView', 'clear']);
+    const authServiceSpy = createSpyObj<AuthService>('AuthService', ['hasRole']);
+    const templateRefSpy = createSpyObj<TemplateRef<any>>('TemplateRef', ['createEmbeddedView']);
+    const viewContainerRefSpy = createSpyObj<ViewContainerRef>('ViewContainerRef', ['createEmbeddedView', 'clear']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -20,12 +21,16 @@ describe('HasRoleDirective', () => {
       ]
     });
 
-    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockAuthService = TestBed.inject(AuthService) as unknown as SpyObj<AuthService>;
     mockTemplateRef = templateRefSpy;
     mockViewContainerRef = viewContainerRefSpy;
     
     // Fix: Provide all required constructor arguments
-    directive = new HasRoleDirective(mockTemplateRef, mockViewContainerRef, mockAuthService);
+    directive = new HasRoleDirective(
+      mockTemplateRef as unknown as TemplateRef<any>,
+      mockViewContainerRef as unknown as ViewContainerRef,
+      mockAuthService as unknown as AuthService
+    );
   });
 
   it('should create an instance', () => {
@@ -33,7 +38,7 @@ describe('HasRoleDirective', () => {
   });
 
   it('should create embedded view when user has required role', () => {
-    mockAuthService.hasRole.and.returnValue(true);
+    mockAuthService.hasRole.mockReturnValue(true);
     
     directive.appHasRole = ['admin'];
     
@@ -41,7 +46,7 @@ describe('HasRoleDirective', () => {
   });
 
   it('should clear view when user does not have required role', () => {
-    mockAuthService.hasRole.and.returnValue(false);
+    mockAuthService.hasRole.mockReturnValue(false);
     
     directive.appHasRole = ['admin'];
     

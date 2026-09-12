@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EditImageModalComponent } from '../edit-image-modal/edit-image-modal.component';
 import {GraphqlService} from '../services/graphql.service';
-import {Image, ImageFragment, OsCategoryFragment, ImageListFragment} from '../graphql/generated';
+import { ImageFragment, OsCategoryFragment, ImageListFragment } from '../graphql/generated';
 import { LoadingStateService } from '../services/loading-state.service';
 
 @Component({
@@ -27,7 +27,7 @@ export class ImageManagementComponent {
   currentView: 'grid' | 'list' = 'grid';
   imagesLists: ImageListFragment[] = [];
   selectedListId: string | null = null;
-  
+
   isLoading$;
 
   constructor() {
@@ -43,9 +43,14 @@ export class ImageManagementComponent {
 
     this.graphql.getImagesListsWithCategories().valueChanges.subscribe({
       next: ({ data }) => {
+        if (!data) {
+          this.loadingStateService.setLoading('image-management', false);
+          return;
+        }
+
         const previousSelectedId = this.selectedListId; // Vorherige ID speichern
-        this.imagesLists = data.imagesLists;
-        this.categories = data.osCategories;
+        this.imagesLists = (data.imagesLists as ImageListFragment[]) || [];
+        this.categories = (data.osCategories as OsCategoryFragment[]) || [];
 
         // Behalte die ausgewählte Liste, wenn sie noch existiert
         if (this.imagesLists.length > 0) {
@@ -54,7 +59,7 @@ export class ImageManagementComponent {
         } else {
           this.selectedListId = null;
         }
-        
+
         this.loadingStateService.setLoading('image-management', false);
       },
       error: (err) => {
@@ -78,7 +83,7 @@ export class ImageManagementComponent {
     return this.imagesLists.find(list => list.id === this.selectedListId);
   }
 
-  selectImage(image: Image) {
+  selectImage(image: ImageFragment) {
     this.openEditModal(image);
   }
 
@@ -115,10 +120,10 @@ export class ImageManagementComponent {
     this.graphql.updateImagePartial(image.id, { categoryId }).subscribe({
       next: () => {
         // Direktes Update im State
-        const updatedImage = {...image, category: this.categories.find(c => c.id === categoryId)};
+        const updatedImage = {...image, category: (this.categories.find(c => c.id === categoryId) as OsCategoryFragment)};
         this.imagesLists = this.imagesLists.map(list => ({
           ...list,
-          images: list.images.map(img => img.id === image.id ? updatedImage : img)
+          images: list.images.map(img => img.id === image.id ? (updatedImage as ImageFragment) : (img as ImageFragment))
         }));
       }
     });
@@ -131,7 +136,7 @@ export class ImageManagementComponent {
         const updatedImage = {...image, isEnabled};
         this.imagesLists = this.imagesLists.map(list => ({
           ...list,
-          images: list.images.map(img => img.id === image.id ? updatedImage : img)
+          images: list.images.map(img => img.id === image.id ? (updatedImage as ImageFragment) : (img as ImageFragment))
         }));
       }
     });

@@ -4,14 +4,15 @@ import { ApolloTestingModule } from 'apollo-angular/testing';
 
 import { OsCategoryManagementComponent } from './os-category-management.component';
 import { GraphqlService } from '../services/graphql.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('OsCategoryManagementComponent', () => {
   let component: OsCategoryManagementComponent;
   let fixture: ComponentFixture<OsCategoryManagementComponent>;
-  let mockGraphqlService: jasmine.SpyObj<GraphqlService>;
+  let mockGraphqlService: SpyObj<GraphqlService>;
 
   beforeEach(async () => {
-    const graphqlServiceSpy = jasmine.createSpyObj('GraphqlService', ['getAllOsCategories', 'deleteOsCategory']);
+    const graphqlServiceSpy = createSpyObj<GraphqlService>('GraphqlService', ['getAllOsCategories', 'deleteOsCategory']);
 
     await TestBed.configureTestingModule({
       imports: [OsCategoryManagementComponent, NoopAnimationsModule, ApolloTestingModule],
@@ -23,7 +24,7 @@ describe('OsCategoryManagementComponent', () => {
 
     fixture = TestBed.createComponent(OsCategoryManagementComponent);
     component = fixture.componentInstance;
-    mockGraphqlService = TestBed.inject(GraphqlService) as jasmine.SpyObj<GraphqlService>;
+    mockGraphqlService = TestBed.inject(GraphqlService) as unknown as SpyObj<GraphqlService>;
     fixture.detectChanges();
   });
 

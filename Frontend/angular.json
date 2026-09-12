@@ -92,9 +92,11 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:vitest",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "configFile": "vitest.config.ts"
+            "runner": "vitest",
+            "runnerConfig": true,
+            "buildTarget": "OpenHD-Management-Frontend:build"
           }
         }
       }

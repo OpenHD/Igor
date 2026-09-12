@@ -6,23 +6,24 @@ import { EMPTY } from 'rxjs';
 
 import { NavbarComponent } from './navbar.component';
 import { AuthService } from '../services/auth.service';
+import { createSpyObj, SpyObj } from '../../testing/create-spy-obj';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  let mockAuthService: jasmine.SpyObj<AuthService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockAuthService: SpyObj<AuthService>;
+  let mockRouter: SpyObj<Router>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['logout', 'isAuthenticated', 'getCurrentUser']);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'createUrlTree', 'serializeUrl'], {
+    const authServiceSpy = createSpyObj<AuthService>('AuthService', ['logout', 'isAuthenticated', 'getCurrentUser']);
+    const routerSpy = createSpyObj<Router>('Router', ['navigate', 'createUrlTree', 'serializeUrl'], {
       events: EMPTY  // Add events as a property
     });
-    const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', ['snapshot']);
+    const activatedRouteSpy = createSpyObj<ActivatedRoute>('ActivatedRoute', ['snapshot']);
 
     // Configure router mocks
-    routerSpy.createUrlTree.and.returnValue({} as any);
-    routerSpy.serializeUrl.and.returnValue('/mock-url');
+    routerSpy.createUrlTree.mockReturnValue({} as any);
+    routerSpy.serializeUrl.mockReturnValue('/mock-url');
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent, NoopAnimationsModule],
@@ -37,8 +38,8 @@ describe('NavbarComponent', () => {
 
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
-    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockAuthService = TestBed.inject(AuthService) as unknown as SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as unknown as SpyObj<Router>;
     fixture.detectChanges();
   });
 
