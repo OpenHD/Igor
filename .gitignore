@@ -43,5 +43,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# AI Artifacts
+.artifacts/
+
 # Docker
 **/.docker/

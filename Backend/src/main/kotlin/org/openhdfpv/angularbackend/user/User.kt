@@ -5,35 +5,29 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.*
 
-
 @Entity
 @Table(name = "users")
 class User(
-    @Column(unique = true)
-    private var username: String,
-    private var password: String,
+    @Column(unique = true, nullable = false)
+    private var username: String = "",
+
+    @Column(nullable = false)
+    private var password: String = "",
 
     @ElementCollection(fetch = FetchType.EAGER, targetClass = Role::class)
     @CollectionTable(name = "user_roles", joinColumns = [JoinColumn(name = "user_id")])
     @Column(name = "roles")
     @Enumerated(EnumType.STRING)
-    var roles: MutableSet<Role>,
-) : UserDetails {
+    var roles: MutableSet<Role> = mutableSetOf()
+) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    lateinit var id: UUID
-        private set
+    var id: UUID? = null
 
-    override fun getAuthorities(): Collection<GrantedAuthority> = roles
-    override fun getUsername() = username
-    override fun getPassword() = password
-    override fun isAccountNonExpired(): Boolean = true
-    override fun isAccountNonLocked(): Boolean = true
-    override fun isCredentialsNonExpired(): Boolean = true
-    override fun isEnabled(): Boolean = true
+    fun getUsername(): String = username
+    fun getPassword(): String = password
     
-    // Methods for updating user properties
     fun updateUsername(newUsername: String) {
         this.username = newUsername
     }

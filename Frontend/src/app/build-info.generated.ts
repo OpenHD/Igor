@@ -10,13 +10,13 @@ export interface BuildInfoEntry {
   commit?: string;
 }
 export const BUILD_INFO: BuildInfoMeta = {
-  "generatedAt": "2025-10-06T09:12:37.214Z",
+  "generatedAt": "2026-09-05T17:08:11.341Z",
   "frontend": {
-    "buildTimestamp": "2025-10-02T17:13:25+02:00",
-    "commit": "e61c58696e1db67b189977f6f5276f7d412809a0"
+    "buildTimestamp": "2025-11-11T20:30:09+01:00",
+    "commit": "ba003a7d49586e109b3666edbb33d3700bdd3604"
   },
   "backend": {
-    "buildTimestamp": "2025-10-02T16:48:39+02:00",
-    "commit": "106aaa33e889535584ae7d0b14a47052d5fb72f3"
+    "buildTimestamp": "2026-05-20T11:47:41+02:00",
+    "commit": "332b924a60b9ba020b35d815debd4ae5d275a0cf"
   }
 };

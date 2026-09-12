@@ -20,16 +20,22 @@ class ImageService(
 
     private val logger = LoggerFactory.getLogger(ImageService::class.java)
 
-    fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> =
-        imageEntity?.let { entity ->
-            // Increment the redirect count directly (instead of using copy())
-            entity.redirectsCount = entity.redirectsCount + 1
-            buildImagesRepository.save(entity)
-            ResponseEntity.status(HttpStatus.FOUND)
-                .header("Location", entity.getCurrentAvailableUrl())
-                .build()
-        } ?: ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("ImageEntity not found.")
+    fun handleRedirect(imageEntity: ImageEntity?): ResponseEntity<Any> {
+        if (imageEntity == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ImageEntity not found.")
+        
+        // Increment the redirect count directly (instead of using copy())
+        imageEntity.redirectsCount = imageEntity.redirectsCount + 1
+        buildImagesRepository.save(imageEntity)
+        
+        val url: String? = imageEntity.getCurrentAvailableUrl()
+        if (url.isNullOrBlank()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No available URL found for this image.")
+        }
+
+        return ResponseEntity.status(HttpStatus.FOUND)
+            .header("Location", url)
+            .build()
+    }
 
     fun findBySha256(sha256: String): ImageEntity? =
         buildImagesRepository.findByExtractSha256(sha256)

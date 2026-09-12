@@ -11,21 +11,20 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 @Profile("!test")
 class UserInitializer(
-    private val userRepository: UserRepository,
+    private val userRepository: UserPersistenceRepository,
     private val passwordEncoder: PasswordEncoder,
     private val userProperties: UserProperties
 ) : ApplicationRunner {
 
     @Transactional
-    override fun run(args: ApplicationArguments?) {
-        if (userRepository.findByUsername(userProperties.username) == null) {
-            userRepository.save(
-                User(
-                    username = userProperties.username,
-                    password = passwordEncoder.encode(userProperties.password),
-                    roles = userProperties.roles.map { Role.valueOf(it) }.toMutableSet()
-                )
-            )
+    override fun run(args: ApplicationArguments) {
+        val name = userProperties.username ?: "admin"
+        val existing = userRepository.findByUsername(name)
+        if (existing == null) {
+            val pass = userProperties.password ?: "password"
+            val roles = (userProperties.roles ?: emptyList()).map { Role.valueOf(it) }.toMutableSet()
+            val newUser = User(name, passwordEncoder.encode(pass)!!, roles)
+            userRepository.save(newUser)
         }
     }
 }
@@ -33,7 +32,7 @@ class UserInitializer(
 @Component
 @ConfigurationProperties(prefix = "default-user")
 class UserProperties {
-    lateinit var username: String
-    lateinit var password: String
-    lateinit var roles: List<String>
+    var username: String? = null
+    var password: String? = null
+    var roles: List<String>? = null
 }

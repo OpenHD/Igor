@@ -1,5 +1,8 @@
 package org.openhdfpv.angularbackend.user
 
+import org.jspecify.annotations.NullMarked
+import org.jspecify.annotations.Nullable
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -8,18 +11,20 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
+@NullMarked
 class UserService(
-    private val userRepository: UserRepository,
+    private val userRepository: UserPersistenceRepository,
     private val passwordEncoder: PasswordEncoder
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(username: String) =
-        userRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("User not found")
+    override fun loadUserByUsername(username: String): UserDetails {
+        val user = userRepository.findByUsername(username)
+        return user?.let { UserPrincipal(it) } ?: throw UsernameNotFoundException("User not found")
+    }
 
     fun getAllUsers(): List<User> = userRepository.findAll()
 
-    fun getUserById(id: UUID): User? = userRepository.findById(id).orElse(null)
+    fun getUserById(id: UUID): @Nullable User = userRepository.findById(id).orElse(null)
 
     @Transactional
     fun createUser(username: String, password: String, roles: Set<Role>): User {
@@ -29,20 +34,20 @@ class UserService(
         
         val user = User(
             username = username,
-            password = passwordEncoder.encode(password),
+            password = requireNotNull(passwordEncoder.encode(password)),
             roles = roles.toMutableSet()
         )
         return userRepository.save(user)
     }
 
     @Transactional
-    fun updateUser(id: UUID, username: String?, roles: Set<Role>?): User {
+    fun updateUser(id: UUID, username: @Nullable String?, roles: @Nullable Set<Role>?): User {
         val user = userRepository.findById(id).orElseThrow { 
             IllegalArgumentException("User not found") 
         }
         
         // Prevent changing username to existing one
-        if (username != null && username != user.username) {
+        if (username != null && username != user.getUsername()) {
             if (userRepository.findByUsername(username) != null) {
                 throw IllegalArgumentException("Username already exists")
             }
@@ -63,7 +68,7 @@ class UserService(
             IllegalArgumentException("User not found") 
         }
         
-        user.updatePassword(passwordEncoder.encode(newPassword))
+        user.updatePassword(requireNotNull(passwordEncoder.encode(newPassword)))
         return userRepository.save(user)
     }
 

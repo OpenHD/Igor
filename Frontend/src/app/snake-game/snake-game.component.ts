@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, Inject, PLATFORM_ID, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild, HostListener, Inject, PLATFORM_ID, NgZone, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -6,7 +6,8 @@ import { isPlatformBrowser } from '@angular/common';
   selector: 'app-snake-game',
   imports: [RouterModule],
   templateUrl: './snake-game.component.html',
-  styleUrl: './snake-game.component.scss'
+  styleUrl: './snake-game.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('playBoard', { static: false }) playBoard!: ElementRef;
@@ -23,7 +24,11 @@ export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
   score = 0;
   highScore = 0;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -82,6 +87,7 @@ export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.velocityY = 0;
     this.changeFoodPosition();
     this.startGame();
+    this.cdr.markForCheck();
   }
 
   changeDirection(event: KeyboardEvent) {
@@ -107,7 +113,7 @@ export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initGame() {
     if (this.gameOver) return this.handleGameOver();
-    
+
     if (!this.playBoard?.nativeElement) {
       console.error('PlayBoard element not found');
       return;
@@ -119,7 +125,7 @@ export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.snakeX === this.foodX && this.snakeY === this.foodY) {
       this.changeFoodPosition();
       this.snakeBody.push([this.foodX, this.foodY]);
-      
+
       this.score++;
       this.highScore = this.score >= this.highScore ? this.score : this.highScore;
       if (isPlatformBrowser(this.platformId)) {
@@ -152,5 +158,6 @@ export class SnakeGameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.playBoard.nativeElement.innerHTML = htmlMarkup;
+    this.cdr.markForCheck();
   }
 }

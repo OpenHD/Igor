@@ -34,20 +34,20 @@ export class GraphqlService {
 
   private handleError = (error: any) => {
     console.error('GraphQL Error:', error);
-    
+
     if (error.networkError) {
       this.errorBannerService.setBackendConnectivity(false);
-      
+
       if (error.networkError.status === 401) {
         console.warn('Authentication failed in GraphQL request, logging out user');
         this.authService.logout();
         return throwError(() => error);
       }
     }
-    
+
     if (error.graphQLErrors) {
       for (const graphQLError of error.graphQLErrors) {
-        if (graphQLError.extensions?.code === 'UNAUTHENTICATED' || 
+        if (graphQLError.extensions?.code === 'UNAUTHENTICATED' ||
             graphQLError.message?.toLowerCase().includes('unauthorized') ||
             graphQLError.message?.toLowerCase().includes('authentication') ||
             graphQLError.message?.toLowerCase().includes('invalid token') ||
@@ -58,7 +58,7 @@ export class GraphqlService {
         }
       }
     }
-    
+
     return throwError(() => error);
   };
 
@@ -67,14 +67,14 @@ export class GraphqlService {
       query: GetAllImagesWithCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
-    
+
     query.valueChanges.pipe(
       catchError(this.handleError)
     ).subscribe({
       next: () => this.errorBannerService.setBackendConnectivity(true),
       error: () => {} // Already handled in handleError
     });
-    
+
     return query;
   }
 
@@ -113,14 +113,14 @@ export class GraphqlService {
       query: GetOsCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
-    
+
     query.valueChanges.pipe(
       catchError(this.handleError)
     ).subscribe({
       next: () => this.errorBannerService.setBackendConnectivity(true),
       error: () => {}
     });
-    
+
     return query;
   }
 
@@ -159,14 +159,14 @@ export class GraphqlService {
       query: GetAllImagesListsWithCategoriesDocument,
       fetchPolicy: 'cache-and-network'
     });
-    
+
     query.valueChanges.pipe(
       catchError(this.handleError)
     ).subscribe({
       next: () => this.errorBannerService.setBackendConnectivity(true),
       error: () => {}
     });
-    
+
     return query;
   }
 

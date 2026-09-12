@@ -1,0 +1,7 @@
+allowBuilds:
+  '@nestjs/core': true
+  '@parcel/watcher': true
+  esbuild: true
+  libxmljs2: true
+  lmdb: true
+  msgpackr-extract: true
