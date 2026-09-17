@@ -46,7 +46,7 @@
     "@angular/cli": "^22.1.5",
     "@angular/compiler-cli": "^22.1.5",
     "@angular/localize": "^22.1.5",
-    "@cyclonedx/cyclonedx-npm": "^4.2.1",
+    "@cyclonedx/cyclonedx-npm": "^6.0.0",
     "@graphql-codegen/cli": "^7.4.1",
     "@graphql-codegen/typescript": "^6.1.0",
     "@graphql-codegen/typescript-apollo-angular": "^5.0.1",
