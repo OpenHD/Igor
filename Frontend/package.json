@@ -58,6 +58,6 @@
     "jsdom": "^26.0.0",
     "libxmljs2": "0.37.0",
     "typescript": "~6.0.2",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.11"
   }
 }
