@@ -43,7 +43,7 @@
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "^2.7.2",
     "@angular/build": "^22.1.5",
-    "@angular/cli": "^22.1.5",
+    "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.1.5",
     "@angular/localize": "^22.1.5",
     "@cyclonedx/cyclonedx-npm": "^4.2.1",
