@@ -27,12 +27,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Setup pnpm using the dedicated action
       # Documentation: https://github.com/pnpm/action-setup
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v6
         with:
           # Specify your desired pnpm version. Using a specific major version like '8'
           # helps ensure consistency between local dev and CI if you use v8 locally.
@@ -41,7 +41,7 @@ jobs:
       # Setup Node.js using the actions/setup-node action
       # Documentation: https://github.com/actions/setup-node
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           # Specify the Node.js version your project uses (e.g., '18.x', '20.x')
           # Ensure this matches the version used in your Dockerfile and local dev if possible
