@@ -88,8 +88,8 @@ importers:
         specifier: ^22.1.5
         version: 22.1.6(@angular/compiler-cli@22.1.6(@angular/compiler@22.1.6)(typescript@6.0.3))(@angular/compiler@22.1.6)
       '@cyclonedx/cyclonedx-npm':
-        specifier: ^4.2.1
-        version: 4.2.1(supports-color@7.2.0)
+        specifier: ^6.0.0
+        version: 6.0.1(supports-color@7.2.0)
       '@graphql-codegen/cli':
         specifier: ^7.4.1
         version: 7.4.1(@parcel/watcher@2.6.0)(@types/node@22.20.1)(graphql@17.0.2)(supports-color@7.2.0)(typescript@6.0.3)
@@ -580,8 +580,8 @@ packages:
       xmlbuilder2:
         optional: true
 
-  '@cyclonedx/cyclonedx-npm@4.2.1':
-    resolution: {integrity: sha512-SOA/96sf0wsgUYCRtFkLFm6WoFhG+q1BxdC84hPSn9J3xWlH1e7OnTPJT+WNUzTqzX1nSm5JhjRX4krozu2X+g==}
+  '@cyclonedx/cyclonedx-npm@6.0.1':
+    resolution: {integrity: sha512-/aU3bBC6qP6cV/qQ5SfUSygE/+2hQhwgg6sJML31/gZ96NyMvIUuwdk637H4z+LS/NryRT2kjR2wtD0qBEVVHQ==}
     engines: {node: '>=20.18.0', npm: '>=9'}
     hasBin: true
 
@@ -5553,7 +5553,7 @@ snapshots:
       spdx-expression-parse: 4.0.0
       xmlbuilder2: 4.0.3
 
-  '@cyclonedx/cyclonedx-npm@4.2.1(supports-color@7.2.0)':
+  '@cyclonedx/cyclonedx-npm@6.0.1(supports-color@7.2.0)':
     dependencies:
       '@cyclonedx/cyclonedx-library': 10.2.0(ajv-formats-draft2019@1.6.1(ajv@8.20.0))(ajv-formats@3.0.1(ajv@8.20.0))(ajv@8.20.0)(libxmljs2@0.37.0(supports-color@7.2.0))(packageurl-js@2.0.1)(spdx-expression-parse@4.0.0)(xmlbuilder2@4.0.3)
       commander: 14.0.3
